@@ -1,0 +1,8 @@
+retra
+*.o
+README.md
+evolution/*
+tools/*
+*.ppm
+*.jpg
+*.vim

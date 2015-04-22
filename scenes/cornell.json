@@ -1,0 +1,460 @@
+{
+
+    "scene": [
+
+        { "lighttriangle": {
+            "emission": [1177.6, 998.4, 512.0],
+            "background": false,
+            "backculled": true,
+            "points": [ [343, 548.8, 227],
+                        [343, 548.8, 332],
+                        [213, 548.8, 332] ]
+            }
+        },
+        { "lighttriangle": {
+            "emission": [1177.6, 998.4, 512.0],
+            "background": false,
+            "backculled": true,
+            "points": [ [343, 548.8, 227],
+                        [213, 548.8, 332],
+                        [213, 548.8, 227] ]
+            }
+        },
+
+
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": true,
+            "backculled": true,
+            "normal": [0, 1, 0],
+            "offset": 0
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": true,
+            "backculled": true,
+            "normal": [0, -1, 0],
+            "offset": -548.8
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": true,
+            "backculled": true,
+            "normal": [0, 0, -1],
+            "offset": -559.2
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.16, 0.4, 0.11]
+            },
+            "background": true,
+            "backculled": true,
+            "normal": [1, 0, 0],
+            "offset": 0
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.64, 0.063, 0.061]
+            },
+            "background": true,
+            "backculled": true,
+            "normal": [-1, 0, 0],
+            "offset": -556
+            }
+        },
+
+
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [130, 165,  65],
+                        [ 82, 165, 225],
+                        [240, 165, 272] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [130, 165,  65],
+                        [240, 165, 272],
+                        [290, 165, 114] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [290,   0, 114],
+                        [290, 165, 114],
+                        [240, 165, 272] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [240, 165, 272],
+                        [240,   0, 272],
+                        [290,   0, 114] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [130,   0,  65],
+                        [130, 165,  65],
+                        [290, 165, 114] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [290, 165, 114],
+                        [290,   0, 114],
+                        [130,   0,  65] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [ 82,   0, 225],
+                        [ 82, 165, 225],
+                        [130, 165,  65] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [130, 165,  65],
+                        [130,   0,  65],
+                        [ 82,   0, 225] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [240,   0, 272],
+                        [240, 165, 272],
+                        [ 82, 165, 225] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [ 82, 165, 225],
+                        [ 82,   0, 225],
+                        [240,   0, 272] ]
+            }
+        },
+
+
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [423, 330, 247],
+                        [265, 330, 296],
+                        [314, 330, 456] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [314, 330, 456],
+                        [472, 330, 406],
+                        [423, 330, 247] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [423,   0, 247],
+                        [423, 330, 247],
+                        [472, 330, 406] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [472, 330, 406],
+                        [472,   0, 406],
+                        [423,   0, 247] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [472,   0, 406],
+                        [472, 330, 406],
+                        [314, 330, 456] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [314, 330, 456],
+                        [314,   0, 456],
+                        [472,   0, 406] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [314,   0, 456],
+                        [314, 330, 456],
+                        [265, 330, 296] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [265, 330, 296],
+                        [265,   0, 296],
+                        [314,   0, 456] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [265,   0, 296],
+                        [265, 330, 296],
+                        [423, 330, 247] ]
+            }
+        },
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.75, 0.75, 0.75]
+            },
+            "background": false,
+            "backculled": true,
+            "points": [ [423, 330, 247],
+                        [423,   0, 247],
+                        [265,   0, 296] ]
+            }
+        }
+
+    ],
+
+    "camera": {
+        "viewpoint": [278, 273, -800],
+        "screen": [ [556, 548.8, 0], [0, 548.8, 0],
+                    [556, 0, 0], [0, 0, 0] ],
+        "gridresolution": [512, 512]
+    }
+
+}
+

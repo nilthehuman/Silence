@@ -1,0 +1,163 @@
+{
+
+    "scene": [
+
+        { "lightsphere": {
+            "emission": [1, 0.8, 0.6],
+            "background": false,
+            "backculled": true,
+            "center": [0, 6, 0],
+            "radius": 1
+            }
+        },
+        { "lightsphere": {
+            "emission": [0.6, 0.8, 1],
+            "background": false,
+            "backculled": true,
+            "center": [-8, -6, 0],
+            "radius": 1
+            }
+        },
+
+        { "sphere": {
+            "material": {
+                "character": {
+                    "diffuse":    0,
+                    "metallic":   0,
+                    "reflecting": 1,
+                    "refractive": 0
+                },
+                "color": [1, 1, 1]
+            },
+            "background": false,
+            "backculled": true,
+            "center": [-2, -5, -3],
+            "radius": 2
+            }
+        },
+        { "sphere": {
+            "material": {
+                "character": {
+                    "diffuse":    0,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 1
+                },
+                "color": [1, 1, 1],
+                "refractiveindex": 1.4
+            },
+            "background": false,
+            "backculled": false,
+            "center": [4, -5, 2],
+            "radius": 2
+            }
+        },
+
+        { "triangle": {
+            "material": {
+                "character": {
+                    "diffuse":    0.7,
+                    "metallic":   0.1,
+                    "reflecting": 0,
+                    "refractive": 0.2
+                },
+                "color": [0.6, 0.1, 0.2]
+            },
+            "background": false,
+            "backculled": false,
+            "points": [ [-4, -4, 3],
+                        [-5, -6, 3],
+                        [-2, -5, 3] ]
+            }
+        },
+
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.8, 0.1, 0.1]
+            },
+            "background": true,
+            "backculled": false,
+            "normal": [1, 0, 0],
+            "offset": -10
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.1, 0.1, 0.8]
+            },
+            "background": true,
+            "backculled": false,
+            "normal": [-1, 0, 0],
+            "offset": -10
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.1, 0.8, 0.1]
+            },
+            "background": true,
+            "backculled": false,
+            "normal": [0, 0, 1],
+            "offset": -10
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0, 0, 0]
+            },
+            "background": true,
+            "backculled": false,
+            "normal": [0, -1, 0],
+            "offset": -10
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.7, 0.7, 0.7]
+            },
+            "background": true,
+            "backculled": false,
+            "normal": [0, 1, 0],
+            "offset": -10
+            }
+        }
+
+    ],
+
+    "camera": {
+        "viewpoint": [0, 0, 20],
+        "screen": [ [-1, 1, 19], [1, 1, 19], [-1, -1, 19], [1, -1, 19] ],
+        "gridresolution": [512, 512]
+    }
+
+}
