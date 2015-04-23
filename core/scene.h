@@ -246,6 +246,12 @@ namespace Retra {
         friend std::istream& operator>>( std::istream& is, LightTriangle& light );
     };
 
+    struct Sky {
+        RGB color; // Skies are not allowed to be emitters
+
+        friend std::istream& operator>>( std::istream& is, Sky& sky );
+    };
+
     class Scene {
     public:
         Scene() : lights(), things() { }
@@ -264,11 +270,14 @@ namespace Retra {
 
         Triplet getDirectLight( const Vector& point, const Vector& normal ) const; // Total direct illumination from all lightsources to point
 
+        const Sky& getSky() const { return sky; }
+
         friend std::istream& operator>>( std::istream& is, Scene& scene );
 
     private:
         std::vector< Light* > lights;
         std::vector< Thing* > things;
+        Sky sky;
     };
 
 }

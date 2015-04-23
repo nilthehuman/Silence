@@ -44,7 +44,7 @@ namespace Retra {
         else if ( !thingHit )
         {
             // Missed all surfaces. This path ends here
-            paint( RGB::Black ); // TODO: SKY
+            paint( scene->getSky().color );
             depth = -1;
         }
         else

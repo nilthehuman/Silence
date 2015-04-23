@@ -554,9 +554,31 @@ namespace Retra {
         return is;
     }
 
+    std::istream& operator>>( std::istream& is, Sky& sky )
+    {
+        bool colorDefined = false;
+        is.ignore(std::numeric_limits< std::streamsize >::max(), '{');
+        std::string token;
+        is >> token;
+        while ( token[0] != '}' )
+        {
+            if ( token == "\"color\":"   )
+            {
+                if ( colorDefined ) throw std::string("multiple definitions of \"color\"");
+                colorDefined = true;
+                is >> sky.color;
+            }
+            else throw tokenErrorMessage + token;
+            is >> token;
+        }
+        if ( !colorDefined ) throw std::string("\"color\" undefined");
+        return is;
+    }
+
     // Read Scene description from character stream
     std::istream& operator>>( std::istream& is, Scene& scene )
     {
+        bool skyDefined = false;
         int objectNumber = 0;
         is.ignore(std::numeric_limits< std::streamsize >::max(), '[');
         is >> std::boolalpha;
@@ -624,6 +646,17 @@ namespace Retra {
                     Triangle* triangle = new Triangle;
                     is >> *triangle;
                     scene.things.push_back( triangle );
+                    if ( modeFlags.verbose )
+                        std::cerr << "OK." << std::endl;
+                }
+                else if ( token == "\"sky\":" )
+                {
+                    if ( skyDefined )
+                        throw std::string( "the scene file has multiple Skies defined; please specify at most one Sky instead" );
+                    skyDefined = true;
+                    if ( modeFlags.verbose )
+                        std::cerr << "parseScene: reading Sky from input scene description... ";
+                    is >> scene.sky;
                     if ( modeFlags.verbose )
                         std::cerr << "OK." << std::endl;
                 }

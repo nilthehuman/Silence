@@ -5,6 +5,12 @@
         { "lightpoint": {
             "emission": [1, 1, 1],
             "point": [0, 7, 10]
+            }
+        },
+
+        { "sky": {
+            "color": [0.2, 0.05, 0.15]
+            }
         },
 
         { "triangle": {
