@@ -216,16 +216,19 @@ int main( int argc, char* argv[] )
     if( modeFlags.verbose )
         std::cerr << "main: input scene file read successfully." << std::endl;
 
-    // Check if target file is writable before starting calculations
-    if( modeFlags.verbose )
-        std::cerr << "main: checking if output file is writable... ";
-    std::ofstream ofs;
-    ofs.open( args.outFilename );
-    if( !ofs.is_open() )
-        die( 4, "cannot write file at '" + std::string(args.outFilename) + "'" );
-    ofs.close();
-    if( modeFlags.verbose )
-        std::cerr << "OK." << std::endl;
+    if( strcmp(args.outFilename, "-") )
+    {
+        // Check if target file is writable before starting calculations
+        if( modeFlags.verbose )
+            std::cerr << "main: checking if output file is writable... ";
+        std::ofstream ofs;
+        ofs.open( args.outFilename );
+        if( !ofs.is_open() )
+            die( 4, "cannot write file at '" + std::string(args.outFilename) + "'" );
+        ofs.close();
+        if( modeFlags.verbose )
+            std::cerr << "OK." << std::endl;
+    }
 
     // Render image
     if ( modeFlags.verbose )
@@ -244,18 +247,29 @@ int main( int argc, char* argv[] )
         std::cerr << s << " second(s)." << std::endl;
     }
 
-    // Dump results into file
-    ofs.open( args.outFilename );
-    while( !ofs.is_open() )
+    if( strcmp(args.outFilename, "-") )
     {
-        std::cerr << "cannot write file at '" << args.outFilename << "'; please make the file writable and press Return." << std::endl;
-        std::cin.ignore();
+        // Dump results into file
+        std::ofstream ofs;
         ofs.open( args.outFilename );
+        while( !ofs.is_open() )
+        {
+            std::cerr << "cannot write file at '" << args.outFilename << "'; please make the file writable and press Return." << std::endl;
+            std::cin.ignore();
+            ofs.open( args.outFilename );
+        }
+        camera->writePixels( ofs );
+        ofs.close();
+        if ( modeFlags.verbose )
+            std::cerr << "main: image written to '" << args.outFilename << "'" << std::endl;
     }
-    camera->writePixels( ofs );
-    ofs.close();
-    if ( modeFlags.verbose )
-        std::cerr << "main: image written to '" << args.outFilename << "'" << std::endl;
+    else
+    {
+        // Dump results to standard output
+        camera->writePixels( std::cout );
+        if ( modeFlags.verbose )
+            std::cerr << "main: image written to standard output" << std::endl;
+    }
 
     return 0;
 }
