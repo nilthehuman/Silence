@@ -31,7 +31,9 @@
 namespace Retra {
 
     class Light;
+    class LightPart;
     class Thing;
+    class ThingPart;
     class Scene;
 
     class Ray {
@@ -44,7 +46,9 @@ namespace Retra {
             , depth( depth )
             , rrLimit( rrLimit )
             , lightHit( NULL )
+            , lightPartHit( NULL )
             , thingHit( NULL )
+            , thingPartHit( NULL )
             , insideThings()
         {
             assert( scene );
@@ -83,7 +87,9 @@ namespace Retra {
         const double rrLimit; // Limit to keep weak Rays alive in Russian Roulette
 
         const Light*               lightHit;     // Last intersected Light
+        const LightPart*           lightPartHit; // Last intersected LightPart
         const Thing*               thingHit;     // Last intersected Thing
+        const ThingPart*           thingPartHit; // Last intersected ThingPart
         std::stack< const Thing* > insideThings; // LIFO stack of penetrated Things
     };
 

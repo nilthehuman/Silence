@@ -33,130 +33,209 @@
 namespace Retra {
 
     class Ray;
+    class Scene;
 
-    // Generic scene object class. This is what every lightsource and thing in the Scene needs to be able to do
-    class Surface {
+    // A set of Surfaces that delimit the same physical object
+    class Object {
     public:
-        Surface() { }
-        Surface( bool background, bool backCulled )
-            : background( background )
-            , backCulled( backCulled )
-        { }
-        virtual ~Surface() { }
-
-        virtual double intersect( const Ray& ray )      const = 0; // Returns distance from Ray origin; a return value of zero will mean a miss
-        virtual Vector getRandomPoint()                 const = 0; // Yields a random point on the Object's surface
-        virtual Vector getNormal( const Vector& point ) const = 0; // Returns the outward pointing surface normal
-
         bool isBackground() const { return background; }
+        bool isBackCulled() const { return backCulled; }
 
     protected:
+        Object() { }
+
+        friend std::istream& operator>>( std::istream& is, Scene& );
+
         bool background; // A background is a Surface that may only occlude other backgrounds from any direction
-        bool backCulled; // Back-face culling makes the negative side of a Surface invisible
+        bool backCulled; // Back-face culling makes the negative side of Surfaces invisible
     };
 
+    // Generic surface primitive class. This is what every lightsource and thing in the Scene needs to be able to do
+    class Surface {
+    public:
+        virtual double intersect( const Ray& ray )      const = 0; // Returns distance from Ray origin; a return value of zero will mean a miss
+        virtual Vector getRandomPoint()                 const = 0; // Yields a random point on the surface
+        virtual Vector getNormal( const Vector& point ) const = 0; // Returns the outward pointing surface normal
+
+    protected:
+        Surface() : parent( NULL ) { }
+        Surface( const Object* parent ) : parent( parent ) { }
+        virtual ~Surface() { }
+
+    protected:
+        const Object* parent;
+    };
+
+    class ThingPart : virtual public Surface { };
+
+    class Light;
+    class LightPart : virtual public Surface {
+    public:
+        virtual Triplet getEmission( const Vector& ) const;
+    };
+
+    class Point;
     class Sphere;
     class Plane;
     class Triangle;
-
-    // Non-light objects in the Scene
-    class Thing : virtual public Surface {
+    // Non-light complex objects in the Scene
+    class Thing : public Object {
     public:
-        Thing() { }
-        Thing( const Material& material ) : material( material ) { }
-        virtual ~Thing() { }
+        Thing() : parts() { }
+        ~Thing()
+        {
+            for ( std::vector< ThingPart* >::const_iterator it = partsBegin(); it != partsEnd(); it++ )
+                delete *it;
+        }
+
+        void push_back( ThingPart* part ) { parts.push_back( part ); }
+
+        std::vector< ThingPart* >::const_iterator partsBegin() const { return parts.begin(); }
+        std::vector< ThingPart* >::const_iterator partsEnd()   const { return parts.end();   }
+
+        const ThingPart* getRandomPart() const
+        {
+            const int index = (int)( (double)rand() / RAND_MAX * parts.size() );
+            return parts[ index ];
+        }
 
         const RGB& getColor()            const { return material.getColor(); }
         double     getRefractiveIndex()  const { return material.getRefractiveIndex(); }
 
         Material::Interaction interact() const { return material.interact(); } // Decides how the surface will behave for a particular hit by a particular Ray
 
-        friend std::istream& operator>>( std::istream& is, Sphere&   sphere );
-        friend std::istream& operator>>( std::istream& is, Plane&    plane );
-        friend std::istream& operator>>( std::istream& is, Triangle& triangle );
+        friend std::istream& operator>>( std::istream& is, Sphere& );
+        friend std::istream& operator>>( std::istream& is, Plane& );
+        friend std::istream& operator>>( std::istream& is, Triangle& );
+        friend std::istream& operator>>( std::istream& is, Scene& );
 
-    protected:
+    private:
+        std::vector< ThingPart* > parts;
+
         Material material;
     };
 
+    class LightPoint;
     class LightSphere;
+    class LightPlane;
+    class LightTriangle;
+    // Complex light objects
+    class Light : public Object {
+    public:
+        Light() : parts() { }
+
+        void push_back( LightPart* part ) { parts.push_back( part ); }
+
+        std::vector< LightPart* >::const_iterator partsBegin() const { return parts.begin(); }
+        std::vector< LightPart* >::const_iterator partsEnd()   const { return parts.end();   }
+
+        const LightPart* getRandomPart() const
+        {
+            const int index = rand() % parts.size();
+            return parts[ index ];
+        }
+
+        const Triplet& getEmission() const { return emission; }
+
+        friend std::istream& operator>>( std::istream& is, LightPoint& );
+        friend std::istream& operator>>( std::istream& is, LightSphere& );
+        friend std::istream& operator>>( std::istream& is, LightPlane& );
+        friend std::istream& operator>>( std::istream& is, LightTriangle& );
+        friend std::istream& operator>>( std::istream& is, Scene& );
+
+    private:
+        std::vector< LightPart* > parts;
+
+        Triplet emission; // Light intensity emitted in all directions; not constrained between (0, 0, 0) and (1, 1, 1)
+    };
+
+    class IPoint : virtual public Surface {
+    public:
+        virtual double intersect( const Ray& )    const { return 0; } // Cannot be hit
+        virtual Vector getRandomPoint()           const { return point; }
+        virtual Vector getNormal( const Vector& ) const { return Vector::Zero; }
+
+    protected:
+        IPoint() { }
+        IPoint( const Vector& point ) : point( point ) { }
+
+        friend std::istream& operator>>( std::istream& is, Point& );
+        friend std::istream& operator>>( std::istream& is, LightPoint& );
+
+    protected:
+        Vector point;
+    };
+
+    class LightPoint : public IPoint, public LightPart {
+    public:
+        LightPoint( const Light* parent ) : Surface( parent ) { }
+    };
 
     class ISphere : virtual public Surface {
-    protected:
-        ISphere() { }
-        ISphere( bool background, bool backCulled, const Vector& center, double radius )
-            : Surface( background, backCulled )
-            , center( center )
-            , radius( radius )
-        { }
-
     public:
         virtual double intersect( const Ray& ray ) const;
         virtual Vector getNormal( const Vector& point ) const { return (point - center).normalize(); }
         virtual Vector getRandomPoint() const;
 
-        friend std::istream& operator>>( std::istream& is, Sphere& sphere );
-        friend std::istream& operator>>( std::istream& is, LightSphere& light );
+    protected:
+        ISphere() { }
+        ISphere( const Vector& center, double radius )
+            : center( center )
+            , radius( radius )
+        { }
+
+        friend std::istream& operator>>( std::istream& is, Sphere& );
+        friend std::istream& operator>>( std::istream& is, LightSphere& );
 
     protected:
         Vector center;
         double radius;
     };
 
-    class Sphere : public Thing, public ISphere {
+    class Sphere      : public ISphere, public ThingPart {
     public:
-        Sphere() { }
-        Sphere( const Material& material, bool background, bool backCulled, const Vector& center, double radius )
-            : Thing( material )
-            , ISphere( background, backCulled, center, radius )
-        { }
+        Sphere     ( const Thing* parent ) : Surface( parent ) { }
+    };
+
+    class LightSphere : public ISphere, public LightPart {
+    public:
+        LightSphere( const Light* parent ) : Surface( parent ) { }
     };
 
     class IPlane : virtual public Surface {
-    protected:
-        IPlane() { }
-        IPlane( bool background, bool backCulled, const Vector& normal, double offset )
-            : Surface( background, backCulled )
-            , normal( normal )
-            , offset( offset )
-        {
-            this->normal.normalize();
-        }
-
     public:
         virtual double intersect( const Ray& ray ) const;
         virtual Vector getNormal( const Vector& ) const { return normal; }
         virtual Vector getRandomPoint() const;
 
-        friend std::istream& operator>>( std::istream& is, Plane& plane );
+    protected:
+        IPlane() { }
+        IPlane( const Vector& normal, double offset )
+            : normal( normal )
+            , offset( offset )
+        {
+            this->normal.normalize();
+        }
+
+        friend std::istream& operator>>( std::istream& is, Plane& );
+        friend std::istream& operator>>( std::istream& is, LightPlane& );
 
     protected:
         Vector normal;
         double offset; // Signed distance from Origin: sign is `+' if the normal points AWAY from Origin, `-' if it points toward it
     };
 
-    class Plane : public Thing, public IPlane {
+    class Plane      : public IPlane, public ThingPart {
     public:
-        Plane() { }
-        Plane( const Material& material, bool background, bool backCulled, Vector normal, double offset )
-            : Thing( material )
-            , IPlane( background, backCulled, normal, offset )
-        { }
+        Plane     ( const Thing* parent ) : Surface( parent ) { }
     };
 
-    class LightTriangle;
+    class LightPlane : public IPlane, public LightPart {
+    public:
+        LightPlane( const Light* parent ) : Surface( parent ) { }
+    };
 
     class ITriangle : virtual public Surface {
-    protected:
-        ITriangle() { }
-        ITriangle( bool background, bool backCulled, const Vector& a, const Vector& b, const Vector& c )
-            : Surface( background, backCulled )
-        {
-            points[0] = a;
-            points[1] = b;
-            points[2] = c;
-        }
-
     public:
         virtual double intersect( const Ray& ray ) const;
         virtual Vector getNormal( const Vector& ) const
@@ -167,89 +246,38 @@ namespace Retra {
         }
         virtual Vector getRandomPoint() const;
 
-        friend std::istream& operator>>( std::istream& is, Triangle& triangle );
-        friend std::istream& operator>>( std::istream& is, LightTriangle& light );
+        friend std::istream& operator>>( std::istream& is, Triangle& );
+        friend std::istream& operator>>( std::istream& is, LightTriangle& );
 
     protected:
+        ITriangle() { }
+        ITriangle( const Vector& a, const Vector& b, const Vector& c )
+        {
+            points[0] = a;
+            points[1] = b;
+            points[2] = c;
+        }
+
+    private:
         Vector points[3];
     };
 
-    class Triangle : public Thing, public ITriangle {
+    class Triangle      : public ITriangle, public ThingPart {
     public:
-        Triangle() { }
-        Triangle( const Material& material, bool background, bool backCulled, const Vector& a, const Vector& b, const Vector& c )
-            : Thing( material )
-            , ITriangle( background, backCulled, a, b, c )
-        { }
+        Triangle     ( const Thing* parent ) : Surface( parent ) { }
     };
 
-    class Light : virtual public Surface {
-    protected:
-        Light() { }
-        Light( const Triplet& emission ) : emission( emission ) { }
-
+    class LightTriangle : public ITriangle, public LightPart {
     public:
-        virtual ~Light() { }
+        LightTriangle( const Light* parent ) : Surface( parent ) { }
 
-        virtual Triplet getEmission( const Vector& ) const { return emission; }
-
-    protected:
-        Triplet emission; // Light intensity emitted in all directions; not constrained between (0, 0, 0) and (1, 1, 1)
-    };
-
-    class LightPoint : public Light {
-    public:
-        LightPoint() { }
-        LightPoint( const RGB& color, const Vector& point )
-            : Light( color )
-            , point( point )
-        { }
-
-        virtual double intersect( const Ray& )    const { return 0; } // Cannot be hit
-        virtual Vector getRandomPoint()           const { return point; }
-        virtual Vector getNormal( const Vector& ) const { return Vector::Zero; }
-        virtual bool   isBackground()             const { return true; } // Never occludes another object
-
-        friend std::istream& operator>>( std::istream& is, LightPoint& light );
-
-    protected:
-        Vector point;
-    };
-
-    class LightSphere : public Light, public ISphere {
-    public:
-        LightSphere() { }
-        LightSphere( const RGB& color, bool background, bool backCulled, const Vector& center, double radius )
-            : Light( color )
-            , ISphere( background, backCulled, center, radius )
-        { }
-
-        friend std::istream& operator>>( std::istream& is, LightSphere& light );
-    };
-
-    class LightTriangle : public Light, public ITriangle {
-    public:
-        LightTriangle() { }
-        LightTriangle( const RGB& color, bool background, bool backCulled, const Vector& a, const Vector& b, const Vector& c )
-            : Light( color )
-            , ITriangle( background, backCulled, a, b, c )
-        { }
-
-        virtual Triplet getEmission( const Vector& direction ) const
-        {
-            double tilt = direction * getNormal( points[0] );
-            if ( backCulled && tilt < 0 )
-                return RGB::Black;
-            return emission * abs( tilt );
-        }
-
-        friend std::istream& operator>>( std::istream& is, LightTriangle& light );
+        virtual Triplet getEmission( const Vector& direction ) const;
     };
 
     struct Sky {
         RGB color; // Skies are not allowed to be emitters
 
-        friend std::istream& operator>>( std::istream& is, Sky& sky );
+        friend std::istream& operator>>( std::istream& is, Sky& );
     };
 
     class Scene {
@@ -272,7 +300,7 @@ namespace Retra {
 
         const Sky& getSky() const { return sky; }
 
-        friend std::istream& operator>>( std::istream& is, Scene& scene );
+        friend std::istream& operator>>( std::istream& is, Scene& );
 
     private:
         std::vector< Light* > lights;

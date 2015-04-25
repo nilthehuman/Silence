@@ -29,6 +29,19 @@
 
 namespace Retra {
 
+    Triplet LightPart::getEmission( const Vector& ) const
+    {
+        return ((Light*)parent)->getEmission(); // By default
+    }
+
+    Triplet LightTriangle::getEmission( const Vector& direction ) const
+    {
+        double tilt = direction * getNormal( Vector::Zero );
+        if ( parent->isBackCulled() && tilt < 0 )
+            return RGB::Black;
+        return ((Light*)parent)->getEmission() * abs( tilt );
+    }
+
     double ISphere::intersect( const Ray& ray ) const
     {
         // Algorithm cribbed from smallpt
@@ -42,7 +55,7 @@ namespace Retra {
         const double sqrtDiscriminant = sqrt( discriminant );
         if ( (t = b - sqrtDiscriminant) > EPSILON )
             return t;
-        if ( (t = b + sqrtDiscriminant) > EPSILON && !backCulled )
+        if ( (t = b + sqrtDiscriminant) > EPSILON && !parent->isBackCulled() )
             return t;
         return 0;
     }
@@ -71,7 +84,7 @@ namespace Retra {
             return 0;
         else {
             double nominator = offset - normal * ray.getOrigin();
-            if ( backCulled && EPSILON < nominator )
+            if ( parent->isBackCulled() && EPSILON < nominator )
                 return 0;
             double t = nominator / denominator;
             if ( EPSILON < t )
@@ -100,7 +113,7 @@ namespace Retra {
         const Vector edge2 = points[2] - points[0];
         const Vector P = ray.getDirection().cross( edge2 );
         const double determinant = edge1 * P;
-        if ( backCulled )
+        if ( parent->isBackCulled() )
         {
             if ( determinant < EPSILON )
                 return 0;
@@ -143,11 +156,12 @@ namespace Retra {
             Triplet directLight = 0; // How much of the light intensity from this lightsource actually strikes the point
             for ( int i = 0; i < SHADOWRAYS; ++i )
             {
-                const Vector lightPoint = (*light)->getRandomPoint();
+                const LightPart* lightPart = (*light)->getRandomPart();
+                const Vector lightPoint = lightPart->getRandomPoint();
                 const Vector toLightPoint = (lightPoint - surfacePoint).normalized();
                 if ( surfaceNormal * toLightPoint < 0 )
                     continue;
-                Triplet emission = (*light)->getEmission( -toLightPoint );
+                Triplet emission = lightPart->getEmission( -toLightPoint );
                 if ( RGB::Black == emission )
                     continue;
                 const Ray    shadowRay( this, surfacePoint, toLightPoint, RGB::Black, 1, INF );
@@ -155,21 +169,23 @@ namespace Retra {
                 double t = INF;
                 bool occluded = false;
                 // Lights are non-occluding. Check Things only
-                for ( std::vector< Thing* >::const_iterator it = thingsBegin(); it != thingsEnd(); it++ )
-                    if ( (*it)->isBackground() == false )
-                        if ( (t = (*it)->intersect(shadowRay)) && t < distance )
-                        {
-                            occluded = true;
-                            break;
-                        }
-                if ( !occluded && (*light)->isBackground() )
-                    for ( std::vector< Thing* >::const_iterator it = thingsBegin(); it != thingsEnd(); it++ )
-                        if ( (*it)->isBackground() == true )
-                            if ( (t = (*it)->intersect(shadowRay)) && t < distance )
+                for ( std::vector< Thing* >::const_iterator thing = thingsBegin(); thing != thingsEnd(); thing++ )
+                    if ( (*thing)->isBackground() == false )
+                        for ( std::vector< ThingPart* >::const_iterator part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                            if ( (t = (*part)->intersect(shadowRay)) && t < distance )
                             {
                                 occluded = true;
                                 break;
                             }
+                if ( !occluded && (*light)->isBackground() )
+                    for ( std::vector< Thing* >::const_iterator thing = thingsBegin(); thing != thingsEnd(); thing++ )
+                        if ( (*thing)->isBackground() == true )
+                            for ( std::vector< ThingPart* >::const_iterator part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                                if ( (t = (*part)->intersect(shadowRay)) && t < distance )
+                                {
+                                    occluded = true;
+                                    break;
+                                }
                 if ( !occluded )
                 {
                     directLight += emission * (surfaceNormal * toLightPoint) * // As per the Phong model

@@ -38,7 +38,7 @@ namespace Retra {
         if ( lightHit )
         {
             // Hit a lightsource. This path ends here
-            paint( lightHit->getEmission(-direction) );
+            paint( lightPartHit->getEmission(-direction) );
             depth = 0;
         }
         else if ( !thingHit )
@@ -93,7 +93,7 @@ namespace Retra {
 
     RGB Ray::bounceDiffuse()
     {
-        const Vector surfaceNormal = thingHit->getNormal( origin );
+        const Vector surfaceNormal = thingPartHit->getNormal( origin );
         RGB currentColor = color * scene->getDirectLight( origin, surfaceNormal );
         if ( russianRoulette() )
             return currentColor;
@@ -123,7 +123,7 @@ namespace Retra {
                 n2 = insideThings.top()->getRefractiveIndex();
             insideThings.push( tempTop );
         }
-        const Vector surfaceNormal = thingHit->getNormal( origin );
+        const Vector surfaceNormal = thingPartHit->getNormal( origin );
         direction -= surfaceNormal * (direction * surfaceNormal) * 2;
         const double cosTheta = direction * surfaceNormal;
         paint( RGB::White * schlick( n1, n2, cosTheta ) );
@@ -137,7 +137,7 @@ namespace Retra {
     {
         if ( russianRoulette() )
             return color;
-        const Vector surfaceNormal = thingHit->getNormal( origin );
+        const Vector surfaceNormal = thingPartHit->getNormal( origin );
         direction -= surfaceNormal * (direction * surfaceNormal) * 2;
         traceToNextIntersection();
         return trace();
@@ -169,7 +169,7 @@ namespace Retra {
             insideThings.push( tempTop );
         }
         const double eta = n1 / n2;
-        const Vector surfaceNormal = thingHit->getNormal( origin );
+        const Vector surfaceNormal = thingPartHit->getNormal( origin );
         const double cosTheta1 = abs( direction * surfaceNormal );
         const double sinTheta2Squared = eta * eta * ( 1.0 - cosTheta1 * cosTheta1 ); // sin(x)^2 + cos(x)^2 == 1
         if ( 1 < sinTheta2Squared )
@@ -181,7 +181,7 @@ namespace Retra {
         {
             // Actual refractive transmission
             const double cosTheta2 = sqrt( 1.0 - sinTheta2Squared );
-            direction = direction * eta + surfaceNormal * ( eta * cosTheta1 - cosTheta2 ) * ( into ? 1.0 : -1.0 );
+            direction = direction * eta + surfaceNormal * ( eta * cosTheta1 - cosTheta2 ) * ( direction * surfaceNormal < 0 ? 1.0 : -1.0 );
             if ( into )
                 insideThings.push( thingHit );
             else
@@ -193,49 +193,63 @@ namespace Retra {
 
     double Ray::findNearestIntersection()
     {
-        lightHit = NULL;
-        thingHit = NULL;
+        lightHit     = NULL;
+        lightPartHit = NULL;
+        thingHit     = NULL;
+        thingPartHit = NULL;
 
         double t, nearestT = INF;
 
         // Check foreground Surfaces
-        for ( std::vector< Thing* >::const_iterator it = scene->thingsBegin(); it != scene->thingsEnd(); it++ )
-            if ( (*it)->isBackground() == false )
-                if ( (t = (*it)->intersect(*this)) && t < nearestT )
-                {
-                    nearestT = t;
-                    thingHit = *it;
-                }
+        for ( std::vector< Thing* >::const_iterator thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
+            if ( (*thing)->isBackground() == false )
+                for ( std::vector< ThingPart* >::const_iterator part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                    if ( (t = (*part)->intersect(*this)) && t < nearestT )
+                    {
+                        nearestT     = t;
+                        thingHit     = *thing;
+                        thingPartHit = *part;
+                    }
 
-        for ( std::vector< Light* >::const_iterator it = scene->lightsBegin(); it != scene->lightsEnd(); it++ )
-            if ( (*it)->isBackground() == false )
-                if ( (t = (*it)->intersect(*this)) && t < nearestT )
-                {
-                    nearestT = t;
-                    lightHit = *it;
-                    thingHit = NULL;
-                }
+        for ( std::vector< Light* >::const_iterator light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
+            if ( (*light)->isBackground() == false )
+                for ( std::vector< LightPart* >::const_iterator part = (*light)->partsBegin(); part != (*light)->partsEnd(); part++ )
+                    if ( (t = (*part)->intersect(*this)) && t < nearestT )
+                    {
+                        nearestT     = t;
+                        lightHit     = *light;
+                        lightPartHit = *part;
+                        thingHit     = NULL;
+                        thingPartHit = NULL;
+                    }
 
         if ( thingHit || lightHit )
             return nearestT;
 
         // Check background Surfaces
-        for ( std::vector< Thing* >::const_iterator it = scene->thingsBegin(); it != scene->thingsEnd(); it++ )
-            if ( (*it)->isBackground() == true )
-                if ( (t = (*it)->intersect(*this)) && t < nearestT )
-                {
-                    nearestT = t;
-                    thingHit = *it;
-                }
+        for ( std::vector< Thing* >::const_iterator thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
+            if ( (*thing)->isBackground() == true )
+                for ( std::vector< ThingPart* >::const_iterator part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                    if ( (t = (*part)->intersect(*this)) && t < nearestT )
+                    {
+                        nearestT     = t;
+                        lightHit     = NULL;
+                        lightPartHit = NULL;
+                        thingHit     = *thing;
+                        thingPartHit = *part;
+                    }
 
-        for ( std::vector< Light* >::const_iterator it = scene->lightsBegin(); it != scene->lightsEnd(); it++ )
-            if ( (*it)->isBackground() == true )
-                if ( (t = (*it)->intersect(*this)) && t < nearestT )
-                {
-                    nearestT = t;
-                    lightHit = *it;
-                    thingHit = NULL;
-                }
+        for ( std::vector< Light* >::const_iterator light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
+            if ( (*light)->isBackground() == true )
+                for ( std::vector< LightPart* >::const_iterator part = (*light)->partsBegin(); part != (*light)->partsEnd(); part++ )
+                    if ( (t = (*part)->intersect(*this)) && t < nearestT )
+                    {
+                        nearestT     = t;
+                        lightHit     = *light;
+                        lightPartHit = *part;
+                        thingHit     = NULL;
+                        thingPartHit = NULL;
+                    }
 
         return nearestT;
     }

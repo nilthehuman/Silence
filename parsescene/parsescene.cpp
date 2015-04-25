@@ -36,6 +36,9 @@ namespace Retra {
 
     static const std::string tokenErrorMessage = "unrecognized token: ";
 
+    static Light* light = NULL;
+    static Thing* thing = NULL;
+
     // Read and parse scene description
     Camera* parseScene( std::istream& is )
     {
@@ -252,7 +255,7 @@ namespace Retra {
         return is;
     }
 
-    std::istream& operator>>( std::istream& is, LightPoint& light )
+    std::istream& operator>>( std::istream& is, LightPoint& lightPoint )
     {
         bool emissionDefined = false;
         bool pointDefined    = false;
@@ -265,13 +268,13 @@ namespace Retra {
             {
                 if ( emissionDefined ) throw std::string("multiple definitions of \"emission\"");
                 emissionDefined = true;
-                is >> light.emission;
+                is >> light->emission;
             }
             else if ( token == "\"point\":"    )
             {
                 if ( pointDefined ) throw std::string("multiple definitions of \"point\"");
                 pointDefined = true;
-                is >> light.point;
+                is >> lightPoint.point;
             }
             else if ( token == ","             )
             {
@@ -279,12 +282,11 @@ namespace Retra {
             else throw tokenErrorMessage + token;
             is >> token;
         }
-        if ( !emissionDefined ) throw std::string("\"emission\" undefined");
-        if ( !pointDefined    ) throw std::string("\"point\" undefined");
+        if ( !pointDefined ) throw std::string("\"point\" undefined");
         return is;
     }
 
-    std::istream& operator>>( std::istream& is, LightSphere& light )
+    std::istream& operator>>( std::istream& is, LightSphere& lightSphere )
     {
         bool emissionDefined   = false;
         bool backgroundDefined = false;
@@ -300,31 +302,31 @@ namespace Retra {
             {
                 if ( emissionDefined ) throw std::string("multiple definitions of \"emission\"");
                 emissionDefined = true;
-                is >> light.emission;
+                is >> light->emission;
             }
             else if ( token == "\"background\":" )
             {
                 if ( backgroundDefined ) throw std::string("multiple definitions of \"background\"");
                 backgroundDefined = true;
-                is >> light.background;
+                is >> light->background;
             }
             else if ( token == "\"backculled\":" )
             {
                 if ( backCulledDefined ) throw std::string("multiple definitions of \"backculled\"");
                 backCulledDefined = true;
-                is >> light.backCulled;
+                is >> light->backCulled;
             }
             else if ( token == "\"center\":"     )
             {
                 if ( centerDefined ) throw std::string("multiple definitions of \"center\"");
                 centerDefined = true;
-                is >> light.center;
+                is >> lightSphere.center;
             }
             else if ( token == "\"radius\":"     )
             {
                 if ( radiusDefined ) throw std::string("multiple definitions of \"radius\"");
                 radiusDefined = true;
-                is >> light.radius;
+                is >> lightSphere.radius;
             }
             else if ( token == ","               )
             {
@@ -332,15 +334,65 @@ namespace Retra {
             else throw tokenErrorMessage + token;
             is >> token;
         }
-        if ( !emissionDefined   ) throw std::string("\"emission\" undefined");
-        if ( !backgroundDefined ) throw std::string("\"background\" undefined");
-        if ( !backCulledDefined ) throw std::string("\"backculled\" undefined");
-        if ( !centerDefined     ) throw std::string("\"center\" undefined");
-        if ( !radiusDefined     ) throw std::string("\"radius\" undefined");
+        if ( !centerDefined ) throw std::string("\"center\" undefined");
+        if ( !radiusDefined ) throw std::string("\"radius\" undefined");
         return is;
     }
 
-    std::istream& operator>>( std::istream& is, LightTriangle& light )
+    std::istream& operator>>( std::istream& is, LightPlane& lightPlane )
+    {
+        bool emissionDefined   = false;
+        bool backgroundDefined = false;
+        bool backCulledDefined = false;
+        bool normalDefined     = false;
+        bool offsetDefined     = false;
+        is.ignore(std::numeric_limits< std::streamsize >::max(), '{');
+        std::string token;
+        is >> token;
+        while ( token[0] != '}' )
+        {
+            if      ( token == "\"emission\":"   )
+            {
+                if ( emissionDefined ) throw std::string("multiple definitions of \"emission\"");
+                emissionDefined = true;
+                is >> light->emission;
+            }
+            else if ( token == "\"background\":" )
+            {
+                if ( backgroundDefined ) throw std::string("multiple definitions of \"background\"");
+                backgroundDefined = true;
+                is >> light->background;
+            }
+            else if ( token == "\"backculled\":" )
+            {
+                if ( backCulledDefined ) throw std::string("multiple definitions of \"backculled\"");
+                backCulledDefined = true;
+                is >> light->backCulled;
+            }
+            else if ( token == "\"normal\":"     )
+            {
+                if ( normalDefined ) throw std::string("multiple definitions of \"normal\"");
+                normalDefined = true;
+                is >> lightPlane.normal;
+            }
+            else if ( token == "\"offset\":"     )
+            {
+                if ( offsetDefined ) throw std::string("multiple definitions of \"offset\"");
+                offsetDefined = true;
+                is >> lightPlane.offset;
+            }
+            else if ( token == ","               )
+            {
+            }
+            else throw tokenErrorMessage + token;
+            is >> token;
+        }
+        if ( !normalDefined ) throw std::string("\"normal\" undefined");
+        if ( !offsetDefined ) throw std::string("\"offset\" undefined");
+        return is;
+    }
+
+    std::istream& operator>>( std::istream& is, LightTriangle& lightTriangle )
     {
         bool emissionDefined   = false;
         bool backgroundDefined = false;
@@ -355,27 +407,27 @@ namespace Retra {
             {
                 if ( emissionDefined ) throw std::string("multiple definitions of \"emission\"");
                 emissionDefined = true;
-                is >> light.emission;
+                is >> light->emission;
             }
             else if ( token == "\"background\":" )
             {
                 if ( backgroundDefined ) throw std::string("multiple definitions of \"background\"");
                 backgroundDefined = true;
-                is >> light.background;
+                is >> light->background;
             }
             else if ( token == "\"backculled\":" )
             {
                 if ( backCulledDefined ) throw std::string("multiple definitions of \"backculled\"");
                 backCulledDefined = true;
-                is >> light.backCulled;
+                is >> light->backCulled;
             }
             else if ( token == "\"points\":"     )
             {
                 if ( pointsDefined ) throw std::string("multiple definitions of \"points\"");
                 pointsDefined = true;
-                is.ignore(std::numeric_limits< std::streamsize >::max(), '[') >> light.points[0];
-                is.ignore(std::numeric_limits< std::streamsize >::max(), ',') >> light.points[1];
-                is.ignore(std::numeric_limits< std::streamsize >::max(), ',') >> light.points[2];
+                is.ignore(std::numeric_limits< std::streamsize >::max(), '[') >> lightTriangle.points[0];
+                is.ignore(std::numeric_limits< std::streamsize >::max(), ',') >> lightTriangle.points[1];
+                is.ignore(std::numeric_limits< std::streamsize >::max(), ',') >> lightTriangle.points[2];
                 is.ignore(std::numeric_limits< std::streamsize >::max(), ']');
             }
             else if ( token == ","               )
@@ -384,10 +436,7 @@ namespace Retra {
             else throw tokenErrorMessage + token;
             is >> token;
         }
-        if ( !emissionDefined   ) throw std::string("\"emission\" undefined");
-        if ( !backgroundDefined ) throw std::string("\"background\" undefined");
-        if ( !backCulledDefined ) throw std::string("\"backculled\" undefined");
-        if ( !pointsDefined     ) throw std::string("\"points\" undefined");
+        if ( !pointsDefined ) throw std::string("\"points\" undefined");
         return is;
     }
 
@@ -407,19 +456,19 @@ namespace Retra {
             {
                 if ( materialDefined ) throw std::string("multiple definitions of \"material\"");
                 materialDefined = true;
-                is >> sphere.material;
+                is >> thing->material;
             }
             else if ( token == "\"background\":" )
             {
                 if ( backgroundDefined ) throw std::string("multiple definitions of \"background\"");
                 backgroundDefined = true;
-                is >> sphere.background;
+                is >> thing->background;
             }
             else if ( token == "\"backculled\":" )
             {
                 if ( backCulledDefined ) throw std::string("multiple definitions of \"backculled\"");
                 backCulledDefined = true;
-                is >> sphere.backCulled;
+                is >> thing->backCulled;
             }
             else if ( token == "\"center\":"     )
             {
@@ -439,11 +488,8 @@ namespace Retra {
             else throw tokenErrorMessage + token;
             is >> token;
         }
-        if ( !materialDefined   ) throw std::string("\"material\" undefined");
-        if ( !backgroundDefined ) throw std::string("\"background\" undefined");
-        if ( !backCulledDefined ) throw std::string("\"backculled\" undefined");
-        if ( !centerDefined     ) throw std::string("\"center\" undefined");
-        if ( !radiusDefined     ) throw std::string("\"radius\" undefined");
+        if ( !centerDefined ) throw std::string("\"center\" undefined");
+        if ( !radiusDefined ) throw std::string("\"radius\" undefined");
         return is;
     }
 
@@ -463,19 +509,19 @@ namespace Retra {
             {
                 if ( materialDefined ) throw std::string("multiple definitions of \"material\"");
                 materialDefined = true;
-                is >> plane.material;
+                is >> thing->material;
             }
             else if ( token == "\"background\":" )
             {
                 if ( backgroundDefined ) throw std::string("multiple definitions of \"background\"");
                 backgroundDefined = true;
-                is >> plane.background;
+                is >> thing->background;
             }
             else if ( token == "\"backculled\":" )
             {
                 if ( backCulledDefined ) throw std::string("multiple definitions of \"backculled\"");
                 backCulledDefined = true;
-                is >> plane.backCulled;
+                is >> thing->backCulled;
             }
             else if ( token == "\"normal\":"     )
             {
@@ -495,11 +541,8 @@ namespace Retra {
             else throw tokenErrorMessage + token;
             is >> token;
         }
-        if ( !materialDefined   ) throw std::string("\"material\" undefined");
-        if ( !backgroundDefined ) throw std::string("\"background\" undefined");
-        if ( !backCulledDefined ) throw std::string("\"backculled\" undefined");
-        if ( !normalDefined     ) throw std::string("\"normal\" undefined");
-        if ( !offsetDefined     ) throw std::string("\"offset\" undefined");
+        if ( !normalDefined ) throw std::string("\"normal\" undefined");
+        if ( !offsetDefined ) throw std::string("\"offset\" undefined");
         return is;
     }
 
@@ -518,19 +561,19 @@ namespace Retra {
             {
                 if ( materialDefined ) throw std::string("multiple definitions of \"material\"");
                 materialDefined = true;
-                is >> triangle.material;
+                is >> thing->material;
             }
             else if ( token == "\"background\":" )
             {
                 if ( backgroundDefined ) throw std::string("multiple definitions of \"background\"");
                 backgroundDefined = true;
-                is >> triangle.background;
+                is >> thing->background;
             }
             else if ( token == "\"backculled\":" )
             {
                 if ( backCulledDefined ) throw std::string("multiple definitions of \"backculled\"");
                 backCulledDefined = true;
-                is >> triangle.backCulled;
+                is >> thing->backCulled;
             }
             else if ( token == "\"points\":"     )
             {
@@ -547,10 +590,7 @@ namespace Retra {
             else throw tokenErrorMessage + token;
             is >> token;
         }
-        if ( !materialDefined   ) throw std::string("\"material\" undefined");
-        if ( !backgroundDefined ) throw std::string("\"background\" undefined");
-        if ( !backCulledDefined ) throw std::string("\"backculled\" undefined");
-        if ( !pointsDefined     ) throw std::string("\"points\" undefined");
+        if ( !pointsDefined ) throw std::string("\"points\" undefined");
         return is;
     }
 
@@ -579,73 +619,227 @@ namespace Retra {
     std::istream& operator>>( std::istream& is, Scene& scene )
     {
         bool skyDefined = false;
+
         int objectNumber = 0;
+
         is.ignore(std::numeric_limits< std::streamsize >::max(), '[');
         is >> std::boolalpha;
         std::string token;
-        while ( token[0] != ']' )
+        while ( token[0] != ']' || light || thing )
         {
-            is.ignore(std::numeric_limits< std::streamsize >::max(), '{');
             is >> token;
             try
             {
-                if      ( token == "\"lightpoint\":" )
+                if ( token == "{" || token == "}" || token == "}," )
                 {
+                    continue;
+                }
+                else if ( token == "\"light\":" )
+                {
+                    if ( light )
+                        throw std::string( "nested Lights are not allowed" );
+                    if ( modeFlags.verbose )
+                        std::cerr << "parseScene: reading Light from input scene description..." << std::endl;
+                    light = new Light;
+                    is.ignore(std::numeric_limits< std::streamsize >::max(), '[');
+                }
+                else if ( token == "\"thing\":" )
+                {
+                    if ( thing )
+                        throw std::string( "nested Things are not allowed" );
+                    if ( modeFlags.verbose )
+                        std::cerr << "parseScene: reading Thing from input scene description..." << std::endl;
+                    thing = new Thing;
+                    is.ignore(std::numeric_limits< std::streamsize >::max(), '[');
+                }
+                else if ( token == "\"background\":" )
+                {
+                    if      ( light )
+                        is >> light->background;
+                    else if ( thing )
+                        is >> thing->background;
+                    else
+                        throw std::string( "unexpected \"background\" token" );
+                }
+                else if ( token == "\"backculled\":" )
+                {
+                    if      ( light )
+                        is >> light->backCulled;
+                    else if ( thing )
+                        is >> thing->backCulled;
+                    else
+                        throw std::string( "unexpected \"backculled\" token" );
+                }
+                else if ( token == "\"emission\":" )
+                {
+                    if      ( light )
+                        is >> light->emission;
+                    else if ( thing )
+                        throw std::string( "unexpected \"emission\" token" );
+                    else
+                        throw std::string( "unexpected \"emission\" token" );
+                }
+                else if ( token == "\"material\":" )
+                {
+                    if      ( light )
+                        throw std::string( "unexpected \"material\" token" );
+                    else if ( thing )
+                        is >> thing->material;
+                    else
+                        throw std::string( "unexpected \"material\" token" );
+                }
+                else if ( token == "\"lightpoint\":" )
+                {
+                    if ( thing )
+                        throw std::string( "a Thing cannot contain light parts" );
                     if ( modeFlags.verbose )
                         std::cerr << "parseScene: reading LightPoint from input scene description... ";
-                    LightPoint* light = new LightPoint;
-                    is >> *light;
-                    scene.lights.push_back( light );
+                    bool single = !light;
+                    if ( single )
+                        light = new Light;
+                    LightPoint* lightPoint = new LightPoint( light );
+                    is >> *lightPoint;
+                    is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
+                    light->push_back( lightPoint );
+                    if ( single )
+                    {
+                        scene.lights.push_back( light );
+                        light = NULL;
+                    }
+                    ++objectNumber;
                     if ( modeFlags.verbose )
                         std::cerr << "OK." << std::endl;
                 }
                 else if ( token == "\"lightsphere\":" )
                 {
+                    if ( thing )
+                        throw std::string( "a Thing cannot contain light parts" );
                     if ( modeFlags.verbose )
                         std::cerr << "parseScene: reading LightSphere from input scene description... ";
-                    LightSphere* light = new LightSphere;
-                    is >> *light;
-                    scene.lights.push_back( light );
+                    bool single = !light;
+                    if ( single )
+                        light = new Light;
+                    LightSphere* lightSphere = new LightSphere( light );
+                    is >> *lightSphere;
+                    is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
+                    light->push_back( lightSphere );
+                    if ( single )
+                    {
+                        scene.lights.push_back( light );
+                        light = NULL;
+                    }
+                    ++objectNumber;
+                    if ( modeFlags.verbose )
+                        std::cerr << "OK." << std::endl;
+                }
+                else if ( token == "\"lightplane\":" )
+                {
+                    if ( thing )
+                        throw std::string( "a Thing cannot contain light parts" );
+                    if ( modeFlags.verbose )
+                        std::cerr << "parseScene: reading LightPlane from input scene description... ";
+                    bool single = !light;
+                    if ( single )
+                        light = new Light;
+                    LightPlane* lightPlane = new LightPlane( light );
+                    is >> *lightPlane;
+                    is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
+                    light->push_back( lightPlane );
+                    if ( single )
+                    {
+                        scene.lights.push_back( light );
+                        light = NULL;
+                    }
+                    ++objectNumber;
                     if ( modeFlags.verbose )
                         std::cerr << "OK." << std::endl;
                 }
                 else if ( token == "\"lighttriangle\":" )
                 {
+                    if ( thing )
+                        throw std::string( "a Thing cannot contain light parts" );
                     if ( modeFlags.verbose )
                         std::cerr << "parseScene: reading LightTriangle from input scene description... ";
-                    LightTriangle* light = new LightTriangle;
-                    is >> *light;
-                    scene.lights.push_back( light );
+                    bool single = !light;
+                    if ( single )
+                        light = new Light;
+                    light = new Light;
+                    LightTriangle* lightTriangle = new LightTriangle( light );
+                    is >> *lightTriangle;
+                    is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
+                    light->push_back( lightTriangle );
+                    if ( single )
+                    {
+                        scene.lights.push_back( light );
+                        light = NULL;
+                    }
+                    ++objectNumber;
                     if ( modeFlags.verbose )
                         std::cerr << "OK." << std::endl;
                 }
                 else if ( token == "\"sphere\":" )
                 {
+                    if ( light )
+                        throw std::string( "a Light cannot contain thing parts" );
                     if ( modeFlags.verbose )
                         std::cerr << "parseScene: reading Sphere from input scene description... ";
-                    Sphere* sphere = new Sphere;
+                    bool single = !thing;
+                    if ( single )
+                        thing = new Thing;
+                    Sphere* sphere = new Sphere( thing );
                     is >> *sphere;
-                    scene.things.push_back( sphere );
+                    is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
+                    thing->push_back( sphere );
+                    if ( single )
+                    {
+                        scene.things.push_back( thing );
+                        thing = NULL;
+                    }
+                    ++objectNumber;
                     if ( modeFlags.verbose )
                         std::cerr << "OK." << std::endl;
                 }
                 else if ( token == "\"plane\":" )
                 {
+                    if ( light )
+                        throw std::string( "a Light cannot contain thing parts" );
                     if ( modeFlags.verbose )
                         std::cerr << "parseScene: reading Plane from input scene description... ";
-                    Plane* plane = new Plane;
+                    bool single = !thing;
+                    if ( single )
+                        thing = new Thing;
+                    Plane* plane = new Plane( thing );
                     is >> *plane;
-                    scene.things.push_back( plane );
+                    is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
+                    thing->push_back( plane );
+                    if ( single )
+                    {
+                        scene.things.push_back( thing );
+                        thing = NULL;
+                    }
+                    ++objectNumber;
                     if ( modeFlags.verbose )
                         std::cerr << "OK." << std::endl;
                 }
                 else if ( token == "\"triangle\":" )
                 {
+                    if ( light )
+                        throw std::string( "a Light cannot contain thing parts" );
                     if ( modeFlags.verbose )
                         std::cerr << "parseScene: reading Triangle from input scene description... ";
-                    Triangle* triangle = new Triangle;
+                    bool single = !thing;
+                    if ( single )
+                        thing = new Thing;
+                    Triangle* triangle = new Triangle( thing );
                     is >> *triangle;
-                    scene.things.push_back( triangle );
+                    is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
+                    thing->push_back( triangle );
+                    if ( single )
+                    {
+                        scene.things.push_back( thing );
+                        thing = NULL;
+                    }
+                    ++objectNumber;
                     if ( modeFlags.verbose )
                         std::cerr << "OK." << std::endl;
                 }
@@ -657,10 +851,34 @@ namespace Retra {
                     if ( modeFlags.verbose )
                         std::cerr << "parseScene: reading Sky from input scene description... ";
                     is >> scene.sky;
+                    is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
                     if ( modeFlags.verbose )
                         std::cerr << "OK." << std::endl;
                 }
-                else if ( token == "," )
+                else if ( token == "]" )
+                {
+                    if      ( light )
+                    {
+                        scene.lights.push_back( light );
+                        light = NULL;
+                        is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
+                        token.clear();
+                        if ( modeFlags.verbose )
+                            std::cerr << "parseScene: end of Light." << std::endl;
+                    }
+                    else if ( thing )
+                    {
+                        scene.things.push_back( thing );
+                        thing = NULL;
+                        is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
+                        token.clear();
+                        if ( modeFlags.verbose )
+                            std::cerr << "parseScene: end of Thing." << std::endl;
+                    }
+                    else
+                        throw std::string( "unexpected ']' token" );
+                }
+                else if ( token == "]," || token == "," )
                 {
                 }
                 else
@@ -673,9 +891,6 @@ namespace Retra {
                 ss << "in object #" << objectNumber << ": " << e;
                 throw ss.str();
             }
-            is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
-            ++objectNumber;
-            is >> token;
         }
         return is;
     }

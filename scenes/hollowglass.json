@@ -29,7 +29,8 @@
             }
         },
 
-        { "sphere": {
+        { "thing": [
+
             "material": {
                 "character": {
                     "diffuse":    0,
@@ -42,26 +43,19 @@
             },
             "background": false,
             "backculled": false,
-            "center": [0, -3, 4],
-            "radius": 4
-            }
-        },
-        { "sphere": {
-            "material": {
-                "character": {
-                    "diffuse":    0,
-                    "metallic":   0,
-                    "reflecting": 0,
-                    "refractive": 1
-                },
-                "color": [1, 1, 1],
-                "refractiveindex": 1
+
+            { "sphere": {
+                "center": [0, -3, 4],
+                "radius": 4
+                }
             },
-            "background": false,
-            "backculled": false,
-            "center": [0, -3, 4],
-            "radius": 3.9
+            { "sphere": {
+                "center": [0, -3, 4],
+                "radius": 3.9
+                }
             }
+
+            ]
         },
 
         { "plane": {
@@ -80,7 +74,6 @@
             "offset": -10
             }
         },
-
         { "plane": {
             "material": {
                 "character": {
@@ -97,7 +90,6 @@
             "offset": -10
             }
         },
-
         { "plane": {
             "material": {
                 "character": {
@@ -114,7 +106,6 @@
             "offset": -10
             }
         },
-
         { "plane": {
             "material": {
                 "character": {
@@ -131,7 +122,6 @@
             "offset": -10
             }
         },
-
         { "plane": {
             "material": {
                 "character": {
