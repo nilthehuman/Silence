@@ -49,7 +49,7 @@ namespace Retra {
                     std::cerr << "Camera: rendering... " << (int)((double)(row - rowBegin) / (rowEnd - rowBegin) * 100) << "% done.";
                     if ( 3 == row % 4 )
                     {
-                        const int estimate = (int)( (std::time( NULL ) - start) * (double)(rowEnd - row) / (row - rowBegin) );
+                        const int estimate = (int)( difftime( std::time( NULL ), start ) * (rowEnd - row) / (row - rowBegin) );
                         const int m = estimate / 60;
                         const int s = estimate % 60;
                         std::cerr << " Time left: ";
