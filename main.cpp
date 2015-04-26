@@ -53,7 +53,7 @@ void help( std::string progname )
     std::cout << "usage: " << progname << " SCENE_FILENAME [OPTIONS]" << std::endl << std::endl;
     std::cout << "Command line options:" << std::endl;
     std::cout << "  -s, --spp SAMPLES   Set the number of samples per pixel (default 64)" << std::endl;
-    std::cout << "  -d, --depth DEPTH   Set the maximal depth (length) of any path (default 6)" << std::endl;
+    std::cout << "  -d, --depth DEPTH   Set the maximal depth (length) of any path (default 12)" << std::endl;
     std::cout << "  -r, --rr LIMIT      Set the stay-alive limit used in Russian roulette (default 0.25)" << std::endl;
     std::cout << "  -g, --gamma EXP     Set the exponent for post-mortem gamma correction (default 1.0)" << std::endl;
     std::cout << "  -o, --out FILENAME  Set the filename for the output image (default image.ppm)" << std::endl;
@@ -170,7 +170,7 @@ int main( int argc, char* argv[] )
     // Parse command line arguments
     struct arguments args;
     args.spp         = 64;
-    args.depth       = 6;
+    args.depth       = 12;
     args.rrLimit     = 0.25;
     args.gamma       = 1;
     args.inFilename  = NULL;
