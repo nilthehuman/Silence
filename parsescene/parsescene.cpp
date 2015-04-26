@@ -861,6 +861,7 @@ namespace Retra {
                     {
                         scene.lights.push_back( light );
                         light = NULL;
+                        ++objectNumber;
                         is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
                         token.clear();
                         if ( modeFlags.verbose )
@@ -870,6 +871,7 @@ namespace Retra {
                     {
                         scene.things.push_back( thing );
                         thing = NULL;
+                        ++objectNumber;
                         is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
                         token.clear();
                         if ( modeFlags.verbose )
