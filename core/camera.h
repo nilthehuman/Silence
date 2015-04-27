@@ -35,8 +35,6 @@ namespace Retra {
         enum Axis { AXIS_X, AXIS_Y, AXIS_Z };
 
     private:
-        static const int cpuThreads = 4;
-
         struct Screen {
             Screen() { }
             Screen( Vector topLeft, Vector topRight, Vector bottomLeft, Vector bottomRight, int width, int height )

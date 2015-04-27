@@ -49,9 +49,10 @@ namespace Retra {
         const time_t start = std::time( NULL );
         #pragma omp parallel
         {
-            const int threadNum = omp_get_thread_num();
-            const int rowBegin  = (double) threadNum      / cpuThreads * screen.gridheight;
-            const int rowEnd    = (double)(threadNum + 1) / cpuThreads * screen.gridheight;
+            const int numThreads = omp_get_num_threads();
+            const int threadNum  = omp_get_thread_num();
+            const int rowBegin   = (double) threadNum      / numThreads * screen.gridheight;
+            const int rowEnd     = (double)(threadNum + 1) / numThreads * screen.gridheight;
             // The engine's core loop
             for ( int row = rowBegin; row < rowEnd; ++row )
             {
@@ -103,9 +104,10 @@ namespace Retra {
         const clock_t start = clock();
         #pragma omp parallel shared(elapsedTime, pixelColorSum)
         {
-            const int threadNum = omp_get_thread_num();
-            const int rowBegin  = (double) threadNum      / cpuThreads * screen.gridheight;
-            const int rowEnd    = (double)(threadNum + 1) / cpuThreads * screen.gridheight;
+            const int numThreads = omp_get_num_threads();
+            const int threadNum  = omp_get_thread_num();
+            const int rowBegin   = (double) threadNum      / numThreads * screen.gridheight;
+            const int rowEnd     = (double)(threadNum + 1) / numThreads * screen.gridheight;
             for ( int row = rowBegin; row < rowEnd; ++row )
                 for ( int col = 0; col < screen.gridwidth; ++col )
                     pixelColorSum[row*screen.gridwidth + col] = RGB::Black;
@@ -125,7 +127,7 @@ namespace Retra {
                 if ( 0 == threadNum )
                 {
                     ++sppSoFar;
-                    elapsedTime = 1000.0 * (clock() - start) / CLOCKS_PER_SEC / cpuThreads; // clock() returns total CPU time
+                    elapsedTime = 1000.0 * (clock() - start) / CLOCKS_PER_SEC / numThreads; // clock() returns total CPU time
                 }
                 #pragma omp flush(elapsedTime)
             }
