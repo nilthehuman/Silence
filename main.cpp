@@ -263,9 +263,13 @@ int main( int argc, char* argv[] )
 #ifdef COMPILE_WITH_GUI
     if ( args.gui )
     {
+        if ( modeFlags.verbose )
+            std::cerr << "main: creating GUI." << std::endl;
         GUI gui( camera );
         gui.initialize( &argc, argv );
         gui.setup( args.depth, args.rrLimit, (int)(1000.0 / args.fps) );
+        if ( modeFlags.verbose )
+            std::cerr << "main: starting the renderer." << std::endl;
         gui.run();
         exit( 0 );
     }
