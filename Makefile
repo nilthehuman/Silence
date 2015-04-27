@@ -28,7 +28,7 @@ core/scene.o: core/scene.h core/aux.h core/material.h core/ray.h core/triplet.h
 
 core/triplet.o: core/triplet.h core/aux.h
 
-parsescene/parsescene.o: core/material.h core/scene.h
+parsescene/parsescene.o: parsescene/parsescene.h core/material.h core/scene.h
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
