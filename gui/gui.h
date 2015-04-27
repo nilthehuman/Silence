@@ -65,6 +65,8 @@ namespace Retra {
         static void moveAndTurnCamera( int );
         static void handleKeyPress( unsigned char key, int, int );
         static void handleKeyRelease( unsigned char key, int, int );
+        static void handleArrowKeyPress( int key, int, int );
+        static void handleArrowKeyRelease( int key, int, int );
         static void undoReshape( int, int );
 
     private:

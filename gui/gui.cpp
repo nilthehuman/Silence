@@ -142,6 +142,28 @@ namespace Retra {
         }
     }
 
+    void GUI::handleArrowKeyPress( int key, int, int )
+    {
+        switch ( key ) {
+            case GLUT_KEY_UP:    self->keys.up    = true; break;
+            case GLUT_KEY_DOWN:  self->keys.down  = true; break;
+            case GLUT_KEY_LEFT:  self->keys.left  = true; break;
+            case GLUT_KEY_RIGHT: self->keys.right = true; break;
+            default: ;
+        }
+    }
+
+    void GUI::handleArrowKeyRelease( int key, int, int )
+    {
+        switch ( key ) {
+            case GLUT_KEY_UP:    self->keys.up    = false; break;
+            case GLUT_KEY_DOWN:  self->keys.down  = false; break;
+            case GLUT_KEY_LEFT:  self->keys.left  = false; break;
+            case GLUT_KEY_RIGHT: self->keys.right = false; break;
+            default: ;
+        }
+    }
+
     void GUI::undoReshape( int, int )
     {
         glutReshapeWindow( self->camera->getGridwidth(), self->camera->getGridheight() );
@@ -159,6 +181,8 @@ namespace Retra {
         glutDisplayFunc( &redisplay );
         glutKeyboardFunc( &handleKeyPress );
         glutKeyboardUpFunc( &handleKeyRelease );
+        glutSpecialFunc( &handleArrowKeyPress );
+        glutSpecialUpFunc( &handleArrowKeyRelease );
         glutReshapeFunc( &undoReshape );
 
         glClearColor( 0, 0, 0, 1 );
