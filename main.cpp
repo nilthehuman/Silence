@@ -30,6 +30,10 @@
 
 #include "core/camera.h"
 
+#ifdef COMPILE_WITH_GUI
+#include "gui/gui.h"
+#endif
+
 #include "parsescene/parsescene.h"
 
 using namespace Retra;
@@ -46,6 +50,10 @@ struct arguments {
     double gamma;
     char*  inFilename;
     char*  outFilename;
+#ifdef COMPILE_WITH_GUI
+    bool   gui;
+    int    fps;
+#endif
 };
 
 void help( std::string progname )
@@ -57,6 +65,10 @@ void help( std::string progname )
     std::cout << "  -r, --rr LIMIT      Set the stay-alive limit used in Russian roulette (default 0.25)" << std::endl;
     std::cout << "  -g, --gamma EXP     Set the exponent for post-mortem gamma correction (default 1.0)" << std::endl;
     std::cout << "  -o, --out FILENAME  Set the filename for the output image (default image.ppm)" << std::endl;
+#ifdef COMPILE_WITH_GUI
+    std::cout << "      --gui           Start interactive graphical interface instead of outputting to file" << std::endl;
+    std::cout << "  -f, --fps FPS       Set the framerate for the graphical interface (default 10)" << std::endl;
+#endif
     std::cout << "  -h, --help          Print this help message and quit" << std::endl;
     std::cout << "  -v, --version       Print version information and quit" << std::endl << std::endl;
     std::cout << "Exit status:" << std::endl;
@@ -81,7 +93,7 @@ void usage( std::string progname )
 {
     std::cerr << "usage: " << progname << " SCENE_FILENAME [-v|--verbose] [--spp SAMPLES_PER_PIXEL]" << std::endl;
     std::cerr << "  [--depth MAX_DEPTH_OF_PATHS] [--rr RUSSIAN_ROULETTE_LIMIT] [--gamma GAMMA]" << std::endl;
-    std::cerr << "  [--out IMAGE_FILENAME]" << std::endl;
+    std::cerr << "  [--out IMAGE_FILENAME] [--gui]" << std::endl;
     exit(1);
 }
 
@@ -135,6 +147,20 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
                 usage( args->progname );
             args->outFilename = argv[i];
         }
+#ifdef COMPILE_WITH_GUI
+        else if( !strcmp(argv[i], "--gui") )
+        {
+            args->gui = true;
+        }
+        else if( !strcmp(argv[i], "-f") || !strcmp(argv[i], "--fps") )
+        {
+            if ( argc <= ++i )
+                usage( args->progname );
+            args->fps = atoi( argv[i] );
+            if ( !args->fps )
+                usage( args->progname );
+        }
+#endif
         else if( !strcmp(argv[i], "-h") || !strcmp(argv[i], "--help") )
         {
             help( args->progname );
@@ -160,6 +186,17 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
     }
     if( !args->inFilename )
         usage( args->progname );
+#ifdef COMPILE_WITH_GUI
+    if( args->gui )
+    {
+        if( args->spp   != 64 )
+            std::cerr << "main: warning: starting in GUI mode, disregarding --spp setting." << std::endl;
+        if( args->gamma !=  1 )
+            std::cerr << "main: warning: starting in GUI mode, disregarding --gamma setting." << std::endl;
+        if( strcmp( args->outFilename, "image.ppm" ) )
+            std::cerr << "main: warning: starting in GUI mode, disregarding --out setting." << std::endl;
+    }
+#endif
 }
 
 int main( int argc, char* argv[] )
@@ -175,12 +212,19 @@ int main( int argc, char* argv[] )
     args.gamma       = 1;
     args.inFilename  = NULL;
     args.outFilename = (char*)"image.ppm";
+#ifdef COMPILE_WITH_GUI
+    args.gui         = false;
+    args.fps         = 10;
+#endif
     parseArgs( argc, argv, &args );
     if( modeFlags.verbose )
     {
         std::cerr << "main: arguments: ";
         std::cerr << "spp = " << args.spp << ", depth = " << args.depth << ", rrLimit = " << args.rrLimit << ", gamma = " << args.gamma << "," << std::endl;
-        std::cerr << "      outFilename = " << args.outFilename << std::endl;
+#ifdef COMPILE_WITH_GUI
+        if( !args.gui )
+            std::cerr << "      outFilename = " << args.outFilename << std::endl;
+#endif
     }
 
     // Process scene description input
@@ -215,6 +259,17 @@ int main( int argc, char* argv[] )
         ifs.close();
     if( modeFlags.verbose )
         std::cerr << "main: input scene file read successfully." << std::endl;
+
+#ifdef COMPILE_WITH_GUI
+    if ( args.gui )
+    {
+        GUI gui( camera );
+        gui.initialize( &argc, argv );
+        gui.setup( args.depth, args.rrLimit, (int)(1000.0 / args.fps) );
+        gui.run();
+        exit( 0 );
+    }
+#endif
 
     if( strcmp(args.outFilename, "-") )
     {

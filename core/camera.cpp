@@ -31,6 +31,17 @@ namespace Retra {
 
     static const std::string tokenErrorMessage = "unrecognized token: ";
 
+    // Reset pixel buffer to all black
+    void Camera::clear()
+    {
+        assert( !rendering );
+        #pragma omp parallel for
+        for ( int row = 0; row < screen.gridheight; ++row )
+            for ( int col = 0; col < screen.gridwidth; ++col )
+                pixels[row][col] = RGB::Black;
+        sppSoFar = 0;
+    }
+
     // Take a shot of the virtual Scene
     void Camera::capture( int spp, int depth, double rrLimit )
     {
@@ -82,9 +93,55 @@ namespace Retra {
         rendering = false;
     }
 
+    // Keep refining the image until a given time limit is reached
+    void Camera::render( int renderTime, int depth, double rrLimit )
+    {
+        rendering = true;
+        const int sppBefore = sppSoFar;
+        int elapsedTime = 0;
+        Triplet* pixelColorSum = new Triplet[ screen.gridwidth * screen.gridheight ];
+        const clock_t start = clock();
+        #pragma omp parallel shared(elapsedTime, pixelColorSum)
+        {
+            const int threadNum = omp_get_thread_num();
+            const int rowBegin  = (double) threadNum      / cpuThreads * screen.gridheight;
+            const int rowEnd    = (double)(threadNum + 1) / cpuThreads * screen.gridheight;
+            for ( int row = rowBegin; row < rowEnd; ++row )
+                for ( int col = 0; col < screen.gridwidth; ++col )
+                    pixelColorSum[row*screen.gridwidth + col] = RGB::Black;
+            while ( elapsedTime < renderTime )
+            {
+                for ( int row = rowBegin; row < rowEnd; ++row )
+                {
+                    if ( modeFlags.verbose && 0 == threadNum )
+                        std::cerr << "Camera: rendering... " << sppSoFar << " samples per pixel." << '\r' << std::flush;
+                    for ( int col = 0; col < screen.gridwidth; ++col )
+                    {
+                        Ray ray = generateRay( row, col, depth, rrLimit );
+                        ray.traceToNextIntersection(); // Initialize ray (sort of)
+                        pixelColorSum[row*screen.gridwidth + col] += ray.trace();
+                    }
+                }
+                if ( 0 == threadNum )
+                {
+                    ++sppSoFar;
+                    elapsedTime = 1000.0 * (clock() - start) / CLOCKS_PER_SEC / cpuThreads; // clock() returns total CPU time
+                }
+                #pragma omp flush(elapsedTime)
+            }
+            for ( int row = rowBegin; row < rowEnd; ++row )
+                for ( int col = 0; col < screen.gridwidth; ++col )
+                    // Take the SPP-weighed average of the old and new color values
+                    pixels[row][col] = (Triplet(pixels[row][col]) * sppBefore + pixelColorSum[row*screen.gridwidth + col]) / sppSoFar;
+        }
+        delete pixelColorSum;
+        rendering = false;
+    }
+
     void Camera::gammaCorrect( double gamma )
     {
         assert( !rendering );
+        #pragma omp parallel for
         for ( int row = 0; row < screen.gridheight; ++row )
             for ( int col = 0; col < screen.gridwidth; ++col )
                 pixels[row][col].gamma( gamma );
@@ -116,6 +173,104 @@ namespace Retra {
             }
         if ( modeFlags.verbose )
             std::cerr << "done." << std::endl;
+    }
+
+    // Translate both the viewpoint and the screen in camera space
+    void Camera::move( double delta, Axis chosenAxis )
+    {
+        assert( !rendering );
+        // Screen position relative to the viewpoint
+        const Screen relScreen( screen.window[0] - viewpoint,
+                                screen.window[1] - viewpoint,
+                                screen.window[2] - viewpoint,
+                                screen.window[3] - viewpoint,
+                                0, 0 );
+        Vector translation;
+        switch ( chosenAxis )
+        {
+            case AXIS_X:
+                translation = (relScreen.window[1] - relScreen.window[0]).normalized();
+                break;
+            case AXIS_Y:
+                translation = (relScreen.window[0] - relScreen.window[2]).normalized();
+                break;
+            case AXIS_Z:
+                translation = (relScreen.window[0] + relScreen.window[1] +
+                               relScreen.window[2] + relScreen.window[3]).normalized() * -1.0;
+                break;
+            default:
+                assert( false );
+        }
+        viewpoint += translation * delta;
+        for ( int i = 0; i < 4; ++i )
+            screen.window[i] += translation * delta;
+    }
+
+    // Rotate the screen in the positive direction around one of the camera axes
+    void Camera::turn( double theta, Axis chosenAxis )
+    {
+        assert( !rendering );
+        // Screen position relative to the viewpoint
+        const Screen relScreen( screen.window[0] - viewpoint,
+                                screen.window[1] - viewpoint,
+                                screen.window[2] - viewpoint,
+                                screen.window[3] - viewpoint,
+                                0, 0 );
+        // The actual axis direction
+        Vector axisUnit;
+
+        // The Camera always faces the -Z direction
+        switch ( chosenAxis )
+        {
+            case AXIS_X:
+                axisUnit = (relScreen.window[1] - relScreen.window[0]).normalized();
+                break;
+            case AXIS_Y:
+                axisUnit = (relScreen.window[0] - relScreen.window[2]).normalized();
+                break;
+            case AXIS_Z:
+                axisUnit = (relScreen.window[0] + relScreen.window[1] +
+                            relScreen.window[2] + relScreen.window[3]).normalized() * -1.0;
+                break;
+            default:
+                assert( false );
+        }
+
+        // https://www.fastgraph.com/makegames/3drotation/
+        const double c = cos( theta );
+        const double s = sin( theta );
+        const double t = 1 - c;
+        // The rotation matrix
+        Vector rotation[3] = {
+            Vector( t*axisUnit.x*axisUnit.x + c, t*axisUnit.x*axisUnit.y - s*axisUnit.z, t*axisUnit.x*axisUnit.z + s*axisUnit.y ),
+            Vector( t*axisUnit.x*axisUnit.y + s*axisUnit.z, t*axisUnit.y*axisUnit.y + c, t*axisUnit.y*axisUnit.z - s*axisUnit.x ),
+            Vector( t*axisUnit.x*axisUnit.z - s*axisUnit.y, t*axisUnit.y*axisUnit.z - s*axisUnit.x, t*axisUnit.z*axisUnit.z + c )
+        };
+
+        Vector topLeft(
+            rotation[0].x * relScreen.window[0].x + rotation[0].y * relScreen.window[0].y + rotation[0].z * relScreen.window[0].z,
+            rotation[1].x * relScreen.window[0].x + rotation[1].y * relScreen.window[0].y + rotation[1].z * relScreen.window[0].z,
+            rotation[2].x * relScreen.window[0].x + rotation[2].y * relScreen.window[0].y + rotation[2].z * relScreen.window[0].z
+        );
+        Vector topRight(
+            rotation[0].x * relScreen.window[1].x + rotation[0].y * relScreen.window[1].y + rotation[0].z * relScreen.window[1].z,
+            rotation[1].x * relScreen.window[1].x + rotation[1].y * relScreen.window[1].y + rotation[1].z * relScreen.window[1].z,
+            rotation[2].x * relScreen.window[1].x + rotation[2].y * relScreen.window[1].y + rotation[2].z * relScreen.window[1].z
+        );
+        Vector bottomLeft(
+            rotation[0].x * relScreen.window[2].x + rotation[0].y * relScreen.window[2].y + rotation[0].z * relScreen.window[2].z,
+            rotation[1].x * relScreen.window[2].x + rotation[1].y * relScreen.window[2].y + rotation[1].z * relScreen.window[2].z,
+            rotation[2].x * relScreen.window[2].x + rotation[2].y * relScreen.window[2].y + rotation[2].z * relScreen.window[2].z
+        );
+        Vector bottomRight(
+            rotation[0].x * relScreen.window[3].x + rotation[0].y * relScreen.window[3].y + rotation[0].z * relScreen.window[3].z,
+            rotation[1].x * relScreen.window[3].x + rotation[1].y * relScreen.window[3].y + rotation[1].z * relScreen.window[3].z,
+            rotation[2].x * relScreen.window[3].x + rotation[2].y * relScreen.window[3].y + rotation[2].z * relScreen.window[3].z
+        );
+        screen.window[0] = viewpoint + topLeft;
+        screen.window[1] = viewpoint + topRight;
+        screen.window[2] = viewpoint + bottomLeft;
+        screen.window[3] = viewpoint + bottomRight;
     }
 
 }

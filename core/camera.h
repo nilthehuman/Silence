@@ -31,7 +31,10 @@
 namespace Retra {
 
     class Camera {
+    public:
+        enum Axis { AXIS_X, AXIS_Y, AXIS_Z };
 
+    private:
         static const int cpuThreads = 4;
 
         struct Screen {
@@ -55,12 +58,14 @@ namespace Retra {
         Camera( const Scene* scene )
             : scene( scene )
             , pixels( NULL )
+            , sppSoFar( 0 )
             , rendering( false )
         { }
         Camera( const Scene* scene, Vector viewpoint, Screen screen, int width, int height )
             : scene( scene )
             , viewpoint( viewpoint )
             , screen( screen )
+            , sppSoFar( 0 )
             , rendering( false )
         {
             pixels = new RGB*[height];
@@ -77,10 +82,19 @@ namespace Retra {
             }
         }
 
-        void capture( int spp, int depth, double rrLimit );
+        void clear();
+        void capture( int spp,        int depth, double rrLimit );
+        void render ( int renderTime, int depth, double rrLimit );
         void gammaCorrect( double gamma );
 
         void writePixels( std::ostream& os ) const;
+
+        void move( double delta, Axis chosenAxis );
+        void turn( double theta, Axis chosenAxis );
+
+        int  getGridwidth ()    const { return screen.gridwidth; }
+        int  getGridheight()    const { return screen.gridheight; }
+        const RGB** getPixels() const { return (const RGB**)pixels; }
 
         friend std::istream& operator>>( std::istream& is, Camera& camera );
 
@@ -93,6 +107,7 @@ namespace Retra {
         Vector viewpoint;
         Screen screen;
         RGB**  pixels; // The end results go here
+        int    sppSoFar;
         bool   rendering;
     };
 

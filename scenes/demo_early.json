@@ -157,7 +157,7 @@
     "camera": {
         "viewpoint": [0, 0, 20],
         "screen": [ [-1, 1, 19], [1, 1, 19], [-1, -1, 19], [1, -1, 19] ],
-        "gridresolution": [512, 512]
+        "gridresolution": [200, 200]
     }
 
 }

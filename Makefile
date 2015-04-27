@@ -1,6 +1,7 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -Werror -pedantic -fopenmp -std=c++98 -O2
-#GLLIBS = -lGL -lGLU -lglut
+cli: CXXFLAGS = -Wall -Wextra -Werror -pedantic -fopenmp -std=c++98 -O2
+gui: CXXFLAGS = -Wall -Wextra -Werror -pedantic -fopenmp -std=c++98 -O2 -DCOMPILE_WITH_GUI
+GLLIBS = -lGL -lglut
 
 OBJECTS = main.o core/camera.o core/ray.o core/scene.o core/triplet.o parsescene/parsescene.o
 
@@ -13,10 +14,10 @@ cli: $(PROGNAME)
 $(PROGNAME): $(OBJECTS)
 	$(CXX) $(LDFLAGS) -o $(PROGNAME) $^ -fopenmp
 
-#.PHONY: gui
-#gui: gui/gui.h $(OBJECTS)
-#	$(CXX) $(LDFLAGS) -o $(PROGNAME) $^ -fopenmp $(GLLIBS)
-#	@echo ==== Retra built successfully ====
+.PHONY: gui
+gui: gui/gui.o $(OBJECTS)
+	$(CXX) $(LDFLAGS) -o $(PROGNAME) $^ -fopenmp $(GLLIBS)
+	@echo ==== Retra built successfully ====
 
 main.o: core/camera.h parsescene/parsescene.h
 
@@ -28,6 +29,8 @@ core/scene.o: core/scene.h core/aux.h core/material.h core/ray.h core/triplet.h
 
 core/triplet.o: core/triplet.h core/aux.h
 
+gui/gui.o: gui/gui.h core/camera.h
+
 parsescene/parsescene.o: parsescene/parsescene.h core/material.h core/scene.h
 
 %.o: %.cpp
@@ -35,5 +38,5 @@ parsescene/parsescene.o: parsescene/parsescene.h core/material.h core/scene.h
 
 .PHONY: clean
 clean:
-	rm -f $(PROGNAME) *.o core/*.o parsescene/*.o
+	rm -f $(PROGNAME) *.o core/*.o gui/*.o parsescene/*.o
 
