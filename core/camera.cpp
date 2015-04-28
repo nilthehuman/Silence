@@ -38,6 +38,8 @@ namespace Retra {
             for ( int col = 0; col < screen.gridwidth; ++col )
                 pixels[row][col] = RGB::Black;
         sppSoFar = 0;
+        if ( modeFlags.verbose )
+            std::cerr << "                                            " << '\r' << std::flush;
     }
 
     // Take a shot of the virtual Scene

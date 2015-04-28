@@ -24,6 +24,7 @@
 #define RETRA_CAMERA
 
 #include <fstream>
+#include <iostream>
 
 #include "ray.h"
 #include "triplet.h"
@@ -78,6 +79,8 @@ namespace Retra {
                     delete[] pixels[i];
                 delete[] pixels;
             }
+            if ( modeFlags.verbose )
+                std::cerr << "                                            " << '\r' << std::flush;
         }
 
         void clear();
