@@ -271,7 +271,6 @@ int main( int argc, char* argv[] )
         if ( modeFlags.verbose )
             std::cerr << "main: starting the renderer." << std::endl;
         gui.run();
-        exit( 0 );
     }
 #endif
 
