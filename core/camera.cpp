@@ -29,8 +29,6 @@
 
 namespace Retra {
 
-    static const std::string tokenErrorMessage = "unrecognized token: ";
-
     // Reset pixel buffer to all black
     void Camera::clear()
     {
