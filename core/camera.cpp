@@ -247,7 +247,7 @@ namespace Retra {
         Vector rotation[3] = {
             Vector( t*axisUnit.x*axisUnit.x + c, t*axisUnit.x*axisUnit.y - s*axisUnit.z, t*axisUnit.x*axisUnit.z + s*axisUnit.y ),
             Vector( t*axisUnit.x*axisUnit.y + s*axisUnit.z, t*axisUnit.y*axisUnit.y + c, t*axisUnit.y*axisUnit.z - s*axisUnit.x ),
-            Vector( t*axisUnit.x*axisUnit.z - s*axisUnit.y, t*axisUnit.y*axisUnit.z - s*axisUnit.x, t*axisUnit.z*axisUnit.z + c )
+            Vector( t*axisUnit.x*axisUnit.z - s*axisUnit.y, t*axisUnit.y*axisUnit.z + s*axisUnit.x, t*axisUnit.z*axisUnit.z + c )
         };
 
         Vector topLeft(
