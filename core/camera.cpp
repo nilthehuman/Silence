@@ -130,6 +130,7 @@ namespace Retra {
                     elapsedTime = 1000.0 * (clock() - start) / CLOCKS_PER_SEC / numThreads; // clock() returns total CPU time
                 }
                 #pragma omp flush(elapsedTime)
+                #pragma omp barrier
             }
             for ( int row = rowBegin; row < rowEnd; ++row )
                 for ( int col = 0; col < screen.gridwidth; ++col )
