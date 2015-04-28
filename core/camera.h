@@ -93,6 +93,7 @@ namespace Retra {
         void move( double delta, Axis chosenAxis );
         void turn( double theta, Axis chosenAxis );
 
+        const Scene* getScene() const { return scene; }
         int  getGridwidth ()    const { return screen.gridwidth; }
         int  getGridheight()    const { return screen.gridheight; }
         const RGB** getPixels() const { return (const RGB**)pixels; }

@@ -19,7 +19,7 @@ gui: gui/gui.o $(OBJECTS)
 	$(CXX) $(LDFLAGS) -o $(PROGNAME) $^ -fopenmp $(GLLIBS)
 	@echo ==== Retra built successfully ====
 
-main.o: core/camera.h parsescene/parsescene.h
+main.o: core/camera.h core/scene.h parsescene/parsescene.h
 
 core/camera.o: core/camera.h core/ray.h core/triplet.h
 

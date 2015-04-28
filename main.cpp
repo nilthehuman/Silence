@@ -29,6 +29,7 @@
 #include <ctime>
 
 #include "core/camera.h"
+#include "core/scene.h"
 
 #ifdef COMPILE_WITH_GUI
 #include "gui/gui.h"
@@ -38,7 +39,7 @@
 
 using namespace Retra;
 
-const std::string VERSION = "1.1.0";
+const std::string VERSION = "1.2.0";
 
 struct flags Retra::modeFlags;
 
@@ -199,6 +200,13 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
 #endif
 }
 
+Camera* camera = NULL;
+void cleanup()
+{
+    delete camera->getScene();
+    delete camera;
+}
+
 int main( int argc, char* argv[] )
 {
     // Set mode flags to default values
@@ -228,7 +236,6 @@ int main( int argc, char* argv[] )
     }
 
     // Process scene description input
-    Camera* camera = NULL;
     if( modeFlags.verbose )
     {
         if( !strcmp(args.inFilename, "-") )
@@ -268,6 +275,7 @@ int main( int argc, char* argv[] )
         GUI gui( camera );
         gui.initialize( &argc, argv );
         gui.setup( args.depth, args.rrLimit, (int)(1000.0 / args.fps) );
+        atexit( &cleanup );
         if ( modeFlags.verbose )
             std::cerr << "main: starting the renderer." << std::endl;
         gui.run();
@@ -329,6 +337,7 @@ int main( int argc, char* argv[] )
             std::cerr << "main: image written to standard output" << std::endl;
     }
 
+    cleanup();
     return 0;
 }
 
