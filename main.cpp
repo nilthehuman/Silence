@@ -187,6 +187,11 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
     }
     if( !args->inFilename )
         usage( args->progname );
+    if( 1.0 < args->rrLimit )
+    {
+        std::cerr << "main: warning: an rrLimit higher than 1.0 will produce unrealistic results." << std::endl;
+        std::cerr << "               This may not be what you intend." << std::endl;
+    }
 #ifdef COMPILE_WITH_GUI
     if( args->gui )
     {
