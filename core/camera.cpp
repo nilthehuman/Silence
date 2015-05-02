@@ -137,7 +137,7 @@ namespace Retra {
                     // Take the SPP-weighed average of the old and new color values
                     pixels[row][col] = (Triplet(pixels[row][col]) * sppBefore + pixelColorSum[row*screen.gridwidth + col]) / sppSoFar;
         }
-        delete pixelColorSum;
+        delete[] pixelColorSum;
         rendering = false;
     }
 

@@ -52,7 +52,7 @@ namespace Retra {
             }
         glDrawPixels( self->camera->getGridwidth(), self->camera->getGridheight(), GL_RGB, GL_FLOAT, floatPixels );
         glutSwapBuffers();
-        delete floatPixels;
+        delete[] floatPixels;
     }
 
     void GUI::refresh( int )
