@@ -236,8 +236,8 @@ int main( int argc, char* argv[] )
         std::cerr << "spp = " << args.spp << ", depth = " << args.depth << ", rrLimit = " << args.rrLimit << ", gamma = " << args.gamma << "," << std::endl;
 #ifdef COMPILE_WITH_GUI
         if( !args.gui )
-            std::cerr << "      outFilename = " << args.outFilename << std::endl;
 #endif
+            std::cerr << "      outFilename = " << args.outFilename << std::endl;
     }
 
     // Process scene description input
