@@ -1,4 +1,5 @@
 retra
+retra-gui
 *.o
 README.md
 evolution/*

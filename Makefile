@@ -4,22 +4,32 @@ gui: CXXFLAGS = -Wall -Wextra -Werror -pedantic -fopenmp -std=c++98 -O2 -DCOMPIL
 GLLIBS = -lGL -lglut
 
 OBJECTS = main.o core/camera.o core/ray.o core/scene.o core/triplet.o parsescene/parsescene.o
+OBJECTS_WITH_GUI = main-gui.o core/camera.o core/ray.o core/scene.o core/triplet.o parsescene/parsescene.o
 
 PROGNAME = retra
+PROGNAME_WITH_GUI = retra-gui
+
+.PHONY: all
+all: cli gui
 
 .PHONY: cli
 cli: $(PROGNAME)
-	@echo ==== Retra built successfully ====
+	@echo ==== Command line Retra built successfully ====
 
 $(PROGNAME): $(OBJECTS)
 	$(CXX) $(LDFLAGS) -o $(PROGNAME) $^ -fopenmp
 
 .PHONY: gui
-gui: gui/gui.o $(OBJECTS)
-	$(CXX) $(LDFLAGS) -o $(PROGNAME) $^ -fopenmp $(GLLIBS)
-	@echo ==== Retra built successfully ====
+gui: $(PROGNAME_WITH_GUI)
+	@echo ==== Graphical Retra built successfully ====
+
+$(PROGNAME_WITH_GUI): gui/gui.o $(OBJECTS_WITH_GUI)
+	$(CXX) $(LDFLAGS) -o $(PROGNAME_WITH_GUI) $^ -fopenmp $(GLLIBS)
 
 main.o: core/camera.h core/scene.h parsescene/parsescene.h
+
+main-gui.o: main.cpp gui/gui.h core/camera.h core/scene.h parsescene/parsescene.h
+	$(CXX) $(CXXFLAGS) -c -o $@ main.cpp
 
 core/camera.o: core/camera.h core/ray.h core/triplet.h
 
@@ -38,5 +48,5 @@ parsescene/parsescene.o: parsescene/parsescene.h core/material.h core/scene.h
 
 .PHONY: clean
 clean:
-	rm -f $(PROGNAME) *.o core/*.o gui/*.o parsescene/*.o
+	rm -f $(PROGNAME) $(PROGNAME_WITH_GUI) *.o core/*.o gui/*.o parsescene/*.o
 
