@@ -108,6 +108,10 @@ void die( int exitCode, std::string message )
 void parseArgs( int argc, char* argv[], struct arguments* args )
 {
     args->progname = argv[0];
+#ifdef COMPILE_WITH_GUI
+    if ( std::string(args->progname).find("gui") != std::string::npos )
+        args->gui = true;
+#endif
     for ( int i = 1; i < argc; ++i )
     {
         if( !strcmp(argv[i], "-s") || !strcmp(argv[i], "--spp") )
