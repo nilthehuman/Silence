@@ -35,6 +35,15 @@ namespace Retra {
     class Ray;
     class Scene;
 
+    class Thing;
+    class ThingPart;
+    class Light;
+    class LightPart;
+    typedef std::vector< Thing* >    ::const_iterator ThingIt;
+    typedef std::vector< ThingPart* >::const_iterator ThingPartIt;
+    typedef std::vector< Light* >    ::const_iterator LightIt;
+    typedef std::vector< LightPart* >::const_iterator LightPartIt;
+
     // A set of Surfaces that delimit the same physical object
     class Object {
     public:
@@ -84,14 +93,14 @@ namespace Retra {
         Thing() : parts() { }
         ~Thing()
         {
-            for ( std::vector< ThingPart* >::const_iterator it = partsBegin(); it != partsEnd(); it++ )
+            for ( ThingPartIt it = partsBegin(); it != partsEnd(); it++ )
                 delete *it;
         }
 
         void push_back( ThingPart* part ) { parts.push_back( part ); }
 
-        std::vector< ThingPart* >::const_iterator partsBegin() const { return parts.begin(); }
-        std::vector< ThingPart* >::const_iterator partsEnd()   const { return parts.end();   }
+        ThingPartIt partsBegin() const { return parts.begin(); }
+        ThingPartIt partsEnd()   const { return parts.end();   }
 
         const ThingPart* getRandomPart() const
         {
@@ -126,8 +135,8 @@ namespace Retra {
 
         void push_back( LightPart* part ) { parts.push_back( part ); }
 
-        std::vector< LightPart* >::const_iterator partsBegin() const { return parts.begin(); }
-        std::vector< LightPart* >::const_iterator partsEnd()   const { return parts.end();   }
+        LightPartIt partsBegin() const { return parts.begin(); }
+        LightPartIt partsEnd()   const { return parts.end();   }
 
         const LightPart* getRandomPart() const
         {
@@ -285,16 +294,16 @@ namespace Retra {
         Scene() : lights(), things() { }
         ~Scene()
         {
-            for ( std::vector< Light* >::const_iterator it = lightsBegin(); it != lightsEnd(); it++ )
-                delete *it;
-            for ( std::vector< Thing* >::const_iterator it = thingsBegin(); it != thingsEnd(); it++ )
-                delete *it;
+            for ( LightIt light = lightsBegin(); light != lightsEnd(); light++ )
+                delete *light;
+            for ( ThingIt thing = thingsBegin(); thing != thingsEnd(); thing++ )
+                delete *thing;
         }
 
-        std::vector< Light* >::const_iterator lightsBegin() const { return lights.begin(); }
-        std::vector< Light* >::const_iterator lightsEnd()   const { return lights.end();   }
-        std::vector< Thing* >::const_iterator thingsBegin() const { return things.begin(); }
-        std::vector< Thing* >::const_iterator thingsEnd()   const { return things.end();   }
+        LightIt lightsBegin() const { return lights.begin(); }
+        LightIt lightsEnd()   const { return lights.end();   }
+        ThingIt thingsBegin() const { return things.begin(); }
+        ThingIt thingsEnd()   const { return things.end();   }
 
         Triplet getDirectLight( const Vector& point, const Vector& normal ) const; // Total direct illumination from all lightsources to point
 

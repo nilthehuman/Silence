@@ -151,7 +151,7 @@ namespace Retra {
     Triplet Scene::getDirectLight( const Vector& surfacePoint, const Vector& surfaceNormal ) const
     {
         Triplet directLightTotal;
-        for ( std::vector< Light* >::const_iterator light = lightsBegin(); light != lightsEnd(); light++ )
+        for ( LightIt light = lightsBegin(); light != lightsEnd(); light++ )
         {
             Triplet directLight = 0; // How much of the light intensity from this lightsource actually strikes the point
             for ( int i = 0; i < SHADOWRAYS; ++i )
@@ -169,18 +169,18 @@ namespace Retra {
                 double t = INF;
                 bool occluded = false;
                 // Lights are non-occluding. Check Things only
-                for ( std::vector< Thing* >::const_iterator thing = thingsBegin(); thing != thingsEnd(); thing++ )
+                for ( ThingIt thing = thingsBegin(); thing != thingsEnd(); thing++ )
                     if ( (*thing)->isBackground() == false )
-                        for ( std::vector< ThingPart* >::const_iterator part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                        for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
                             if ( (t = (*part)->intersect(shadowRay)) && t < distance )
                             {
                                 occluded = true;
                                 break;
                             }
                 if ( !occluded && (*light)->isBackground() )
-                    for ( std::vector< Thing* >::const_iterator thing = thingsBegin(); thing != thingsEnd(); thing++ )
+                    for ( ThingIt thing = thingsBegin(); thing != thingsEnd(); thing++ )
                         if ( (*thing)->isBackground() == true )
-                            for ( std::vector< ThingPart* >::const_iterator part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                            for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
                                 if ( (t = (*part)->intersect(shadowRay)) && t < distance )
                                 {
                                     occluded = true;

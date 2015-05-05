@@ -201,9 +201,9 @@ namespace Retra {
         double t, nearestT = INF;
 
         // Check foreground Surfaces
-        for ( std::vector< Thing* >::const_iterator thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
+        for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
             if ( (*thing)->isBackground() == false )
-                for ( std::vector< ThingPart* >::const_iterator part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
                     if ( (t = (*part)->intersect(*this)) && t < nearestT )
                     {
                         nearestT     = t;
@@ -211,9 +211,9 @@ namespace Retra {
                         thingPartHit = *part;
                     }
 
-        for ( std::vector< Light* >::const_iterator light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
+        for ( LightIt light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
             if ( (*light)->isBackground() == false )
-                for ( std::vector< LightPart* >::const_iterator part = (*light)->partsBegin(); part != (*light)->partsEnd(); part++ )
+                for ( LightPartIt part = (*light)->partsBegin(); part != (*light)->partsEnd(); part++ )
                     if ( (t = (*part)->intersect(*this)) && t < nearestT )
                     {
                         nearestT     = t;
@@ -227,9 +227,9 @@ namespace Retra {
             return nearestT;
 
         // Check background Surfaces
-        for ( std::vector< Thing* >::const_iterator thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
+        for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
             if ( (*thing)->isBackground() == true )
-                for ( std::vector< ThingPart* >::const_iterator part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
                     if ( (t = (*part)->intersect(*this)) && t < nearestT )
                     {
                         nearestT     = t;
@@ -239,9 +239,9 @@ namespace Retra {
                         thingPartHit = *part;
                     }
 
-        for ( std::vector< Light* >::const_iterator light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
+        for ( LightIt light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
             if ( (*light)->isBackground() == true )
-                for ( std::vector< LightPart* >::const_iterator part = (*light)->partsBegin(); part != (*light)->partsEnd(); part++ )
+                for ( LightPartIt part = (*light)->partsBegin(); part != (*light)->partsEnd(); part++ )
                     if ( (t = (*part)->intersect(*this)) && t < nearestT )
                     {
                         nearestT     = t;
