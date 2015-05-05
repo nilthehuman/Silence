@@ -53,7 +53,7 @@ namespace Retra {
     protected:
         Object() { }
 
-        friend std::istream& operator>>( std::istream& is, Scene& );
+        friend std::istream& operator>>( std::istream&, Scene& );
 
         bool background; // A background is a Surface that may only occlude other backgrounds from any direction
         bool backCulled; // Back-face culling makes the negative side of Surfaces invisible
@@ -113,10 +113,10 @@ namespace Retra {
 
         Material::Interaction interact() const { return material.interact(); } // Decides how the surface will behave for a particular hit by a particular Ray
 
-        friend std::istream& operator>>( std::istream& is, Sphere& );
-        friend std::istream& operator>>( std::istream& is, Plane& );
-        friend std::istream& operator>>( std::istream& is, Triangle& );
-        friend std::istream& operator>>( std::istream& is, Scene& );
+        friend std::istream& operator>>( std::istream&, Sphere& );
+        friend std::istream& operator>>( std::istream&, Plane& );
+        friend std::istream& operator>>( std::istream&, Triangle& );
+        friend std::istream& operator>>( std::istream&, Scene& );
 
     private:
         std::vector< ThingPart* > parts;
@@ -146,11 +146,11 @@ namespace Retra {
 
         const Triplet& getEmission() const { return emission; }
 
-        friend std::istream& operator>>( std::istream& is, LightPoint& );
-        friend std::istream& operator>>( std::istream& is, LightSphere& );
-        friend std::istream& operator>>( std::istream& is, LightPlane& );
-        friend std::istream& operator>>( std::istream& is, LightTriangle& );
-        friend std::istream& operator>>( std::istream& is, Scene& );
+        friend std::istream& operator>>( std::istream&, LightPoint& );
+        friend std::istream& operator>>( std::istream&, LightSphere& );
+        friend std::istream& operator>>( std::istream&, LightPlane& );
+        friend std::istream& operator>>( std::istream&, LightTriangle& );
+        friend std::istream& operator>>( std::istream&, Scene& );
 
     private:
         std::vector< LightPart* > parts;
@@ -168,8 +168,8 @@ namespace Retra {
         IPoint() { }
         IPoint( const Vector& point ) : point( point ) { }
 
-        friend std::istream& operator>>( std::istream& is, Point& );
-        friend std::istream& operator>>( std::istream& is, LightPoint& );
+        friend std::istream& operator>>( std::istream&, Point& );
+        friend std::istream& operator>>( std::istream&, LightPoint& );
 
     protected:
         Vector point;
@@ -193,8 +193,8 @@ namespace Retra {
             , radius( radius )
         { }
 
-        friend std::istream& operator>>( std::istream& is, Sphere& );
-        friend std::istream& operator>>( std::istream& is, LightSphere& );
+        friend std::istream& operator>>( std::istream&, Sphere& );
+        friend std::istream& operator>>( std::istream&, LightSphere& );
 
     protected:
         Vector center;
@@ -226,8 +226,8 @@ namespace Retra {
             this->normal.normalize();
         }
 
-        friend std::istream& operator>>( std::istream& is, Plane& );
-        friend std::istream& operator>>( std::istream& is, LightPlane& );
+        friend std::istream& operator>>( std::istream&, Plane& );
+        friend std::istream& operator>>( std::istream&, LightPlane& );
 
     protected:
         Vector normal;
@@ -255,8 +255,8 @@ namespace Retra {
         }
         virtual Vector getRandomPoint() const;
 
-        friend std::istream& operator>>( std::istream& is, Triangle& );
-        friend std::istream& operator>>( std::istream& is, LightTriangle& );
+        friend std::istream& operator>>( std::istream&, Triangle& );
+        friend std::istream& operator>>( std::istream&, LightTriangle& );
 
     protected:
         ITriangle() { }
@@ -286,7 +286,7 @@ namespace Retra {
     struct Sky {
         RGB color; // Skies are not allowed to be emitters
 
-        friend std::istream& operator>>( std::istream& is, Sky& );
+        friend std::istream& operator>>( std::istream&, Sky& );
     };
 
     class Scene {
@@ -309,7 +309,7 @@ namespace Retra {
 
         const Sky& getSky() const { return sky; }
 
-        friend std::istream& operator>>( std::istream& is, Scene& );
+        friend std::istream& operator>>( std::istream&, Scene& );
 
     private:
         std::vector< Light* > lights;
