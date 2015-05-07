@@ -68,7 +68,6 @@ namespace Retra {
         virtual Vector getNormal( const Vector& point ) const = 0; // Returns the outward pointing surface normal
 
     protected:
-        Surface() : parent( NULL ) { }
         Surface( const Object* parent ) : parent( parent ) { }
         virtual ~Surface() { }
 
@@ -76,11 +75,16 @@ namespace Retra {
         const Object* parent;
     };
 
-    class ThingPart : virtual public Surface { };
+    class ThingPart : virtual public Surface {
+    public:
+        ThingPart( const Thing* parent ) : Surface( (Object*)parent ) { }
+    };
 
     class Light;
     class LightPart : virtual public Surface {
     public:
+        LightPart( const Light* parent ) : Surface( (Object*)parent ) { }
+
         virtual Triplet getEmission( const Vector& ) const;
     };
 
@@ -166,8 +170,11 @@ namespace Retra {
         virtual Vector getNormal( const Vector& ) const { return Vector::Zero; }
 
     protected:
-        IPoint() { }
-        IPoint( const Vector& point ) : point( point ) { }
+        IPoint( const Object* parent ) : Surface( parent ) { }
+        IPoint( const Object* parent, const Vector& point )
+            : Surface( parent )
+            , point( point )
+        { }
 
         friend std::istream& operator>>( std::istream&, Point& );
         friend std::istream& operator>>( std::istream&, LightPoint& );
@@ -178,7 +185,11 @@ namespace Retra {
 
     class LightPoint : public IPoint, public LightPart {
     public:
-        LightPoint( const Light* parent ) : Surface( parent ) { }
+        LightPoint( const Light* parent )
+            : Surface  ( parent )
+            , IPoint   ( parent )
+            , LightPart( parent )
+        { }
     };
 
     class ISphere : virtual public Surface {
@@ -188,9 +199,10 @@ namespace Retra {
         virtual Vector getRandomPoint() const;
 
     protected:
-        ISphere() { }
-        ISphere( const Vector& center, double radius )
-            : center( center )
+        ISphere( const Object* parent ) : Surface( parent ) { }
+        ISphere( const Object* parent, const Vector& center, double radius )
+            : Surface( parent )
+            , center( center )
             , radius( radius )
         { }
 
@@ -204,12 +216,20 @@ namespace Retra {
 
     class Sphere      : public ISphere, public ThingPart {
     public:
-        Sphere     ( const Thing* parent ) : Surface( parent ) { }
+        Sphere     ( const Thing* parent )
+            : Surface  ( parent )
+            , ISphere  ( parent )
+            , ThingPart( parent )
+        { }
     };
 
     class LightSphere : public ISphere, public LightPart {
     public:
-        LightSphere( const Light* parent ) : Surface( parent ) { }
+        LightSphere( const Light* parent )
+            : Surface  ( parent )
+            , ISphere  ( parent )
+            , LightPart( parent )
+        { }
     };
 
     class IPlane : virtual public Surface {
@@ -219,9 +239,10 @@ namespace Retra {
         virtual Vector getRandomPoint() const;
 
     protected:
-        IPlane() { }
-        IPlane( const Vector& normal, double offset )
-            : normal( normal )
+        IPlane( const Object* parent ) : Surface( parent ) { }
+        IPlane( const Object* parent, const Vector& normal, double offset )
+            : Surface( parent )
+            , normal( normal )
             , offset( offset )
         {
             this->normal.normalize();
@@ -237,12 +258,20 @@ namespace Retra {
 
     class Plane      : public IPlane, public ThingPart {
     public:
-        Plane     ( const Thing* parent ) : Surface( parent ) { }
+        Plane     ( const Thing* parent )
+            : Surface  ( parent )
+            , IPlane   ( parent )
+            , ThingPart( parent )
+        { }
     };
 
     class LightPlane : public IPlane, public LightPart {
     public:
-        LightPlane( const Light* parent ) : Surface( parent ) { }
+        LightPlane( const Light* parent )
+            : Surface  ( parent )
+            , IPlane   ( parent )
+            , LightPart( parent )
+        { }
     };
 
     class ITriangle : virtual public Surface {
@@ -260,8 +289,9 @@ namespace Retra {
         friend std::istream& operator>>( std::istream&, LightTriangle& );
 
     protected:
-        ITriangle() { }
-        ITriangle( const Vector& a, const Vector& b, const Vector& c )
+        ITriangle( const Object* parent ) : Surface( parent ) { }
+        ITriangle( const Object* parent, const Vector& a, const Vector& b, const Vector& c )
+            : Surface( parent )
         {
             points[0] = a;
             points[1] = b;
@@ -274,12 +304,20 @@ namespace Retra {
 
     class Triangle      : public ITriangle, public ThingPart {
     public:
-        Triangle     ( const Thing* parent ) : Surface( parent ) { }
+        Triangle     ( const Thing* parent )
+            : Surface  ( parent )
+            , ITriangle( parent )
+            , ThingPart( parent )
+        { }
     };
 
     class LightTriangle : public ITriangle, public LightPart {
     public:
-        LightTriangle( const Light* parent ) : Surface( parent ) { }
+        LightTriangle( const Light* parent )
+            : Surface  ( parent )
+            , ITriangle( parent )
+            , LightPart( parent )
+        { }
 
         virtual Triplet getEmission( const Vector& direction ) const;
     };
