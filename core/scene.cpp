@@ -24,10 +24,39 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <cassert>
 
 #include "ray.h"
 
 namespace Retra {
+
+    void Surface::rotate( Vector& point, double theta, WorldAxis axis )
+    {
+        double c = cos( theta );
+        double s = sin( theta );
+        Vector newPoint;
+        switch( axis )
+        {
+            case AXIS_X:
+                newPoint.x = point.x;
+                newPoint.y = c * point.y - s * point.z;
+                newPoint.z = s * point.y + c * point.z;
+                break;
+            case AXIS_Y:
+                newPoint.x =  c * point.x + s * point.z;
+                newPoint.y = point.y;
+                newPoint.z = -s * point.x + c * point.z;
+                break;
+            case AXIS_Z:
+                newPoint.x = c * point.x - s * point.y;
+                newPoint.y = s * point.x + c * point.y;
+                newPoint.z = point.z;
+                break;
+            default:
+                assert( false );
+        }
+        point = newPoint;
+    }
 
     Triplet LightPart::getEmission( const Vector& ) const
     {

@@ -31,6 +31,8 @@
 
 namespace Retra {
 
+    enum WorldAxis { AXIS_X, AXIS_Y, AXIS_Z };
+
     class Ray;
     class Scene;
 
@@ -66,10 +68,13 @@ namespace Retra {
         virtual Vector getRandomPoint()                 const = 0; // Yields a random point on the surface
         virtual Vector getNormal( const Vector& point ) const = 0; // Returns the outward pointing surface normal
         virtual void   move( const Vector& translation )      = 0; // Translate Surface by an arbitrary world space vector
+        virtual void   move( double theta, WorldAxis axis )   = 0; // Rotate Surface around one of the world coordinate axes
 
     protected:
         Surface( const Object* parent ) : parent( parent ) { }
         virtual ~Surface() { }
+
+        static void rotate( Vector& point, double theta, WorldAxis axis ); // Helper function to rotate a point around a world axis
 
     protected:
         const Object* parent;
@@ -189,6 +194,7 @@ namespace Retra {
         { }
 
         virtual void move( const Vector& translation ) { point += translation; }
+        virtual void move( double theta, WorldAxis axis ) { rotate( point, theta, axis ); }
 
         friend std::istream& operator>>( std::istream&, Point& );
         friend std::istream& operator>>( std::istream&, LightPoint& );
@@ -221,6 +227,7 @@ namespace Retra {
         { }
 
         virtual void move( const Vector& translation ) { center += translation; }
+        virtual void move( double theta, WorldAxis axis ) { rotate( center, theta, axis ); }
 
         friend std::istream& operator>>( std::istream&, Sphere& );
         friend std::istream& operator>>( std::istream&, LightSphere& );
@@ -265,6 +272,7 @@ namespace Retra {
         }
 
         virtual void move( const Vector& translation ) { offset += normal * translation; }
+        virtual void move( double theta, WorldAxis axis ) { rotate( normal, theta, axis ); }
 
         friend std::istream& operator>>( std::istream&, Plane& );
         friend std::istream& operator>>( std::istream&, LightPlane& );
@@ -308,6 +316,12 @@ namespace Retra {
             points[0] += translation;
             points[1] += translation;
             points[2] += translation;
+        }
+        virtual void move( double theta, WorldAxis axis )
+        {
+            rotate( points[0], theta, axis );
+            rotate( points[1], theta, axis );
+            rotate( points[2], theta, axis );
         }
 
         friend std::istream& operator>>( std::istream&, Triangle& );
