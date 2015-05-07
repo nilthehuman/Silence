@@ -24,7 +24,6 @@
 #define RETRA_SCENE
 
 #include <vector>
-#include <cassert>
 
 #include "aux.h"
 #include "material.h"
