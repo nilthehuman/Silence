@@ -52,6 +52,7 @@ namespace Retra {
 
     protected:
         Object() { }
+        virtual ~Object() { }
 
         friend std::istream& operator>>( std::istream&, Scene& );
 
