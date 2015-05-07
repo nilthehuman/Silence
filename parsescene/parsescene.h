@@ -23,7 +23,7 @@
 #ifndef RETRA_PARSESCENE
 #define RETRA_PARSESCENE
 
-#include <string>
+#include <istream>
 
 namespace Retra {
 
