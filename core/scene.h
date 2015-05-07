@@ -66,6 +66,7 @@ namespace Retra {
         virtual double intersect( const Ray& ray )      const = 0; // Returns distance from Ray origin; a return value of zero will mean a miss
         virtual Vector getRandomPoint()                 const = 0; // Yields a random point on the surface
         virtual Vector getNormal( const Vector& point ) const = 0; // Returns the outward pointing surface normal
+        virtual void   move( const Vector& translation )      = 0; // Translate Surface by an arbitrary world space vector
 
     protected:
         Surface( const Object* parent ) : parent( parent ) { }
@@ -118,6 +119,12 @@ namespace Retra {
 
         Material::Interaction interact() const { return material.interact(); } // Decides how the surface will behave for a particular hit by a particular Ray
 
+        virtual void move( const Vector& translation ) const
+        {
+            for ( ThingPartIt part = partsBegin(); part != partsEnd(); part++ )
+                (*part)->move( translation );
+        }
+
         friend std::istream& operator>>( std::istream&, Sphere& );
         friend std::istream& operator>>( std::istream&, Plane& );
         friend std::istream& operator>>( std::istream&, Triangle& );
@@ -151,6 +158,12 @@ namespace Retra {
 
         const Triplet& getEmission() const { return emission; }
 
+        virtual void move( const Vector& translation ) const
+        {
+            for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
+                (*part)->move( translation );
+        }
+
         friend std::istream& operator>>( std::istream&, LightPoint& );
         friend std::istream& operator>>( std::istream&, LightSphere& );
         friend std::istream& operator>>( std::istream&, LightPlane& );
@@ -175,6 +188,8 @@ namespace Retra {
             : Surface( parent )
             , point( point )
         { }
+
+        virtual void move( const Vector& translation ) { point += translation; }
 
         friend std::istream& operator>>( std::istream&, Point& );
         friend std::istream& operator>>( std::istream&, LightPoint& );
@@ -205,6 +220,8 @@ namespace Retra {
             , center( center )
             , radius( radius )
         { }
+
+        virtual void move( const Vector& translation ) { center += translation; }
 
         friend std::istream& operator>>( std::istream&, Sphere& );
         friend std::istream& operator>>( std::istream&, LightSphere& );
@@ -248,6 +265,8 @@ namespace Retra {
             this->normal.normalize();
         }
 
+        virtual void move( const Vector& translation ) { offset += normal * translation; }
+
         friend std::istream& operator>>( std::istream&, Plane& );
         friend std::istream& operator>>( std::istream&, LightPlane& );
 
@@ -284,6 +303,13 @@ namespace Retra {
             return edge0.cross( edge1 ).normalize();
         }
         virtual Vector getRandomPoint() const;
+
+        virtual void move( const Vector& translation )
+        {
+            points[0] += translation;
+            points[1] += translation;
+            points[2] += translation;
+        }
 
         friend std::istream& operator>>( std::istream&, Triangle& );
         friend std::istream& operator>>( std::istream&, LightTriangle& );
