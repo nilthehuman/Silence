@@ -34,6 +34,8 @@ namespace Retra {
 
     const double UNITDIST   = 10; // Points at this distance from a Light receive 1.0 times its intensity
 
+    const double PI         = 3.141592654;
+
     const int    SHADOWRAYS = 1; // The number of shadow rays only matters if you're using a small amount of samples.
                                  // 8 <= SHADOWRAYS should help eliminate any crude variance in the penumbrae
 
