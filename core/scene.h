@@ -51,6 +51,9 @@ namespace Retra {
         bool isBackground() const { return background; }
         bool isBackCulled() const { return backCulled; }
 
+        virtual void move( const Vector& translation )    const = 0; // Move each part
+        virtual void move( double theta, WorldAxis axis ) const = 0; // Rotate each part
+
     protected:
         Object() { }
         virtual ~Object() { }
@@ -128,6 +131,11 @@ namespace Retra {
             for ( ThingPartIt part = partsBegin(); part != partsEnd(); part++ )
                 (*part)->move( translation );
         }
+        virtual void move( double theta, WorldAxis axis ) const
+        {
+            for ( ThingPartIt part = partsBegin(); part != partsEnd(); part++ )
+                (*part)->move( theta, axis );
+        }
 
         friend std::istream& operator>>( std::istream&, Sphere& );
         friend std::istream& operator>>( std::istream&, Plane& );
@@ -166,6 +174,11 @@ namespace Retra {
         {
             for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
                 (*part)->move( translation );
+        }
+        virtual void move( double theta, WorldAxis axis ) const
+        {
+            for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
+                (*part)->move( theta, axis );
         }
 
         friend std::istream& operator>>( std::istream&, LightPoint& );
