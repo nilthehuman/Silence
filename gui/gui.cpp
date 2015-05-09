@@ -68,32 +68,27 @@ namespace Retra {
     {
         glutTimerFunc( self->moveAndTurnTime, &moveAndTurnCamera, 0 );
 
-        bool changed = false;
+        if ( self->keys.w )     self->camera->move( -moveStep, Camera::AXIS_Z );
+        if ( self->keys.a )     self->camera->move( -moveStep, Camera::AXIS_X );
+        if ( self->keys.s )     self->camera->move(  moveStep, Camera::AXIS_Z );
+        if ( self->keys.d )     self->camera->move(  moveStep, Camera::AXIS_X );
 
-        if ( self->keys.w )     { self->camera->move( -moveStep, Camera::AXIS_Z ); changed = true; }
-        if ( self->keys.a )     { self->camera->move( -moveStep, Camera::AXIS_X ); changed = true; }
-        if ( self->keys.s )     { self->camera->move(  moveStep, Camera::AXIS_Z ); changed = true; }
-        if ( self->keys.d )     { self->camera->move(  moveStep, Camera::AXIS_X ); changed = true; }
+        if ( self->keys.h )     self->camera->move( -moveStep, Camera::AXIS_X );
+        if ( self->keys.j )     self->camera->move( -moveStep, Camera::AXIS_Y );
+        if ( self->keys.k )     self->camera->move(  moveStep, Camera::AXIS_Y );
+        if ( self->keys.l )     self->camera->move(  moveStep, Camera::AXIS_X );
 
-        if ( self->keys.h )     { self->camera->move( -moveStep, Camera::AXIS_X ); changed = true; }
-        if ( self->keys.j )     { self->camera->move( -moveStep, Camera::AXIS_Y ); changed = true; }
-        if ( self->keys.k )     { self->camera->move(  moveStep, Camera::AXIS_Y ); changed = true; }
-        if ( self->keys.l )     { self->camera->move(  moveStep, Camera::AXIS_X ); changed = true; }
+        if ( self->keys.up    ) self->camera->move(  moveStep, Camera::AXIS_Y );
+        if ( self->keys.down  ) self->camera->move( -moveStep, Camera::AXIS_Y );
+        if ( self->keys.left  ) self->camera->move( -moveStep, Camera::AXIS_X );
+        if ( self->keys.right ) self->camera->move(  moveStep, Camera::AXIS_X );
 
-        if ( self->keys.up    ) { self->camera->move(  moveStep, Camera::AXIS_Y ); changed = true; }
-        if ( self->keys.down  ) { self->camera->move( -moveStep, Camera::AXIS_Y ); changed = true; }
-        if ( self->keys.left  ) { self->camera->move( -moveStep, Camera::AXIS_X ); changed = true; }
-        if ( self->keys.right ) { self->camera->move(  moveStep, Camera::AXIS_X ); changed = true; }
-
-        if ( self->keys.x )     { self->camera->turn(  turnStep, Camera::AXIS_X ); changed = true; }
-        if ( self->keys.X )     { self->camera->turn( -turnStep, Camera::AXIS_X ); changed = true; }
-        if ( self->keys.y )     { self->camera->turn(  turnStep, Camera::AXIS_Y ); changed = true; }
-        if ( self->keys.Y )     { self->camera->turn( -turnStep, Camera::AXIS_Y ); changed = true; }
-        if ( self->keys.z )     { self->camera->turn(  turnStep, Camera::AXIS_Z ); changed = true; }
-        if ( self->keys.Z )     { self->camera->turn( -turnStep, Camera::AXIS_Z ); changed = true; }
-
-        if ( changed )
-            self->camera->clear();
+        if ( self->keys.x )     self->camera->turn(  turnStep, Camera::AXIS_X );
+        if ( self->keys.X )     self->camera->turn( -turnStep, Camera::AXIS_X );
+        if ( self->keys.y )     self->camera->turn(  turnStep, Camera::AXIS_Y );
+        if ( self->keys.Y )     self->camera->turn( -turnStep, Camera::AXIS_Y );
+        if ( self->keys.z )     self->camera->turn(  turnStep, Camera::AXIS_Z );
+        if ( self->keys.Z )     self->camera->turn( -turnStep, Camera::AXIS_Z );
     }
 
     void GUI::handleKeyPress( unsigned char key, int, int )

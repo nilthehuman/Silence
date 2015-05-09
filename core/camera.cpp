@@ -189,6 +189,7 @@ namespace Retra {
     void Camera::move( double delta, Axis chosenAxis )
     {
         assert( !rendering );
+        clear();
         // Screen position relative to the viewpoint
         const Screen relScreen( screen.window[0] - viewpoint,
                                 screen.window[1] - viewpoint,
@@ -220,6 +221,7 @@ namespace Retra {
     void Camera::turn( double theta, Axis chosenAxis )
     {
         assert( !rendering );
+        clear();
         // Screen position relative to the viewpoint
         const Screen relScreen( screen.window[0] - viewpoint,
                                 screen.window[1] - viewpoint,
