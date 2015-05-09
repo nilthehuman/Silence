@@ -97,7 +97,7 @@ namespace Retra {
     }
 
     // Keep refining the image until a given time limit is reached
-    void Camera::render( int renderTime, int depth, double rrLimit )
+    int Camera::render( int renderTime, int depth, double rrLimit )
     {
         if ( scene->isChanged() )
         {
@@ -107,9 +107,10 @@ namespace Retra {
         rendering = true;
         const int sppBefore = sppSoFar;
         int elapsedTime = 0;
+        int clockError  = 0;
         Triplet* pixelColorSum = new Triplet[ screen.gridwidth * screen.gridheight ];
         const clock_t start = clock();
-        #pragma omp parallel shared(elapsedTime, pixelColorSum)
+        #pragma omp parallel shared(elapsedTime, clockError, pixelColorSum)
         {
             const int numThreads = omp_get_num_threads();
             const int threadNum  = omp_get_thread_num();
@@ -143,9 +144,12 @@ namespace Retra {
                 for ( int col = 0; col < screen.gridwidth; ++col )
                     // Take the SPP-weighed average of the old and new color values
                     pixels[row][col] = (Triplet(pixels[row][col]) * sppBefore + pixelColorSum[row*screen.gridwidth + col]) / sppSoFar;
+            if ( 0 == threadNum )
+                clockError = elapsedTime * (numThreads - 1);
         }
         delete[] pixelColorSum;
         rendering = false;
+        return clockError; // Return clock's measurement error due to multithreading
     }
 
     void Camera::gammaCorrect( double gamma )

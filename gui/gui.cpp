@@ -60,7 +60,7 @@ namespace Retra {
         if ( -1 == self->windowId )
             return;
         glutTimerFunc( self->refreshTime, &refresh, 0 );
-        self->camera->render( self->refreshTime * 0.8, self->depth, self->rrLimit );
+        self->clockError += self->camera->render( self->refreshTime * 0.8, self->depth, self->rrLimit );
         glutPostRedisplay();
     }
 
@@ -192,8 +192,9 @@ namespace Retra {
         this->refreshTime = refreshTime;
     }
 
-    void GUI::run() const
+    void GUI::run()
     {
+        this->clockError      = 0;
         glutTimerFunc( refreshTime,     &refresh,           0 );
         glutTimerFunc( moveAndTurnTime, &moveAndTurnCamera, 0 );
         glutMainLoop();

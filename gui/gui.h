@@ -45,6 +45,7 @@ namespace Retra {
             , depth( -1 )
             , rrLimit( -1 )
             , refreshTime( -1 )
+            , clockError( -1 )
         {
             assert( !self );
             self = this;
@@ -57,7 +58,7 @@ namespace Retra {
 
         void initialize( int* argc, char* argv[] );
         void setup( int depth, double rrLimit, int refreshTime /*millisecs*/ );
-        void run() const;
+        void run();
 
     private:
         static void redisplay();
@@ -84,6 +85,7 @@ namespace Retra {
         int         depth;
         double      rrLimit;
         int         refreshTime;
+        int         clockError; // Millisecs
     };
 
 }
