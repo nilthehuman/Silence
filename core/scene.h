@@ -31,7 +31,7 @@
 
 namespace Retra {
 
-    enum WorldAxis { AXIS_X, AXIS_Y, AXIS_Z };
+    enum WorldAxis { AXIS_X, AXIS_Y, AXIS_Z, INVALID };
 
     class Ray;
     class Scene;
