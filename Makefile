@@ -41,6 +41,8 @@ src/core/triplet.o: src/core/triplet.h src/core/aux.h
 
 src/gui/gui.o: src/gui/gui.h src/core/camera.h
 
+src/gui/motion.o: src/gui/motion.h src/core/scene.h src/core/triplet.h
+
 src/parser/parsescene.o: src/parser/parsescene.h src/core/material.h src/core/scene.h
 
 src/parser/parsemotions.o: src/parser/parsemotions.h src/gui/motion.h
