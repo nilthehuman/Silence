@@ -24,6 +24,9 @@
 #define RETRA_GUI
 
 #include <cassert>
+#include <vector>
+
+#include "motion.h"
 
 namespace Retra {
 
@@ -45,6 +48,7 @@ namespace Retra {
             , depth( -1 )
             , rrLimit( -1 )
             , refreshTime( -1 )
+            , lastMoveObjects( -1 )
             , clockError( -1 )
         {
             assert( !self );
@@ -55,14 +59,20 @@ namespace Retra {
             keys.x  = keys.X    = keys.y    = keys.Y     =
                                   keys.z    = keys.Z     = false;
         }
+        ~GUI()
+        {
+            for ( std::vector< Motion* >::iterator m = motions.begin(); m != motions.end(); m++ )
+                delete *m;
+        }
 
         void initialize( int* argc, char* argv[] );
-        void setup( int depth, double rrLimit, int refreshTime /*millisecs*/ );
+        void setup( int depth, double rrLimit, int refreshTime /*millisecs*/, const std::vector< Motion* >& motions );
         void run();
 
     private:
         static void redisplay();
         static void refresh( int );
+        static void moveObjects( int );
         static void moveAndTurnCamera( int );
         static void handleKeyPress( unsigned char key, int, int );
         static void handleKeyRelease( unsigned char key, int, int );
@@ -71,6 +81,7 @@ namespace Retra {
         static void undoReshape( int, int );
 
     private:
+        static const int    moveObjectsTime;
         static const int    moveAndTurnTime;
         static const double moveStep;
         static const double turnStep; // Radians
@@ -85,6 +96,8 @@ namespace Retra {
         int         depth;
         double      rrLimit;
         int         refreshTime;
+        std::vector< Motion* > motions;
+        clock_t     lastMoveObjects;
         int         clockError; // Millisecs
     };
 

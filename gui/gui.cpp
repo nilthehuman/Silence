@@ -25,11 +25,14 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 
+#include <ctime>
+
 #include "../core/camera.h"
 #include "../core/triplet.h"
 
 namespace Retra {
 
+    const int    GUI::moveObjectsTime = 10;
     const int    GUI::moveAndTurnTime = 10;
     const double GUI::moveStep        =  1;
     const double GUI::turnStep        =  0.1;
@@ -62,6 +65,19 @@ namespace Retra {
         glutTimerFunc( self->refreshTime, &refresh, 0 );
         self->clockError += self->camera->render( self->refreshTime * 0.8, self->depth, self->rrLimit );
         glutPostRedisplay();
+    }
+
+    void GUI::moveObjects( int )
+    {
+        if ( -1 == self->windowId )
+            return;
+        glutTimerFunc( self->moveObjectsTime, &moveObjects, 0 );
+        const clock_t now = clock();
+        const double  elapsedTime = (double)(now - self->lastMoveObjects) / CLOCKS_PER_SEC - 0.001 * self->clockError;
+        for ( std::vector< Motion* >::iterator m = self->motions.begin(); m != self->motions.end(); m++ )
+            (*m)->step( elapsedTime );
+        self->clockError      = 0;
+        self->lastMoveObjects = now;
     }
 
     void GUI::moveAndTurnCamera( int )
@@ -185,17 +201,20 @@ namespace Retra {
         glutSwapBuffers();
     }
 
-    void GUI::setup( int depth, double rrLimit, int refreshTime )
+    void GUI::setup( int depth, double rrLimit, int refreshTime, const std::vector< Motion* >& motions )
     {
         this->depth       = depth;
         this->rrLimit     = rrLimit;
         this->refreshTime = refreshTime;
+        this->motions     = motions;
     }
 
     void GUI::run()
     {
         this->clockError      = 0;
+        this->lastMoveObjects = clock();
         glutTimerFunc( refreshTime,     &refresh,           0 );
+        glutTimerFunc( moveObjectsTime, &moveObjects,       0 );
         glutTimerFunc( moveAndTurnTime, &moveAndTurnCamera, 0 );
         glutMainLoop();
     }

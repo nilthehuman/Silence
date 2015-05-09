@@ -4,7 +4,7 @@ gui: CXXFLAGS = -Wall -Wextra -Werror -pedantic -fopenmp -std=c++98 -O2 -DCOMPIL
 GLLIBS = -lGL -lglut
 
 OBJECTS = main.o core/camera.o core/ray.o core/scene.o core/triplet.o parsescene/parsescene.o
-OBJECTS_WITH_GUI = main-gui.o core/camera.o core/ray.o core/scene.o core/triplet.o parsescene/parsescene.o
+OBJECTS_WITH_GUI = main-gui.o core/camera.o core/ray.o core/scene.o core/triplet.o gui/gui.o gui/motion.o parsescene/parsescene.o
 
 PROGNAME = retra
 PROGNAME_WITH_GUI = retra-gui
@@ -23,7 +23,7 @@ $(PROGNAME): $(OBJECTS)
 gui: $(PROGNAME_WITH_GUI)
 	@echo ==== Graphical Retra built successfully ====
 
-$(PROGNAME_WITH_GUI): gui/gui.o $(OBJECTS_WITH_GUI)
+$(PROGNAME_WITH_GUI): $(OBJECTS_WITH_GUI)
 	$(CXX) $(LDFLAGS) -o $(PROGNAME_WITH_GUI) $^ -fopenmp $(GLLIBS)
 
 main.o: core/camera.h core/scene.h parsescene/parsescene.h
