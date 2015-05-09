@@ -99,12 +99,12 @@ namespace Retra {
     // Keep refining the image until a given time limit is reached
     void Camera::render( int renderTime, int depth, double rrLimit )
     {
-        rendering = true;
         if ( scene->isChanged() )
         {
             clear();
             scene->clearChanged();
         }
+        rendering = true;
         const int sppBefore = sppSoFar;
         int elapsedTime = 0;
         Triplet* pixelColorSum = new Triplet[ screen.gridwidth * screen.gridheight ];
