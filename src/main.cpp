@@ -33,10 +33,10 @@
 
 #ifdef COMPILE_WITH_GUI
 #include "gui/gui.h"
-#include "parsescene/parsemotions.h"
+#include "parser/parsemotions.h"
 #endif
 
-#include "parsescene/parsescene.h"
+#include "parser/parsescene.h"
 
 using namespace Retra;
 
