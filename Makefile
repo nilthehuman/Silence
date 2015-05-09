@@ -3,8 +3,8 @@ cli: CXXFLAGS = -Wall -Wextra -Werror -pedantic -fopenmp -std=c++98 -O2
 gui: CXXFLAGS = -Wall -Wextra -Werror -pedantic -fopenmp -std=c++98 -O2 -DCOMPILE_WITH_GUI
 GLLIBS = -lGL -lglut
 
-OBJECTS = main.o core/camera.o core/ray.o core/scene.o core/triplet.o parsescene/parsescene.o
-OBJECTS_WITH_GUI = main-gui.o core/camera.o core/ray.o core/scene.o core/triplet.o gui/gui.o gui/motion.o parsescene/parsescene.o parsescene/parsemotions.o
+OBJECTS = src/main.o src/core/camera.o src/core/ray.o src/core/scene.o src/core/triplet.o src/parsescene/parsescene.o
+OBJECTS_WITH_GUI = src/main-gui.o src/core/camera.o src/core/ray.o src/core/scene.o src/core/triplet.o src/gui/gui.o src/gui/motion.o src/parsescene/parsescene.o src/parsescene/parsemotions.o
 
 PROGNAME = retra
 PROGNAME_WITH_GUI = retra-gui
@@ -26,29 +26,29 @@ gui: $(PROGNAME_WITH_GUI)
 $(PROGNAME_WITH_GUI): $(OBJECTS_WITH_GUI)
 	$(CXX) $(LDFLAGS) -o $(PROGNAME_WITH_GUI) $^ -fopenmp $(GLLIBS)
 
-main.o: core/camera.h core/scene.h parsescene/parsescene.h
+src/main.o: src/core/camera.h src/core/scene.h src/parsescene/parsescene.h
 
-main-gui.o: main.cpp gui/gui.h core/camera.h core/scene.h parsescene/parsescene.h parsescene/parsemotions.h
-	$(CXX) $(CXXFLAGS) -c -o $@ main.cpp
+src/main-gui.o: src/main.cpp src/gui/gui.h src/core/camera.h src/core/scene.h src/parsescene/parsescene.h src/parsescene/parsemotions.h
+	$(CXX) $(CXXFLAGS) -c -o $@ src/main.cpp
 
-core/camera.o: core/camera.h core/ray.h core/triplet.h
+src/core/camera.o: src/core/camera.h src/core/ray.h src/core/triplet.h
 
-core/ray.o: core/ray.h core/aux.h core/scene.h core/triplet.h
+src/core/ray.o: src/core/ray.h src/core/aux.h src/core/scene.h src/core/triplet.h
 
-core/scene.o: core/scene.h core/aux.h core/material.h core/ray.h core/triplet.h
+src/core/scene.o: src/core/scene.h src/core/aux.h src/core/material.h src/core/ray.h src/core/triplet.h
 
-core/triplet.o: core/triplet.h core/aux.h
+src/core/triplet.o: src/core/triplet.h src/core/aux.h
 
-gui/gui.o: gui/gui.h core/camera.h
+src/gui/gui.o: src/gui/gui.h src/core/camera.h
 
-parsescene/parsescene.o: parsescene/parsescene.h core/material.h core/scene.h
+src/parsescene/parsescene.o: src/parsescene/parsescene.h src/core/material.h src/core/scene.h
 
-parsescene/parsemotions.o: parsescene/parsemotions.h gui/motion.h
+src/parsescene/parsemotions.o: src/parsescene/parsemotions.h src/gui/motion.h
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 .PHONY: clean
 clean:
-	rm -f $(PROGNAME) $(PROGNAME_WITH_GUI) *.o core/*.o gui/*.o parsescene/*.o
+	rm -f $(PROGNAME) $(PROGNAME_WITH_GUI) src/*.o src/core/*.o src/gui/*.o src/parsescene/*.o
 
