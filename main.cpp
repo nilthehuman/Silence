@@ -33,6 +33,7 @@
 
 #ifdef COMPILE_WITH_GUI
 #include "gui/gui.h"
+#include "parsescene/parsemotions.h"
 #endif
 
 #include "parsescene/parsescene.h"
@@ -49,11 +50,12 @@ struct arguments {
     int    depth;
     double rrLimit;
     double gamma;
-    char*  inFilename;
+    char*  sceneFilename;
     char*  outFilename;
 #ifdef COMPILE_WITH_GUI
     bool   gui;
     int    fps;
+    char*  motionsFilename;
 #endif
 };
 
@@ -69,6 +71,7 @@ void help( std::string progname )
 #ifdef COMPILE_WITH_GUI
     std::cout << "      --gui           Start interactive graphical interface instead of outputting to file" << std::endl;
     std::cout << "  -f, --fps FPS       Set the framerate for the graphical interface (default 10)" << std::endl;
+    std::cout << "  -m, --motions FILEN Set the file describing how the surfaces move" << std::endl;
 #endif
     std::cout << "  -h, --help          Print this help message and quit" << std::endl;
     std::cout << "  -v, --version       Print version information and quit" << std::endl << std::endl;
@@ -165,6 +168,12 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
             if ( !args->fps )
                 usage( args->progname );
         }
+        else if( !strcmp(argv[i], "-m") || !strcmp(argv[i], "--motions") )
+        {
+            if ( argc <= ++i )
+                usage( args->progname );
+            args->motionsFilename = argv[i];
+        }
 #endif
         else if( !strcmp(argv[i], "-h") || !strcmp(argv[i], "--help") )
         {
@@ -180,12 +189,12 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
         }
         else
         {
-            if( args->inFilename )
+            if( args->sceneFilename )
                 usage( args->progname );
-            args->inFilename = argv[i];
+            args->sceneFilename = argv[i];
         }
     }
-    if( !args->inFilename )
+    if( !args->sceneFilename )
         usage( args->progname );
     if( 1.0 < args->rrLimit )
     {
@@ -201,6 +210,11 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
             std::cerr << "main: warning: starting in GUI mode, disregarding --gamma setting." << std::endl;
         if( strcmp( args->outFilename, "image.ppm" ) )
             std::cerr << "main: warning: starting in GUI mode, disregarding --out setting." << std::endl;
+    }
+    if ( !args->gui )
+    {
+        if( args->motionsFilename )
+            std::cerr << "main: warning: starting in CLI mode, disregarding --motions setting." << std::endl;
     }
 #endif
 }
@@ -219,15 +233,16 @@ int main( int argc, char* argv[] )
 
     // Parse command line arguments
     struct arguments args;
-    args.spp         = 64;
-    args.depth       = 12;
-    args.rrLimit     = 0.25;
-    args.gamma       = 1;
-    args.inFilename  = NULL;
-    args.outFilename = (char*)"image.ppm";
+    args.spp             = 64;
+    args.depth           = 12;
+    args.rrLimit         = 0.25;
+    args.gamma           = 1;
+    args.sceneFilename   = NULL;
+    args.outFilename     = (char*)"image.ppm";
 #ifdef COMPILE_WITH_GUI
-    args.gui         = false;
-    args.fps         = 10;
+    args.gui             = false;
+    args.fps             = 10;
+    args.motionsFilename = NULL;
 #endif
     parseArgs( argc, argv, &args );
     if( modeFlags.verbose )
@@ -243,22 +258,22 @@ int main( int argc, char* argv[] )
     // Process scene description input
     if( modeFlags.verbose )
     {
-        if( !strcmp(args.inFilename, "-") )
+        if( !strcmp(args.sceneFilename, "-") )
             std::cerr << "main: reading scene description from standard input..." << std::endl;
         else
-            std::cerr << "main: reading scene file '" << args.inFilename << "'..." << std::endl;
+            std::cerr << "main: reading scene file '" << args.sceneFilename << "'..." << std::endl;
     }
     std::istream* is;
     std::ifstream ifs;
-    if( !strcmp(args.inFilename, "-") )
+    if( !strcmp(args.sceneFilename, "-") )
     {
         is = &std::cin;
     }
     else
     {
-        ifs.open( args.inFilename );
+        ifs.open( args.sceneFilename );
         if( !ifs.is_open() )
-            die( 2, "cannot read file at '" + std::string(args.inFilename) + "'" );
+            die( 2, "cannot read file at '" + std::string(args.sceneFilename) + "'" );
         is = &ifs;
     }
     try {
@@ -273,13 +288,47 @@ int main( int argc, char* argv[] )
         std::cerr << "main: input scene file read successfully." << std::endl;
 
 #ifdef COMPILE_WITH_GUI
+    std::vector< Motion* > motions;
+    if( args.motionsFilename )
+    {
+        // Process motions description input
+        if( modeFlags.verbose )
+        {
+            if( !strcmp(args.motionsFilename, "-") )
+                std::cerr << "main: reading motions description from standard input..." << std::endl;
+            else
+                std::cerr << "main: reading motions file '" << args.motionsFilename << "'..." << std::endl;
+        }
+        if( !strcmp(args.motionsFilename, "-") )
+        {
+            is = &std::cin;
+        }
+        else
+        {
+            ifs.open( args.motionsFilename );
+            if( !ifs.is_open() )
+                die( 2, "cannot read file at '" + std::string(args.motionsFilename) + "'" );
+            is = &ifs;
+        }
+        try {
+            motions = parseMotions( *is, camera->getScene() );
+        }
+        catch( std::string e ) {
+            die( 3, e );
+        }
+        if( ifs.is_open() )
+            ifs.close();
+        if( modeFlags.verbose )
+            std::cerr << "main: input motions file read successfully." << std::endl;
+    }
+
     if ( args.gui )
     {
         if ( modeFlags.verbose )
             std::cerr << "main: creating GUI." << std::endl;
         GUI gui( camera );
         gui.initialize( &argc, argv );
-        gui.setup( args.depth, args.rrLimit, (int)(1000.0 / args.fps) );
+        gui.setup( args.depth, args.rrLimit, (int)(1000.0 / args.fps), motions );
         atexit( &cleanup );
         if ( modeFlags.verbose )
             std::cerr << "main: starting the renderer." << std::endl;
