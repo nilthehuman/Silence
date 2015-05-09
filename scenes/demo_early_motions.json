@@ -1,0 +1,40 @@
+{
+
+    "motions": [
+
+        {
+            "light":   1,
+            "type":   "linear",
+            "delta":  [0.2, 0.2, 0]
+        },
+
+        {
+            "thing":   0,
+            "type":   "orbiting",
+            "axis":   "X",
+            "period": 20
+        },
+
+        {
+            "thing":   0,
+            "type":   "orbiting",
+            "axis":   "Y",
+            "period": 20
+        },
+
+        {
+            "thing":   1,
+            "type":   "orbiting",
+            "axis":   "Y",
+            "period": 20
+        },
+
+        {
+            "thing":   2,
+            "type":   "brownian",
+            "scale":   1
+        }
+
+    ]
+
+}
