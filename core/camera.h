@@ -104,7 +104,7 @@ namespace Retra {
         Ray generateRay( int row, int col, int depth, double rrLimit ) const;
 
     private:
-        const Scene* scene;
+        const Scene* const scene;
 
         Vector viewpoint;
         Screen screen;
