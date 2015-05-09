@@ -58,6 +58,32 @@ namespace Retra {
         point = newPoint;
     }
 
+    void Light::move( const Vector& translation ) const
+    {
+        for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
+            (*part)->move( translation );
+        scene->setChanged();
+    }
+    void Light::move( double theta, WorldAxis axis ) const
+    {
+        for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
+            (*part)->move( theta, axis );
+        scene->setChanged();
+    }
+
+    void Thing::move( const Vector& translation ) const
+    {
+        for ( ThingPartIt part = partsBegin(); part != partsEnd(); part++ )
+            (*part)->move( translation );
+        scene->setChanged();
+    }
+    void Thing::move( double theta, WorldAxis axis ) const
+    {
+        for ( ThingPartIt part = partsBegin(); part != partsEnd(); part++ )
+            (*part)->move( theta, axis );
+        scene->setChanged();
+    }
+
     Triplet LightPart::getEmission( const Vector& ) const
     {
         return ((Light*)parent)->getEmission(); // By default

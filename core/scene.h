@@ -55,11 +55,12 @@ namespace Retra {
         virtual void move( double theta, WorldAxis axis ) const = 0; // Rotate each part
 
     protected:
-        Object() { }
+        Object( const Scene* scene ) : scene( scene ) { }
         virtual ~Object() { }
 
         friend std::istream& operator>>( std::istream&, Scene& );
 
+        const Scene* const scene;
         bool background; // A background is a Surface that may only occlude other backgrounds from any direction
         bool backCulled; // Back-face culling makes the negative side of Surfaces invisible
     };
@@ -103,7 +104,7 @@ namespace Retra {
     // Non-light complex objects in the Scene
     class Thing : public Object {
     public:
-        Thing() : parts() { }
+        Thing( const Scene* scene ) : Object( scene ) { }
         ~Thing()
         {
             for ( ThingPartIt it = partsBegin(); it != partsEnd(); it++ )
@@ -126,16 +127,8 @@ namespace Retra {
 
         Material::Interaction interact() const { return material.interact(); } // Decides how the surface will behave for a particular hit by a particular Ray
 
-        virtual void move( const Vector& translation ) const
-        {
-            for ( ThingPartIt part = partsBegin(); part != partsEnd(); part++ )
-                (*part)->move( translation );
-        }
-        virtual void move( double theta, WorldAxis axis ) const
-        {
-            for ( ThingPartIt part = partsBegin(); part != partsEnd(); part++ )
-                (*part)->move( theta, axis );
-        }
+        virtual void move( const Vector& translation ) const;
+        virtual void move( double theta, WorldAxis axis ) const;
 
         friend std::istream& operator>>( std::istream&, Sphere& );
         friend std::istream& operator>>( std::istream&, Plane& );
@@ -155,7 +148,7 @@ namespace Retra {
     // Complex light objects
     class Light : public Object {
     public:
-        Light() : parts() { }
+        Light( const Scene* scene ) : Object( scene ) { }
 
         void push_back( LightPart* part ) { parts.push_back( part ); }
 
@@ -170,16 +163,8 @@ namespace Retra {
 
         const Triplet& getEmission() const { return emission; }
 
-        virtual void move( const Vector& translation ) const
-        {
-            for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
-                (*part)->move( translation );
-        }
-        virtual void move( double theta, WorldAxis axis ) const
-        {
-            for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
-                (*part)->move( theta, axis );
-        }
+        virtual void move( const Vector& translation ) const;
+        virtual void move( double theta, WorldAxis axis ) const;
 
         friend std::istream& operator>>( std::istream&, LightPoint& );
         friend std::istream& operator>>( std::istream&, LightSphere& );
@@ -382,7 +367,7 @@ namespace Retra {
 
     class Scene {
     public:
-        Scene() : lights(), things() { }
+        Scene() : changed( false ) { }
         ~Scene()
         {
             for ( LightIt light = lightsBegin(); light != lightsEnd(); light++ )
@@ -400,12 +385,22 @@ namespace Retra {
 
         const Sky& getSky() const { return sky; }
 
+        bool isChanged()    const { return changed; }
+        void clearChanged() const { changed = false; }
+
+    private:
+        void setChanged()   const { changed = true; }
+
+        friend class Light;
+        friend class Thing;
         friend std::istream& operator>>( std::istream&, Scene& );
 
     private:
         std::vector< Light* > lights;
         std::vector< Thing* > things;
         Sky sky;
+
+        mutable bool changed;
     };
 
 }

@@ -27,6 +27,8 @@
 
 #include <omp.h>
 
+#include "scene.h"
+
 namespace Retra {
 
     // Reset pixel buffer to all black
@@ -98,6 +100,11 @@ namespace Retra {
     void Camera::render( int renderTime, int depth, double rrLimit )
     {
         rendering = true;
+        if ( scene->isChanged() )
+        {
+            clear();
+            scene->clearChanged();
+        }
         const int sppBefore = sppSoFar;
         int elapsedTime = 0;
         Triplet* pixelColorSum = new Triplet[ screen.gridwidth * screen.gridheight ];

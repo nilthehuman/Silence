@@ -640,7 +640,7 @@ namespace Retra {
                         throw std::string( "nested Lights are not allowed" );
                     if ( modeFlags.verbose )
                         std::cerr << "parseScene: reading Light from input scene description..." << std::endl;
-                    light = new Light;
+                    light = new Light( &scene );
                     is.ignore(std::numeric_limits< std::streamsize >::max(), '[');
                 }
                 else if ( token == "\"thing\":" )
@@ -649,7 +649,7 @@ namespace Retra {
                         throw std::string( "nested Things are not allowed" );
                     if ( modeFlags.verbose )
                         std::cerr << "parseScene: reading Thing from input scene description..." << std::endl;
-                    thing = new Thing;
+                    thing = new Thing( &scene );
                     is.ignore(std::numeric_limits< std::streamsize >::max(), '[');
                 }
                 else if ( token == "\"background\":" )
@@ -696,7 +696,7 @@ namespace Retra {
                         std::cerr << "parseScene: reading LightPoint from input scene description... ";
                     bool single = !light;
                     if ( single )
-                        light = new Light;
+                        light = new Light( &scene );
                     LightPoint* lightPoint = new LightPoint( light );
                     is >> *lightPoint;
                     is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
@@ -718,7 +718,7 @@ namespace Retra {
                         std::cerr << "parseScene: reading LightSphere from input scene description... ";
                     bool single = !light;
                     if ( single )
-                        light = new Light;
+                        light = new Light( &scene );
                     LightSphere* lightSphere = new LightSphere( light );
                     is >> *lightSphere;
                     is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
@@ -740,7 +740,7 @@ namespace Retra {
                         std::cerr << "parseScene: reading LightPlane from input scene description... ";
                     bool single = !light;
                     if ( single )
-                        light = new Light;
+                        light = new Light( &scene );
                     LightPlane* lightPlane = new LightPlane( light );
                     is >> *lightPlane;
                     is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
@@ -762,8 +762,8 @@ namespace Retra {
                         std::cerr << "parseScene: reading LightTriangle from input scene description... ";
                     bool single = !light;
                     if ( single )
-                        light = new Light;
-                    light = new Light;
+                        light = new Light( &scene );
+                    light = new Light( &scene );
                     LightTriangle* lightTriangle = new LightTriangle( light );
                     is >> *lightTriangle;
                     is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
@@ -785,7 +785,7 @@ namespace Retra {
                         std::cerr << "parseScene: reading Sphere from input scene description... ";
                     bool single = !thing;
                     if ( single )
-                        thing = new Thing;
+                        thing = new Thing( &scene );
                     Sphere* sphere = new Sphere( thing );
                     is >> *sphere;
                     is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
@@ -807,7 +807,7 @@ namespace Retra {
                         std::cerr << "parseScene: reading Plane from input scene description... ";
                     bool single = !thing;
                     if ( single )
-                        thing = new Thing;
+                        thing = new Thing( &scene );
                     Plane* plane = new Plane( thing );
                     is >> *plane;
                     is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
@@ -829,7 +829,7 @@ namespace Retra {
                         std::cerr << "parseScene: reading Triangle from input scene description... ";
                     bool single = !thing;
                     if ( single )
-                        thing = new Thing;
+                        thing = new Thing( &scene );
                     Triangle* triangle = new Triangle( thing );
                     is >> *triangle;
                     is.ignore(std::numeric_limits< std::streamsize >::max(), '}');
