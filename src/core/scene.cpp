@@ -208,7 +208,7 @@ namespace Retra {
         Triplet directLightTotal;
         for ( LightIt light = lightsBegin(); light != lightsEnd(); light++ )
         {
-            Triplet directLight = 0; // How much of the light intensity from this lightsource actually strikes the point
+            Triplet directLight; // How much of the light intensity from this lightsource actually strikes the point
             for ( int i = 0; i < SHADOWRAYS; ++i )
             {
                 const LightPart* lightPart = (*light)->getRandomPart();

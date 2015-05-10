@@ -32,7 +32,7 @@
 namespace Retra {
 
     struct Triplet {
-        Triplet( double x = 0, double y = 0, double z = 0 ) : x(x), y(y), z(z) { }
+        explicit Triplet( double x = 0, double y = 0, double z = 0 ) : x(x), y(y), z(z) { }
         Triplet( const Triplet& other ) : x(other.x), y(other.y), z(other.z) { }
 
         bool     operator==( const Triplet& other ) const { return  equal( x, other.x ) &&  equal( y, other.y ) &&  equal( z, other.z ); }
@@ -55,13 +55,13 @@ namespace Retra {
     };
 
     struct RGB : public Triplet {
-        RGB( double x = 0, double y = 0, double z = 0 ) : Triplet(x, y, z)
+        explicit RGB( double x = 0, double y = 0, double z = 0 ) : Triplet(x, y, z)
         {
             assert( 0 <= x && x <= 1 );
             assert( 0 <= y && y <= 1 );
             assert( 0 <= z && z <= 1 );
         }
-        RGB( const Triplet& triplet ) : Triplet(triplet)
+        explicit RGB( const Triplet& triplet ) : Triplet(triplet)
         {
             assert( 0 <= x && x <= 1 );
             assert( 0 <= y && y <= 1 );
@@ -98,7 +98,7 @@ namespace Retra {
     };
 
     struct Vector : public Triplet {
-        Vector( double x = 0, double y = 0, double z = 0 ) : Triplet(x, y, z) { }
+        explicit Vector( double x = 0, double y = 0, double z = 0 ) : Triplet(x, y, z) { }
 
         // Redefine operators so that they return Vectors rather than Triplets
         Vector  operator+ ( const Vector& other ) const { return Vector( x+other.x, y+other.y, z+other.z); }
