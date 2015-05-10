@@ -87,12 +87,14 @@ namespace Retra {
     class ThingPart : virtual public Surface {
     public:
         ThingPart( const Thing* parent ) : Surface( (Object*)parent ) { }
+        virtual ~ThingPart() { }
     };
 
     class Light;
     class LightPart : virtual public Surface {
     public:
         LightPart( const Light* parent ) : Surface( (Object*)parent ) { }
+        virtual ~LightPart() { }
 
         virtual Triplet getEmission( const Vector& ) const;
     };
