@@ -38,7 +38,7 @@ namespace Retra {
         if ( lightHit )
         {
             // Hit a lightsource. This path ends here
-            paint( lightPartHit->getEmission(-direction) );
+            paint( lightHit->getEmission() );
             depth = 0;
         }
         else if ( !thingHit )
