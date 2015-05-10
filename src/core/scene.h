@@ -107,8 +107,8 @@ namespace Retra {
         Thing( const Scene* scene ) : Object( scene ) { }
         ~Thing()
         {
-            for ( ThingPartIt it = partsBegin(); it != partsEnd(); it++ )
-                delete *it;
+            for ( ThingPartIt part = partsBegin(); part != partsEnd(); part++ )
+                delete *part;
         }
 
         void push_back( ThingPart* part ) { parts.push_back( part ); }
@@ -149,6 +149,11 @@ namespace Retra {
     class Light : public Object {
     public:
         Light( const Scene* scene ) : Object( scene ) { }
+        ~Light()
+        {
+            for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
+                delete *part;
+        }
 
         void push_back( LightPart* part ) { parts.push_back( part ); }
 
