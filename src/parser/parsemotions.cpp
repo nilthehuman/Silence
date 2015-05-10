@@ -37,6 +37,7 @@ namespace Retra {
         int       type   = -1;
         double    scale;
         Vector    delta;
+        double    stop   = -1;
         WorldAxis axis   = INVALID;
         double    period;
         Vector    begin;
@@ -87,6 +88,10 @@ namespace Retra {
             {
                 is >> delta;
             }
+            else if( token == "\"stop\":" )
+            {
+                is >> stop;
+            }
             else if( token == "\"axis\":" )
             {
                 is >> token;
@@ -127,7 +132,7 @@ namespace Retra {
             }
             case 1:
             {
-                LinearMotion* motion = new LinearMotion( object, delta );
+                LinearMotion* motion = new LinearMotion( object, delta, stop );
                 motions.push_back( motion );
                 break;
             }

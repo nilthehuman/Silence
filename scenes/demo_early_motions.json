@@ -5,7 +5,8 @@
         {
             "light":   1,
             "type":   "linear",
-            "delta":  [0.2, 0.2, 0]
+            "delta":  [0.2, 0.2, 0],
+            "stop":   20
         },
 
         {

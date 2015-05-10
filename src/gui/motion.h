@@ -58,15 +58,19 @@ namespace Retra {
     // Move in a constant direction at constant speed
     class LinearMotion : public Motion {
     public:
-        LinearMotion( const Object* object, const Vector& delta )
+        LinearMotion( const Object* object, const Vector& delta, double stop = -1 )
             : Motion( object )
             , delta( delta )
+            , stop( stop )
+            , distance( 0 )
         { }
 
         virtual void step( double dt ) const;
 
     private:
         Vector delta;
+        double stop; // Maximal distance traveled
+        mutable double distance;
     };
 
     // Rotate around fixed world axis

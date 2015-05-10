@@ -45,7 +45,11 @@ namespace Retra {
 
     void LinearMotion::step( double dt ) const
     {
-        object->move( delta * dt );
+        if ( stop < 0 || distance < stop )
+        {
+            object->move( delta * dt );
+            distance += delta.length() * dt;
+        }
     }
 
     void OrbitingMotion::step( double dt ) const
