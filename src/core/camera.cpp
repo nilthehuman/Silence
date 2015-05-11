@@ -97,7 +97,7 @@ namespace Retra {
     }
 
     // Keep refining the image until a given time limit is reached
-    int Camera::render( int renderTime, int depth, double rrLimit )
+    int Camera::render( int renderTime, int depth, double rrLimit, double gamma )
     {
         if ( scene->isChanged() )
         {
@@ -143,7 +143,8 @@ namespace Retra {
             for ( int row = rowBegin; row < rowEnd; ++row )
                 for ( int col = 0; col < screen.gridwidth; ++col )
                     // Take the SPP-weighed average of the old and new color values
-                    pixels[row][col] = (Triplet(pixels[row][col]) * sppBefore + pixelColorSum[row*screen.gridwidth + col]) / sppSoFar;
+                    pixels[row][col] = pixels[row][col] * ((double)sppBefore / sppSoFar) +
+                                       RGB(pixelColorSum[row*screen.gridwidth + col] / (sppSoFar - sppBefore)).gamma(gamma) * ((double)(sppSoFar - sppBefore) / sppSoFar);
             if ( 0 == threadNum )
                 clockError = elapsedTime * (numThreads - 1);
         }
@@ -155,6 +156,8 @@ namespace Retra {
     void Camera::gammaCorrect( double gamma )
     {
         assert( !rendering );
+        if ( 1 == gamma )
+            return;
         #pragma omp parallel for
         for ( int row = 0; row < screen.gridheight; ++row )
             for ( int col = 0; col < screen.gridwidth; ++col )

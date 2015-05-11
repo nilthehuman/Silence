@@ -47,6 +47,7 @@ namespace Retra {
             , windowId( -1 )
             , depth( -1 )
             , rrLimit( -1 )
+            , gamma( -1 )
             , refreshTime( -1 )
             , lastMoveObjects( -1 )
             , clockError( -1 )
@@ -66,7 +67,7 @@ namespace Retra {
         }
 
         void initialize( int* argc, char* argv[] );
-        void setup( int depth, double rrLimit, int refreshTime /*millisecs*/, const std::vector< Motion* >& motions );
+        void setup( int depth, double rrLimit, double gamma, int refreshTime /*millisecs*/, const std::vector< Motion* >& motions );
         void run();
 
     private:
@@ -95,6 +96,7 @@ namespace Retra {
 
         int         depth;
         double      rrLimit;
+        double      gamma;
         int         refreshTime;
         std::vector< Motion* > motions;
         clock_t     lastMoveObjects;

@@ -85,7 +85,7 @@ namespace Retra {
 
         void clear();
         void capture( int spp,        int depth, double rrLimit );
-        int  render ( int renderTime, int depth, double rrLimit );
+        int  render ( int renderTime, int depth, double rrLimit, double gamma = 1 );
         void gammaCorrect( double gamma );
 
         void writePixels( std::ostream& os ) const;
