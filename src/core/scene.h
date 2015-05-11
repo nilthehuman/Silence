@@ -45,6 +45,16 @@ namespace Retra {
     typedef std::vector< Light* >    ::const_iterator LightIt;
     typedef std::vector< LightPart* >::const_iterator LightPartIt;
 
+    class Point;
+    class Sphere;
+    class Plane;
+    class Triangle;
+
+    class LightPoint;
+    class LightSphere;
+    class LightPlane;
+    class LightTriangle;
+
     // A set of Surfaces that delimit the same physical object
     class Object {
     public:
@@ -90,7 +100,6 @@ namespace Retra {
         virtual ~ThingPart() { }
     };
 
-    class Light;
     class LightPart : virtual public Surface {
     public:
         LightPart( const Light* parent ) : Surface( (Object*)parent ) { }
@@ -99,10 +108,6 @@ namespace Retra {
         virtual Triplet getEmission( const Vector& ) const;
     };
 
-    class Point;
-    class Sphere;
-    class Plane;
-    class Triangle;
     // Non-light complex objects in the Scene
     class Thing : public Object {
     public:
@@ -143,10 +148,6 @@ namespace Retra {
         Material material;
     };
 
-    class LightPoint;
-    class LightSphere;
-    class LightPlane;
-    class LightTriangle;
     // Complex light objects
     class Light : public Object {
     public:
