@@ -33,11 +33,20 @@ namespace Retra {
         return os;
     }
 
-    // Returns a random vector whose dot product with 'normal' is non-negative
+    // Returns a random unit vector whose dot product with 'normal' is non-negative
     Vector Vector::random( const Vector& normal )
     {
+        double x;
+        double y;
+        double z;
+        do {
+            x = (double)std::rand() / RAND_MAX * 2 - 1;
+            y = (double)std::rand() / RAND_MAX * 2 - 1;
+            z = (double)std::rand() / RAND_MAX;
+        } while ( 1 < x*x + y*y + z*z || (!x && !y && !z) );
+
         Vector tangentialX, tangentialY;
-        if ( Vector::UnitZ == normal )
+        if ( Vector::UnitZ == normal || -Vector::UnitZ == normal )
         {
             tangentialX = Vector::UnitX;
             tangentialY = Vector::UnitY;
@@ -47,14 +56,6 @@ namespace Retra {
             tangentialX = normal.cross( Vector::UnitZ ).normalize();
             tangentialY = normal.cross( tangentialX   ).normalize();
         }
-        // This won't yield a uniform distribution, but it's good enough for now
-        double x = std::rand() * 2;
-        if ( RAND_MAX < x )
-            x = RAND_MAX - x;
-        double y = std::rand() * 2;
-        if ( RAND_MAX < y )
-            y = RAND_MAX - y;
-        double z = std::rand();
         Vector result = tangentialX * x + tangentialY * y + normal * z;
         return result.normalize();
     }
