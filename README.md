@@ -194,7 +194,6 @@ they are all unsupported.
 
   * Ambient light
   * Octree / BSP tree
-  * Real-time output with OpenGL
 
 ### Unfeatures
 
