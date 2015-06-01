@@ -47,7 +47,7 @@ Go to the directory you want to download to and copy the git repo like so:
 ```bash
 mkdir Retra
 cd Retra
-git clone git://github.com/[...]/retra.git
+git clone git://github.com/nilthehuman/Retra.git
 ```
 
 #### B. / Downloading the tarball
