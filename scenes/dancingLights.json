@@ -1,0 +1,144 @@
+{
+
+    "scene": [
+
+        { "lightpoint": {
+            "emission": [1, 0, 0],
+            "point": [0, 5, 3]
+            }
+        },
+        { "lightpoint": {
+            "emission": [0, 1, 0],
+            "point": [-4, -3, 3]
+            }
+        },
+        { "lightpoint": {
+            "emission": [0, 0, 1],
+            "point": [4, -3, 3]
+            }
+        },
+
+        { "sphere": {
+            "material": {
+                "character": {
+                    "diffuse":    0.2,
+                    "metallic":   0.8,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.8, 0.8, 0.8]
+            },
+            "background": false,
+            "backculled": true,
+            "center": [0, -5, 0],
+            "radius": 3
+            }
+        },
+
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.8, 0.1, 0.1]
+            },
+            "background": true,
+            "backculled": false,
+            "normal": [1, 0.4, 0.2],
+            "offset": -10
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.1, 0.1, 0.8]
+            },
+            "background": true,
+            "backculled": false,
+            "normal": [-1, 0.3, -0.2],
+            "offset": -10
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.1, 0.8, 0.1]
+            },
+            "background": true,
+            "backculled": false,
+            "normal": [-0.4, 0.6, 1],
+            "offset": -10
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.1, 0.8, 0.1]
+            },
+            "background": true,
+            "backculled": false,
+            "normal": [0.1, -0.2, 1],
+            "offset": -10
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.7, 0.7, 0.7]
+            },
+            "background": true,
+            "backculled": false,
+            "normal": [0, 1, 0],
+            "offset": -10
+            }
+        },
+        { "plane": {
+            "material": {
+                "character": {
+                    "diffuse":    1,
+                    "metallic":   0,
+                    "reflecting": 0,
+                    "refractive": 0
+                },
+                "color": [0.7, 0.7, 0.7]
+            },
+            "background": true,
+            "backculled": true,
+            "normal": [-0.3, -1, 0.1],
+            "offset": -10
+            }
+        }
+
+
+    ],
+
+    "camera": {
+        "viewpoint": [0, 0, 20],
+        "screen": [ [-1, 1, 19], [1, 1, 19], [-1, -1, 19], [1, -1, 19] ],
+        "gridresolution": [512, 512]
+    }
+
+}
