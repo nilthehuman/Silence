@@ -206,8 +206,6 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
     {
         if( args->spp   != 64 )
             std::cerr << "main: warning: starting in GUI mode, disregarding --spp setting." << std::endl;
-        if( args->gamma !=  1 )
-            std::cerr << "main: warning: starting in GUI mode, disregarding --gamma setting." << std::endl;
         if( strcmp( args->outFilename, "image.ppm" ) )
             std::cerr << "main: warning: starting in GUI mode, disregarding --out setting." << std::endl;
     }
