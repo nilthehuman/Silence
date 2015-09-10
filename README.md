@@ -81,7 +81,7 @@ make gui
 (Simply typing `make` builds both versions.)
 
 If you see `==== Retra built successfully ====` you're golden. If the compiler
-(or linker) complains about undefined stuff please refer to the "Dependecies"
+(or linker) complains about undefined stuff please refer to the "Dependencies"
 section below.
 
 The Makefile specifies g++ as the compiler. If you want to use a different
