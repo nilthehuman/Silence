@@ -158,7 +158,7 @@ namespace Retra {
         }
         // Allocate new pixel table
         camera.pixels = new RGB*[camera.screen.gridheight];
-        for ( int i = 0; i < camera.screen.gridwidth; ++i )
+        for ( int i = 0; i < camera.screen.gridheight; ++i )
             camera.pixels[i] = new RGB[camera.screen.gridwidth];
         return is;
     }
