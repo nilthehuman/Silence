@@ -286,7 +286,7 @@ int main( int argc, char* argv[] )
     try {
         camera = parseScene( *is );
     }
-    catch( std::string e ) {
+    catch( const std::string& e ) {
         die( 3, e );
     }
     if( ifs.is_open() )
@@ -320,7 +320,7 @@ int main( int argc, char* argv[] )
         try {
             motions = parseMotions( *is, camera->getScene() );
         }
-        catch( std::string e ) {
+        catch( const std::string& e ) {
             die( 3, e );
         }
         if( ifs.is_open() )
