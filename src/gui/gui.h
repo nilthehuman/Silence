@@ -39,6 +39,16 @@ namespace Retra {
             bool h, j, k, l;
             bool up, down, left, right;
             bool x, X, y, Y, z, Z;
+
+            bool any() const
+            {
+                if ( w || a || s || d ||
+                     h || j || k || l ||
+                     up || down || left || right ||
+                     x || X || y || Y || z || Z )
+                    return true;
+                return false;
+            }
         };
 
     public:
@@ -49,8 +59,18 @@ namespace Retra {
             , rrLimit( -1 )
             , gamma( -1 )
             , refreshTime( -1 )
+            , hud( false )
             , lastMoveObjects( -1 )
             , clockError( -1 )
+            , lastHudRefresh( -1 )
+            , lastCameraClear( -1 )
+            , hudClockErrorSinceHudRefresh( -1 )
+            , hudClockErrorSinceCameraClear( -1 )
+            , hudFrames( -1 )
+            , hudFps( -1 )
+            , hudSpp( -1 )
+            , hudRays( -1 )
+            , hudTime( -1 )
         {
             assert( !self );
             self = this;
@@ -67,7 +87,7 @@ namespace Retra {
         }
 
         void initialize( int* argc, char* argv[] );
-        void setup( int depth, double rrLimit, double gamma, int refreshTime /*millisecs*/, const std::vector< Motion* >& motions );
+        void setup( int depth, double rrLimit, double gamma, int refreshTime /*millisecs*/, bool hud, const std::vector< Motion* >& motions );
         void run();
 
     private:
@@ -98,9 +118,21 @@ namespace Retra {
         double      rrLimit;
         double      gamma;
         int         refreshTime;
+        bool        hud;
         std::vector< Motion* > motions;
+
+        // Bookkeeping
         clock_t     lastMoveObjects;
         int         clockError; // Millisecs
+        clock_t     lastHudRefresh;
+        clock_t     lastCameraClear;
+        int         hudClockErrorSinceHudRefresh;  // Millisecs
+        int         hudClockErrorSinceCameraClear; // Millisecs
+        int         hudFrames;
+        int         hudFps;
+        int         hudSpp;
+        int         hudRays;
+        int         hudTime;
     };
 
 }

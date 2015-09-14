@@ -53,9 +53,50 @@ namespace Retra {
                 floatPixels[ row*width*3 + col*3 + 1 ] = pixels[ height - row - 1 ][ col ].y;
                 floatPixels[ row*width*3 + col*3 + 2 ] = pixels[ height - row - 1 ][ col ].z;
             }
+        glRasterPos2i( -1, -1 );
         glDrawPixels( self->camera->getGridwidth(), self->camera->getGridheight(), GL_RGB, GL_FLOAT, floatPixels );
-        glutSwapBuffers();
         delete[] floatPixels;
+
+        if ( self->hud )
+        {
+            self->hudFrames++;
+            const clock_t now = clock();
+            if ( 1 < (double)(now - self->lastHudRefresh) / CLOCKS_PER_SEC - 0.001 * self->hudClockErrorSinceHudRefresh )
+            {
+                self->hudTime = (double)(now - self->lastCameraClear) / CLOCKS_PER_SEC - 0.001 * self->hudClockErrorSinceCameraClear;
+                if ( 0 < self->hudTime )
+                    self->hudFps = self->hudFrames / self->hudTime + 0.5;
+                else
+                    self->hudFps = 0;
+                self->hudRays = width * height * self->hudSpp;
+                self->lastHudRefresh = now;
+                self->hudClockErrorSinceHudRefresh = 0;
+            }
+            glColor3f( 1.0, 1.0, 0.4 );
+            char fpsText[32];
+            char rayText[32];
+            char timeText[32];
+            snprintf( fpsText,  32, "%d fps",   self->hudFps );
+            snprintf( rayText,  32, "%dk rays", self->hudRays / 1000 );
+            snprintf( timeText, 32, "%d secs",  self->hudTime );
+            for ( int i = 0; fpsText[i] != 0; ++i )
+            {
+                glRasterPos2f( -1.0 + i*20.0 / width, 1.0 - 22.0 / height );
+                glutBitmapCharacter( GLUT_BITMAP_9_BY_15, fpsText[i] );
+            }
+            for ( int i = 0; rayText[i] != 0; ++i )
+            {
+                glRasterPos2f( -1.0 + i*20.0 / width, 1.0 - 44.0 / height );
+                glutBitmapCharacter( GLUT_BITMAP_9_BY_15, rayText[i] );
+            }
+            for ( int i = 0; timeText[i] != 0; ++i )
+            {
+                glRasterPos2f( -1.0 + i*20.0 / width, 1.0 - 66.0 / height );
+                glutBitmapCharacter( GLUT_BITMAP_9_BY_15, timeText[i] );
+            }
+        }
+
+        glutSwapBuffers();
     }
 
     void GUI::refresh( int )
@@ -63,7 +104,19 @@ namespace Retra {
         if ( -1 == self->windowId )
             return;
         glutTimerFunc( self->refreshTime, &refresh, 0 );
-        self->clockError += self->camera->render( self->refreshTime * 0.8, self->depth, self->rrLimit, self->gamma );
+        const clock_t now = clock();
+        const Camera::RenderInfo* renderInfo = self->camera->render( self->refreshTime * 0.8, self->depth, self->rrLimit, self->gamma );
+        if ( self->keys.any() || renderInfo->sceneChanged )
+        {
+            self->lastCameraClear               = now;
+            self->hudClockErrorSinceCameraClear = 0;
+            self->hudFrames                     = 0;
+        }
+        self->clockError                    += renderInfo->clockError;
+        self->hudClockErrorSinceHudRefresh  += renderInfo->clockError;
+        self->hudClockErrorSinceCameraClear += renderInfo->clockError;
+        self->hudSpp                         = renderInfo->sppSoFar;
+        delete renderInfo;
         glutPostRedisplay();
     }
 
@@ -239,19 +292,27 @@ namespace Retra {
         glutSwapBuffers();
     }
 
-    void GUI::setup( int depth, double rrLimit, double gamma, int refreshTime, const std::vector< Motion* >& motions )
+    void GUI::setup( int depth, double rrLimit, double gamma, int refreshTime, bool hud, const std::vector< Motion* >& motions )
     {
         this->depth       = depth;
         this->rrLimit     = rrLimit;
         this->gamma       = gamma;
         this->refreshTime = refreshTime;
+        this->hud         = hud;
         this->motions     = motions;
     }
 
     void GUI::run()
     {
-        this->clockError      = 0;
-        this->lastMoveObjects = clock();
+        this->clockError                    = 0;
+        this->hudClockErrorSinceHudRefresh  = 0;
+        this->hudClockErrorSinceCameraClear = 0;
+        this->hudFrames                     = 0;
+        this->hudFps                        = 0;
+        this->hudSpp                        = 0;
+        this->hudRays                       = 0;
+        this->hudTime                       = 0;
+        this->lastMoveObjects = this->lastHudRefresh = this->lastCameraClear = clock();
         glutTimerFunc( refreshTime,     &refresh,           0 );
         glutTimerFunc( moveObjectsTime, &moveObjects,       0 );
         glutTimerFunc( moveAndTurnTime, &moveAndTurnCamera, 0 );

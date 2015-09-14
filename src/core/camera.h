@@ -35,6 +35,13 @@ namespace Retra {
     public:
         enum Axis { AXIS_X, AXIS_Y, AXIS_Z };
 
+        // The GUI's going to need these
+        struct RenderInfo {
+            int  clockError;
+            int  sppSoFar;
+            bool sceneChanged;
+        };
+
     private:
         struct Screen {
             Screen() { }
@@ -84,8 +91,8 @@ namespace Retra {
         }
 
         void clear();
-        void capture( int spp,        int depth, double rrLimit );
-        int  render ( int renderTime, int depth, double rrLimit, double gamma = 1 );
+        void capture( int spp, int depth, double rrLimit );
+        const RenderInfo* render ( int renderTime, int depth, double rrLimit, double gamma = 1 );
         void gammaCorrect( double gamma );
 
         void writePixels( std::ostream& os ) const;

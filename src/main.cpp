@@ -56,6 +56,7 @@ struct arguments {
     bool   gui;
     int    fps;
     char*  motionsFilename;
+    bool   hud;
 #endif
 };
 
@@ -72,6 +73,7 @@ void help( std::string progname )
     std::cout << "      --gui           Start interactive graphical interface instead of outputting to file" << std::endl;
     std::cout << "  -f, --fps FPS       Set the framerate for the graphical interface (default 10)" << std::endl;
     std::cout << "  -m, --motions FILEN Set the file describing how the surfaces move" << std::endl;
+    std::cout << "      --hud           Show performance info in top left corner" << std::endl;
 #endif
     std::cout << "  -h, --help          Print this help message and quit" << std::endl;
     std::cout << "  -v, --version       Print version information and quit" << std::endl << std::endl;
@@ -174,6 +176,10 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
                 usage( args->progname );
             args->motionsFilename = argv[i];
         }
+        else if( !strcmp(argv[i], "--hud") )
+        {
+            args->hud = true;
+        }
 #endif
         else if( !strcmp(argv[i], "-h") || !strcmp(argv[i], "--help") )
         {
@@ -209,10 +215,12 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
         if( strcmp( args->outFilename, "image.ppm" ) )
             std::cerr << "main: warning: starting in GUI mode, disregarding --out setting." << std::endl;
     }
-    if ( !args->gui )
+    else
     {
         if( args->motionsFilename )
             std::cerr << "main: warning: starting in CLI mode, disregarding --motions setting." << std::endl;
+        if( args->hud )
+            std::cerr << "main: warning: starting in CLI mode, disregarding --hud setting." << std::endl;
     }
 #endif
 }
@@ -241,6 +249,7 @@ int main( int argc, char* argv[] )
     args.gui             = false;
     args.fps             = 10;
     args.motionsFilename = NULL;
+    args.hud             = false;
 #endif
     parseArgs( argc, argv, &args );
     if( modeFlags.verbose )
@@ -326,7 +335,7 @@ int main( int argc, char* argv[] )
             std::cerr << "main: creating GUI." << std::endl;
         GUI gui( camera );
         gui.initialize( &argc, argv );
-        gui.setup( args.depth, args.rrLimit, args.gamma, (int)(1000.0 / args.fps), motions );
+        gui.setup( args.depth, args.rrLimit, args.gamma, (int)(1000.0 / args.fps), args.hud, motions );
         atexit( &cleanup );
         if ( modeFlags.verbose )
             std::cerr << "main: starting the renderer." << std::endl;

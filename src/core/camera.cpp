@@ -97,9 +97,10 @@ namespace Retra {
     }
 
     // Keep refining the image until a given time limit is reached
-    int Camera::render( int renderTime, int depth, double rrLimit, double gamma )
+    const Camera::RenderInfo* Camera::render( int renderTime, int depth, double rrLimit, double gamma )
     {
-        if ( scene->isChanged() )
+        const bool sceneChanged = scene->isChanged();
+        if ( sceneChanged )
         {
             clear();
             scene->clearChanged();
@@ -146,11 +147,18 @@ namespace Retra {
                     pixels[row][col] = pixels[row][col] * ((double)sppBefore / sppSoFar) +
                                        RGB(pixelColorSum[row*screen.gridwidth + col] / (sppSoFar - sppBefore)).gamma(gamma) * ((double)(sppSoFar - sppBefore) / sppSoFar);
             if ( 0 == threadNum )
+            {
+                elapsedTime = 1000.0 * (clock() - start) / CLOCKS_PER_SEC / numThreads; // clock() returns total CPU time
                 clockError = elapsedTime * (numThreads - 1);
+            }
         }
         delete[] pixelColorSum;
+        RenderInfo* renderInfo   = new RenderInfo;
+        renderInfo->clockError   = clockError; // Return clock's measurement error due to multithreading
+        renderInfo->sppSoFar     = sppSoFar;
+        renderInfo->sceneChanged = sceneChanged;
         rendering = false;
-        return clockError; // Return clock's measurement error due to multithreading
+        return renderInfo;
     }
 
     void Camera::gammaCorrect( double gamma )
