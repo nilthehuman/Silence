@@ -76,7 +76,8 @@ void help( std::string progname )
     std::cout << "      --hud           Show performance info in top left corner" << std::endl;
 #endif
     std::cout << "  -h, --help          Print this help message and quit" << std::endl;
-    std::cout << "  -v, --version       Print version information and quit" << std::endl << std::endl;
+    std::cout << "      --version       Print version information and quit" << std::endl;
+    std::cout << "  -v, --verbose       Show progress and print troubleshooting info while running" << std::endl << std::endl;
     std::cout << "Exit status:" << std::endl;
     std::cout << "  0  if OK" << std::endl;
     std::cout << "  1  if arguments are unparseable" << std::endl;
