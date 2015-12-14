@@ -60,7 +60,7 @@ namespace Retra {
         const RGB&    getColor()      const { return color; }
         int           getDepth()      const { return depth; }
 
-        Vector operator[]( double t ) const { return Vector( origin + direction * t ); }
+        Vector operator[]( double t ) const { return origin + direction * t; }
 
         double  traceToNextIntersection(); // Initial bounce to find the surface point the Camera sees
         RGB     trace();                   // Trace the Ray all the way through
