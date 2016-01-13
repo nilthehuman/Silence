@@ -100,7 +100,10 @@ void usage( std::string progname )
 {
     std::cerr << "usage: " << progname << " SCENE_FILENAME [-v|--verbose] [--spp SAMPLES_PER_PIXEL]" << std::endl;
     std::cerr << "  [--depth MAX_DEPTH_OF_PATHS] [--rr RUSSIAN_ROULETTE_LIMIT] [--gamma GAMMA]" << std::endl;
-    std::cerr << "  [--out IMAGE_FILENAME] [--gui]" << std::endl;
+    std::cerr << "  [--out IMAGE_FILENAME]" << std::endl;
+#ifdef COMPILE_WITH_GUI
+    std::cerr << "  [--gui]" << std::endl;
+#endif
     exit(1);
 }
 
