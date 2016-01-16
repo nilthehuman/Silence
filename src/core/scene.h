@@ -1,27 +1,27 @@
 /*
  * Copyright 2015 Dániel Arató
  *
- * This file is part of Retra.
+ * This file is part of Silence.
  *
- * Retra is free software: you can redistribute it and/or modify
+ * Silence is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Retra is distributed in the hope that it will be useful,
+ * Silence is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Retra.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Silence.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 // Class hierarchy for representing a Scene and all parts of it
-// Part of Retra, the Reference Tracer
+// Part of Silence, an experimental rendering engine
 
-#ifndef RETRA_SCENE
-#define RETRA_SCENE
+#ifndef SILENCE_SCENE
+#define SILENCE_SCENE
 
 #include <vector>
 
@@ -29,7 +29,7 @@
 #include "material.h"
 #include "triplet.h"
 
-namespace Retra {
+namespace Silence {
 
     enum WorldAxis { AXIS_X, AXIS_Y, AXIS_Z, INVALID };
 
@@ -413,5 +413,5 @@ namespace Retra {
 
 }
 
-#endif // RETRA_SCENE
+#endif // SILENCE_SCENE
 

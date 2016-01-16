@@ -1,27 +1,27 @@
 /*
  * Copyright 2015 Dániel Arató
  *
- * This file is part of Retra.
+ * This file is part of Silence.
  *
- * Retra is free software: you can redistribute it and/or modify
+ * Silence is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Retra is distributed in the hope that it will be useful,
+ * Silence is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Retra.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Silence.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 // Triplet struct for color and 3D vectors, plus a bit of auxiliary math
-// Part of Retra, the Reference Tracer
+// Part of Silence, an experimental rendering engine
 
-#ifndef RETRA_TRIPLET
-#define RETRA_TRIPLET
+#ifndef SILENCE_TRIPLET
+#define SILENCE_TRIPLET
 
 #include <math.h>
 #include <iostream>
@@ -29,7 +29,7 @@
 
 #include "aux.h"
 
-namespace Retra {
+namespace Silence {
 
     struct Triplet {
         explicit Triplet( double x = 0, double y = 0, double z = 0 ) : x(x), y(y), z(z) { }
@@ -131,5 +131,5 @@ namespace Retra {
 
 }
 
-#endif // RETRA_TRIPLET
+#endif // SILENCE_TRIPLET
 

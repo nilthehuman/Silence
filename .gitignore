@@ -1,5 +1,5 @@
-retra
-retra-gui
+silence
+silence-gui
 *.o
 evolution/*
 tools/*

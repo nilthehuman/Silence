@@ -6,22 +6,22 @@ GLLIBS = -lGL -lglut
 OBJECTS = src/main.o src/core/camera.o src/core/ray.o src/core/scene.o src/core/triplet.o src/parser/parsescene.o
 OBJECTS_WITH_GUI = src/main-gui.o src/core/camera.o src/core/ray.o src/core/scene.o src/core/triplet.o src/gui/gui.o src/gui/motion.o src/parser/parsescene.o src/parser/parsemotions.o
 
-PROGNAME = retra
-PROGNAME_WITH_GUI = retra-gui
+PROGNAME = silence
+PROGNAME_WITH_GUI = silence-gui
 
 .PHONY: all
 all: cli gui
 
 .PHONY: cli
 cli: $(PROGNAME)
-	@echo ==== Command line Retra built successfully ====
+	@echo ==== Command line Silence built successfully ====
 
 $(PROGNAME): $(OBJECTS)
 	$(CXX) $(LDFLAGS) -o $(PROGNAME) $^ -fopenmp
 
 .PHONY: gui
 gui: $(PROGNAME_WITH_GUI)
-	@echo ==== Graphical Retra built successfully ====
+	@echo ==== Graphical Silence built successfully ====
 
 $(PROGNAME_WITH_GUI): $(OBJECTS_WITH_GUI)
 	$(CXX) $(LDFLAGS) -o $(PROGNAME_WITH_GUI) $^ -fopenmp $(GLLIBS)
