@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Dániel Arató
+ * Copyright 2016 Dániel Arató
  *
  * This file is part of Silence.
  *
