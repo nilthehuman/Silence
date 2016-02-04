@@ -55,7 +55,7 @@ namespace Silence {
                 assert( equal( diffuse + metallic + reflecting + refractive, 1.0 ) );
             }
 
-            // The BRDF of a Surface is modeled as a stochastic mixture of 4 ideal BRDF's
+            // The BRDF of a Surface is modeled as a mixture of 4 ideal BRDF's
             double diffuse;
             double metallic;
             double reflecting;
@@ -86,17 +86,16 @@ namespace Silence {
         const RGB& getColor()           const { return color; }
         double     getRefractiveIndex() const { return refractiveIndex; }
 
-        Interaction interact() const
+        double interact( Interaction interaction ) const
         {
-            const double r = (double)std::rand() / RAND_MAX;
-            if      ( r < character.diffuse )
-                return DIFFUSE;
-            else if ( r < character.diffuse + character.metallic )
-                return METALLIC;
-            else if ( r < character.diffuse + character.metallic + character.reflecting )
-                return REFLECT;
-            else
-                return REFRACT;
+            switch ( interaction )
+            {
+                case DIFFUSE:  return character.diffuse;
+                case METALLIC: return character.metallic;
+                case REFLECT:  return character.reflecting;
+                case REFRACT:  return character.refractive;
+                default:       assert( false );
+            }
         }
 
         friend std::istream& operator>>( std::istream& is, Character& character );
