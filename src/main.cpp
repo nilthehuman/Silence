@@ -366,7 +366,7 @@ int main( int argc, char* argv[] )
         std::cerr << "main: starting the renderer." << std::endl;
     const time_t start = std::time( NULL );
     std::srand( start );
-    camera->capture( args.spp, args.depth, args.rrLimit ); // Trace those suckers
+    /// -- rendering will take place here -- ///
     camera->gammaCorrect( args.gamma );
     if ( modeFlags.verbose )
     {

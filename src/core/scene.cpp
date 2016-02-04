@@ -202,56 +202,5 @@ namespace Silence {
         return points[0] * (1 - sqrt(r1)) + points[1] * sqrt(r1) * (1 - r2) + points[2] * sqrt(r1) * r2;
     }
 
-    // Computes the sum of the emissions that reach surfacePoint directly by explicit sampling
-    Triplet Scene::getDirectLight( const Vector& surfacePoint, const Vector& surfaceNormal ) const
-    {
-        Triplet directLightTotal;
-        for ( LightIt light = lightsBegin(); light != lightsEnd(); light++ )
-        {
-            Triplet directLight; // How much of the light intensity from this lightsource actually strikes the point
-            for ( int i = 0; i < SHADOWRAYS; ++i )
-            {
-                const LightPart* lightPart = (*light)->getRandomPart();
-                const Vector lightPoint = lightPart->getRandomPoint();
-                const Vector toLightPoint = (lightPoint - surfacePoint).normalized();
-                if ( surfaceNormal * toLightPoint < 0 )
-                    continue;
-                Triplet emission = lightPart->getEmission( -toLightPoint );
-                if ( RGB::Black == emission )
-                    continue;
-                const Ray    shadowRay( this, surfacePoint, toLightPoint, RGB::Black, 1, INF );
-                const double distance = (lightPoint - surfacePoint).length() - EPSILON;
-                double t = INF;
-                bool occluded = false;
-                // Lights are non-occluding. Check Things only
-                for ( ThingIt thing = thingsBegin(); thing != thingsEnd(); thing++ )
-                    if ( (*thing)->isBackground() == false )
-                        for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
-                            if ( (t = (*part)->intersect(shadowRay)) && t < distance )
-                            {
-                                occluded = true;
-                                break;
-                            }
-                if ( !occluded && (*light)->isBackground() )
-                    for ( ThingIt thing = thingsBegin(); thing != thingsEnd(); thing++ )
-                        if ( (*thing)->isBackground() == true )
-                            for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
-                                if ( (t = (*part)->intersect(shadowRay)) && t < distance )
-                                {
-                                    occluded = true;
-                                    break;
-                                }
-                if ( !occluded )
-                {
-                    directLight += emission * (surfaceNormal * toLightPoint) * // As per the Phong model
-                                   UNITDIST * UNITDIST / (distance * distance);
-                }
-            }
-            directLight /= SHADOWRAYS;
-            directLightTotal += directLight;
-        }
-        return directLightTotal;
-    }
-
 }
 

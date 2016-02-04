@@ -24,73 +24,42 @@
 #define SILENCE_RAY
 
 #include <cassert>
-#include <stack>
 
 #include "triplet.h"
 
 namespace Silence {
 
-    class Light;
-    class LightPart;
-    class Thing;
     class ThingPart;
     class Scene;
 
     class Ray {
     public:
-        Ray( const Scene* scene, const Vector& origin, const Vector& direction, const RGB& color, int depth, double rrLimit )
+        Ray( const Scene* scene, const Vector& origin, const Vector& direction )
             : scene( scene )
             , origin( origin )
             , direction( direction )
-            , color( color )
-            , depth( depth )
-            , rrLimit( rrLimit )
-            , lightHit( NULL )
-            , lightPartHit( NULL )
-            , thingHit( NULL )
             , thingPartHit( NULL )
-            , insideThings()
         {
             assert( scene );
             this->direction.normalize();
         }
 
-        const Vector& getOrigin()     const { return origin; }
-        const Vector& getDirection()  const { return direction; }
-        const RGB&    getColor()      const { return color; }
-        int           getDepth()      const { return depth; }
+        const Vector& getOrigin()       const { return origin; }
+        const Vector& getDirection()    const { return direction; }
+        const Vector  getIntersection() const { return 0 < distance ? (*this)[distance] : Vector::Invalid; }
 
-        Vector operator[]( double t ) const { return origin + direction * t; }
+        Vector operator[]( double t )   const { return origin + direction * t; }
 
-        double  traceToNextIntersection(); // Initial bounce to find the surface point the Camera sees
-        RGB     trace();                   // Trace the Ray all the way through
-
-    private:
-        void    paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
-
-        inline bool russianRoulette() const;
-        RGB     bounceDiffuse();
-        RGB     bounceMetallic();
-        RGB     bounceReflect();
-        RGB     bounceRefract();
-
-        double  findNearestIntersection();
-        double  schlick( double n1, double n2, double cosTheta ) const;
+        double findNearestIntersection();
 
     private:
         const Scene* const scene;
 
         Vector  origin;
         Vector  direction;
-        RGB     color; // Current color (may change with each bounce)
-        int     depth; // Number of bounces to live (at most)
-        const double rrLimit; // Limit to keep weak Rays alive in Russian Roulette
+        double  distance;
 
-        const Light*               lightHit;     // Last intersected Light
-        const LightPart*           lightPartHit; // Last intersected LightPart
-        const Thing*               thingHit;     // Last intersected Thing
-        const ThingPart*           thingPartHit; // Last intersected ThingPart
-        std::stack< const Thing* > insideThings; // LIFO stack of penetrated Things
+        const ThingPart* thingPartHit;
     };
 
 }

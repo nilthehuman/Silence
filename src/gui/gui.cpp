@@ -105,7 +105,7 @@ namespace Silence {
             return;
         glutTimerFunc( self->refreshTime, &refresh, 0 );
         const clock_t now = clock();
-        const Camera::RenderInfo* renderInfo = self->camera->render( self->refreshTime * 0.8, self->depth, self->rrLimit, self->gamma );
+        const Camera::RenderInfo* renderInfo /*= renderInfo*/ = new Camera::RenderInfo;
         if ( self->keys.any() || renderInfo->sceneChanged )
         {
             self->lastCameraClear               = now;
@@ -115,7 +115,7 @@ namespace Silence {
         self->clockError                    += renderInfo->clockError;
         self->hudClockErrorSinceHudRefresh  += renderInfo->clockError;
         self->hudClockErrorSinceCameraClear += renderInfo->clockError;
-        self->hudSpp                         = renderInfo->sppSoFar;
+        self->hudSpp                         = /*spp*/ 0;
         delete renderInfo;
         glutPostRedisplay();
     }

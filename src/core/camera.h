@@ -38,7 +38,6 @@ namespace Silence {
         // The GUI's going to need these
         struct RenderInfo {
             int  clockError;
-            int  sppSoFar;
             bool sceneChanged;
         };
 
@@ -64,14 +63,12 @@ namespace Silence {
         Camera( const Scene* scene )
             : scene( scene )
             , pixels( NULL )
-            , sppSoFar( 0 )
             , rendering( false )
         { }
         Camera( const Scene* scene, Vector viewpoint, Screen screen, int width, int height )
             : scene( scene )
             , viewpoint( viewpoint )
             , screen( screen )
-            , sppSoFar( 0 )
             , rendering( false )
         {
             pixels = new RGB*[height];
@@ -91,8 +88,6 @@ namespace Silence {
         }
 
         void clear();
-        void capture( int spp, int depth, double rrLimit );
-        const RenderInfo* render ( int renderTime, int depth, double rrLimit, double gamma = 1 );
         void gammaCorrect( double gamma );
 
         void writePixels( std::ostream& os ) const;
@@ -108,15 +103,11 @@ namespace Silence {
         friend std::istream& operator>>( std::istream& is, Camera& camera );
 
     private:
-        Ray generateRay( int row, int col, int depth, double rrLimit ) const;
-
-    private:
         const Scene* const scene;
 
         Vector viewpoint;
         Screen screen;
         RGB**  pixels; // The end results go here
-        int    sppSoFar;
         bool   rendering;
     };
 

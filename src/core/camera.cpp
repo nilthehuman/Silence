@@ -22,10 +22,7 @@
 
 #include "camera.h"
 
-#include <ctime>
 #include <limits>
-
-#include <omp.h>
 
 #include "scene.h"
 
@@ -39,126 +36,8 @@ namespace Silence {
         for ( int row = 0; row < screen.gridheight; ++row )
             for ( int col = 0; col < screen.gridwidth; ++col )
                 pixels[row][col] = RGB::Black;
-        sppSoFar = 0;
         if ( modeFlags.verbose )
             std::cerr << "                                            " << '\r' << std::flush;
-    }
-
-    // Take a shot of the virtual Scene
-    void Camera::capture( int spp, int depth, double rrLimit )
-    {
-        rendering = true;
-        const time_t start = std::time( NULL );
-        #pragma omp parallel
-        {
-            const int numThreads = omp_get_num_threads();
-            const int threadNum  = omp_get_thread_num();
-            const int rowBegin   = (double) threadNum      / numThreads * screen.gridheight;
-            const int rowEnd     = (double)(threadNum + 1) / numThreads * screen.gridheight;
-            // The engine's core loop
-            for ( int row = rowBegin; row < rowEnd; ++row )
-            {
-                if ( modeFlags.verbose && 2 == threadNum ) // Usually the lower mid thread has the best idea of progress
-                {
-                    std::cerr << "Camera: rendering... " << (int)((double)(row - rowBegin) / (rowEnd - rowBegin) * 100) << "% done.";
-                    if ( 3 == row % 4 )
-                    {
-                        const int estimate = (int)( difftime( std::time( NULL ), start ) * (rowEnd - row) / (row - rowBegin) );
-                        const int m = estimate / 60;
-                        const int s = estimate % 60;
-                        std::cerr << " Time left: ";
-                        if ( m ) std::cerr << m << " min(s) and ";
-                        std::cerr << s << " sec(s).              ";
-                    }
-                    std::cerr << '\r' << std::flush;
-                }
-                for ( int col = 0; col < screen.gridwidth; ++col )
-                {
-                    Triplet pixelColorSum; // Adding up the results would yield an invalid (out-of-bounds) RGB
-                    Ray ray = generateRay( row, col, depth, rrLimit );
-                    ray.traceToNextIntersection(); // Initialize ray (sort of)
-                    if ( ray.getDepth() )
-                    {
-                        for ( int s = 0; s < spp; ++s )
-                        {
-                            Ray rayClone( ray );
-                            pixelColorSum += rayClone.trace();
-                        }
-                        pixels[row][col] = pixelColorSum / spp;
-                    }
-                    else
-                        pixels[row][col] = ray.getColor();
-                }
-            }
-        }
-        if ( modeFlags.verbose )
-            std::cerr << "\rCamera: rendering completed.   " << std::endl;
-        rendering = false;
-    }
-
-    // Keep refining the image until a given time limit is reached
-    const Camera::RenderInfo* Camera::render( int renderTime, int depth, double rrLimit, double gamma )
-    {
-        const bool sceneChanged = scene->isChanged();
-        if ( sceneChanged )
-        {
-            clear();
-            scene->clearChanged();
-        }
-        rendering = true;
-        const int sppBefore = sppSoFar;
-        int elapsedTime = 0;
-        int clockError  = 0;
-        Triplet* pixelColorSum = new Triplet[ screen.gridwidth * screen.gridheight ];
-        const clock_t start = clock();
-        #pragma omp parallel shared(elapsedTime, clockError, pixelColorSum)
-        {
-            const int numThreads = omp_get_num_threads();
-            const int threadNum  = omp_get_thread_num();
-            const int rowBegin   = (double) threadNum      / numThreads * screen.gridheight;
-            const int rowEnd     = (double)(threadNum + 1) / numThreads * screen.gridheight;
-            for ( int row = rowBegin; row < rowEnd; ++row )
-                for ( int col = 0; col < screen.gridwidth; ++col )
-                    pixelColorSum[row*screen.gridwidth + col] = RGB::Black;
-            while ( elapsedTime < renderTime )
-            {
-                for ( int row = rowBegin; row < rowEnd; ++row )
-                {
-                    if ( modeFlags.verbose && 0 == threadNum )
-                        std::cerr << "Camera: rendering... " << sppSoFar << " samples per pixel." << '\r' << std::flush;
-                    for ( int col = 0; col < screen.gridwidth; ++col )
-                    {
-                        Ray ray = generateRay( row, col, depth, rrLimit );
-                        ray.traceToNextIntersection(); // Initialize ray (sort of)
-                        pixelColorSum[row*screen.gridwidth + col] += ray.trace();
-                    }
-                }
-                if ( 0 == threadNum )
-                {
-                    ++sppSoFar;
-                    elapsedTime = 1000.0 * (clock() - start) / CLOCKS_PER_SEC / numThreads; // clock() returns total CPU time
-                }
-                #pragma omp flush(elapsedTime)
-                #pragma omp barrier
-            }
-            for ( int row = rowBegin; row < rowEnd; ++row )
-                for ( int col = 0; col < screen.gridwidth; ++col )
-                    // Take the SPP-weighed average of the old and new color values
-                    pixels[row][col] = pixels[row][col] * ((double)sppBefore / sppSoFar) +
-                                       RGB(pixelColorSum[row*screen.gridwidth + col] / (sppSoFar - sppBefore)).gamma(gamma) * ((double)(sppSoFar - sppBefore) / sppSoFar);
-            if ( 0 == threadNum )
-            {
-                elapsedTime = 1000.0 * (clock() - start) / CLOCKS_PER_SEC / numThreads; // clock() returns total CPU time
-                clockError = elapsedTime * (numThreads - 1);
-            }
-        }
-        delete[] pixelColorSum;
-        RenderInfo* renderInfo   = new RenderInfo;
-        renderInfo->clockError   = clockError; // Return clock's measurement error due to multithreading
-        renderInfo->sppSoFar     = sppSoFar;
-        renderInfo->sceneChanged = sceneChanged;
-        rendering = false;
-        return renderInfo;
     }
 
     void Camera::gammaCorrect( double gamma )
@@ -170,17 +49,6 @@ namespace Silence {
         for ( int row = 0; row < screen.gridheight; ++row )
             for ( int col = 0; col < screen.gridwidth; ++col )
                 pixels[row][col].gamma( gamma );
-    }
-
-    // Shoot ray from camera viewpoint through a given pixel
-    Ray Camera::generateRay( int row, int col, int depth, double rrLimit ) const
-    {
-        const Vector leftEdge  = screen.window[0] + (screen.window[2] - screen.window[0]) * ((0.5 + row) / screen.gridheight );
-        const Vector origin    = leftEdge + (screen.window[1] - screen.window[0]) * ((0.5 + col) / screen.gridwidth );
-        const Vector direction = origin - viewpoint;
-        // Camera emits white Rays as if it's the real light source and Lights are the sinks.
-        // This will produce the same RGB results as long as Ray::paint is commutative
-        return Ray( scene, origin, direction, RGB::White, depth, rrLimit );
     }
 
     // Write rendering results to character stream in PPM format

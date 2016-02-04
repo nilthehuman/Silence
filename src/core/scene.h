@@ -389,8 +389,6 @@ namespace Silence {
         ThingIt thingsBegin() const { return things.begin(); }
         ThingIt thingsEnd()   const { return things.end();   }
 
-        Triplet getDirectLight( const Vector& point, const Vector& normal ) const; // Total direct illumination from all lightsources to point
-
         const Sky& getSky() const { return sky; }
 
         bool isChanged()    const { return changed; }
