@@ -127,6 +127,7 @@ namespace Silence {
         static const Vector UnitX;
         static const Vector UnitY;
         static const Vector UnitZ;
+        static const Vector Invalid;
     };
 
 }

@@ -66,10 +66,11 @@ namespace Silence {
     const RGB RGB::Blue  = RGB(0, 0, 1);
     const RGB RGB::White = RGB(1, 1, 1);
 
-    const Vector Vector::Zero  = Vector(0, 0, 0); // == Vector()
-    const Vector Vector::UnitX = Vector(1, 0, 0);
-    const Vector Vector::UnitY = Vector(0, 1, 0);
-    const Vector Vector::UnitZ = Vector(0, 0, 1);
+    const Vector Vector::Zero    = Vector(0, 0, 0); // == Vector()
+    const Vector Vector::UnitX   = Vector(1, 0, 0);
+    const Vector Vector::UnitY   = Vector(0, 1, 0);
+    const Vector Vector::UnitZ   = Vector(0, 0, 1);
+    const Vector Vector::Invalid = Vector(-INF, -INF, -INF);
 
 }
 
