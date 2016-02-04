@@ -84,19 +84,6 @@ namespace Silence {
         scene->setChanged();
     }
 
-    Triplet LightPart::getEmission( const Vector& ) const
-    {
-        return ((Light*)parent)->getEmission(); // By default
-    }
-
-    Triplet LightTriangle::getEmission( const Vector& direction ) const
-    {
-        double tilt = direction * getNormal( Vector::Zero );
-        if ( parent->isBackCulled() && tilt < 0 )
-            return RGB::Black;
-        return ((Light*)parent)->getEmission() * abs( tilt );
-    }
-
     double ISphere::intersect( const Ray& ray ) const
     {
         // Algorithm cribbed from smallpt
@@ -113,21 +100,6 @@ namespace Silence {
         if ( (t = b + sqrtDiscriminant) > EPSILON && !parent->isBackCulled() )
             return t;
         return 0;
-    }
-
-    Vector ISphere::getRandomPoint() const
-    {
-        double a = std::rand() * 2;
-        if ( RAND_MAX < a )
-            a = RAND_MAX - a;
-        double b = std::rand() * 2;
-        if ( RAND_MAX < b )
-            b = RAND_MAX - b;
-        double c = std::rand() * 2;
-        if ( RAND_MAX < c )
-            c = RAND_MAX - c;
-        const Vector randomDirection = (Vector(a, b, c) - center).normalize();
-        return center + randomDirection * radius;
     }
 
     double IPlane::intersect( const Ray& ray ) const
@@ -147,16 +119,6 @@ namespace Silence {
             else
                 return 0;
         }
-    }
-
-    Vector IPlane::getRandomPoint() const
-    {
-        const Vector origin = normal * offset;
-        const Vector unitX = Vector( origin.y, -origin.x, origin.z ).normalize();
-        const Vector unitY = origin.cross( unitX ).normalize();
-        const double x = std::rand();
-        const double y = std::rand();
-        return origin + unitX * x + unitY * y;
     }
 
     double ITriangle::intersect( const Ray& ray ) const
@@ -191,15 +153,6 @@ namespace Silence {
             return 0;
         else
             return t;
-    }
-
-    Vector ITriangle::getRandomPoint() const
-    {
-        // Formula found here:
-        // www.cs.princeton.edu/~funk/tog02.pdf
-        const double r1 = (double)std::rand() / RAND_MAX;
-        const double r2 = (double)std::rand() / RAND_MAX;
-        return points[0] * (1 - sqrt(r1)) + points[1] * sqrt(r1) * (1 - r2) + points[2] * sqrt(r1) * r2;
     }
 
 }

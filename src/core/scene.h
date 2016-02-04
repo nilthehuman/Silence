@@ -79,7 +79,6 @@ namespace Silence {
     class Surface {
     public:
         virtual double intersect( const Ray& ray )      const = 0; // Returns distance from Ray origin; a return value of zero will mean a miss
-        virtual Vector getRandomPoint()                 const = 0; // Yields a random point on the surface
         virtual Vector getNormal( const Vector& point ) const = 0; // Returns the outward pointing surface normal
         virtual void   move( const Vector& translation )      = 0; // Translate Surface by an arbitrary world space vector
         virtual void   move( double theta, WorldAxis axis )   = 0; // Rotate Surface around one of the world coordinate axes
@@ -104,8 +103,6 @@ namespace Silence {
     public:
         LightPart( const Light* parent ) : Surface( (Object*)parent ) { }
         virtual ~LightPart() { }
-
-        virtual Triplet getEmission( const Vector& ) const;
     };
 
     // Non-light complex objects in the Scene
@@ -123,16 +120,8 @@ namespace Silence {
         ThingPartIt partsBegin() const { return parts.begin(); }
         ThingPartIt partsEnd()   const { return parts.end();   }
 
-        const ThingPart* getRandomPart() const
-        {
-            const int index = (int)( (double)rand() / RAND_MAX * parts.size() );
-            return parts[ index ];
-        }
-
         const RGB& getColor()            const { return material.getColor(); }
         double     getRefractiveIndex()  const { return material.getRefractiveIndex(); }
-
-        Material::Interaction interact() const { return material.interact(); } // Decides how the surface will behave for a particular hit by a particular Ray
 
         virtual void move( const Vector& translation ) const;
         virtual void move( double theta, WorldAxis axis ) const;
@@ -163,14 +152,6 @@ namespace Silence {
         LightPartIt partsBegin() const { return parts.begin(); }
         LightPartIt partsEnd()   const { return parts.end();   }
 
-        const LightPart* getRandomPart() const
-        {
-            const int index = rand() % parts.size();
-            return parts[ index ];
-        }
-
-        const Triplet& getEmission() const { return emission; }
-
         virtual void move( const Vector& translation ) const;
         virtual void move( double theta, WorldAxis axis ) const;
 
@@ -189,7 +170,6 @@ namespace Silence {
     class IPoint : virtual public Surface {
     public:
         virtual double intersect( const Ray& )    const { return 0; } // Cannot be hit
-        virtual Vector getRandomPoint()           const { return point; }
         virtual Vector getNormal( const Vector& ) const { return Vector::Zero; }
 
     protected:
@@ -222,7 +202,6 @@ namespace Silence {
     public:
         virtual double intersect( const Ray& ray ) const;
         virtual Vector getNormal( const Vector& point ) const { return (point - center).normalize(); }
-        virtual Vector getRandomPoint() const;
 
     protected:
         ISphere( const Object* parent ) : Surface( parent ) { }
@@ -265,7 +244,6 @@ namespace Silence {
     public:
         virtual double intersect( const Ray& ray ) const;
         virtual Vector getNormal( const Vector& ) const { return normal; }
-        virtual Vector getRandomPoint() const;
 
     protected:
         IPlane( const Object* parent ) : Surface( parent ) { }
@@ -315,7 +293,6 @@ namespace Silence {
             Vector edge1 = this->points[2] - this->points[0];
             return edge0.cross( edge1 ).normalize();
         }
-        virtual Vector getRandomPoint() const;
 
         virtual void move( const Vector& translation )
         {
@@ -363,8 +340,6 @@ namespace Silence {
             , ITriangle( parent )
             , LightPart( parent )
         { }
-
-        virtual Triplet getEmission( const Vector& direction ) const;
     };
 
     struct Sky {
