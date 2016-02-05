@@ -68,7 +68,6 @@ namespace Silence {
         RGB     bounceReflect();
         RGB     bounceRefract();
 
-        double  findNearestIntersection();
         double  schlick( double n1, double n2, double cosTheta ) const;
 
     private:
