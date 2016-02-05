@@ -37,7 +37,7 @@ namespace Silence {
 
     class Beam {
     public:
-        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray >& edges, const RGB& color, int depth, double rrLimit )
+        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray* >& edges, const RGB& color, int depth, double rrLimit )
             : scene( scene )
             , apex( apex )
             , source( source )
@@ -72,16 +72,16 @@ namespace Silence {
         double  schlick( double n1, double n2, double cosTheta ) const;
 
     private:
-        const Scene* const scene;
+        const Scene* const  scene;
 
-        Vector             apex;   // The point where all Rays meet
-        const Surface*     source; // The Surface the Beam emanates from
-        Ray                pivot;  // A representative Ray
-        std::vector< Ray > edges;  // Rays to mark Beam boundaries
-        RGB                color;  // Current color of pivot Ray (may change with each bounce)
+        Vector              apex;   // The point where all Rays meet
+        const Surface*      source; // The Surface the Beam emanates from
+        Ray                 pivot;  // A representative Ray
+        std::vector< Ray* > edges;  // Rays to mark Beam boundaries
+        RGB                 color;  // Current color of pivot Ray (may change with each bounce)
 
-        int                depth;  // Number of bounces to live (at most)
-        const double       rrLimit;// Limit to keep weak Beams alive in Russian Roulette
+        int                 depth;  // Number of bounces to live (at most)
+        const double        rrLimit;// Limit to keep weak Beams alive in Russian Roulette
 
         std::stack< const Thing* > insideThings; // LIFO stack of penetrated Things (passed down from parent Beam)
     };
