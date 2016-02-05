@@ -40,7 +40,7 @@
 
 using namespace Silence;
 
-const std::string VERSION = "1.3.0";
+const std::string VERSION = "pre-alpha";
 
 struct flags Silence::modeFlags;
 
