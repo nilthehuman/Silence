@@ -57,6 +57,8 @@ namespace Silence {
         //const RGB&    getColor() const { return color; }
         //int           getDepth() const { return depth; }
 
+        bool    contains( const Vector& point ) const;
+
         RGB     trace(); // Trace the Beam until terminated
 
     private:
