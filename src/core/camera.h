@@ -26,10 +26,11 @@
 #include <fstream>
 #include <iostream>
 
-#include "ray.h"
 #include "triplet.h"
 
 namespace Silence {
+
+    class Scene;
 
     class Camera {
     public:
