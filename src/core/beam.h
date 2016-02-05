@@ -51,6 +51,13 @@ namespace Silence {
             assert( scene );
         }
 
+        ~Beam()
+        {
+            std::vector< Ray* >::const_iterator edge;
+            for ( edge = edges.begin(); edge != edges.end(); edge++ )
+                delete *edge;
+        }
+
         // TODO: which of these are really necessary?
         //const Vector& getApex()  const { return apex; }
         //const Vector& getPivot() const { return pivot; }
