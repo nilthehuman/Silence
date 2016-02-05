@@ -31,7 +31,7 @@ src/main.o: src/core/camera.h src/core/scene.h src/parser/parsescene.h
 src/main-gui.o: src/main.cpp src/gui/gui.h src/core/camera.h src/core/scene.h src/parser/parsescene.h src/parser/parsemotions.h
 	$(CXX) $(CXXFLAGS) -c -o $@ src/main.cpp
 
-src/core/camera.o: src/core/camera.h src/core/ray.h src/core/triplet.h
+src/core/camera.o: src/core/camera.h src/core/triplet.h
 
 src/core/ray.o: src/core/ray.h src/core/aux.h src/core/scene.h src/core/triplet.h
 
