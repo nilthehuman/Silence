@@ -41,5 +41,7 @@ namespace Silence {
         Beam penumbra; // Part partially  occluded from the lightsource
     };
 
+}
+
 #endif // SILENCE_SHADOW
 
