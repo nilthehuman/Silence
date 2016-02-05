@@ -37,13 +37,16 @@ namespace Silence {
 
     class Beam {
     public:
-        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray* >& edges, const RGB& color, int depth, double rrLimit )
+        typedef double (*Distribution)( const Ray& pivot, const Vector& point );
+
+        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray* >& edges, const RGB& color, Distribution distribution, int depth, double rrLimit )
             : scene( scene )
             , apex( apex )
             , source( source )
             , pivot( pivot )
             , edges( edges )
             , color( color )
+            , distribution( distribution )
             , depth( depth )
             , rrLimit( rrLimit )
             , insideThings()
@@ -63,6 +66,7 @@ namespace Silence {
         //const Vector& getPivot() const { return pivot; }
         //const RGB&    getColor() const { return color; }
         //int           getDepth() const { return depth; }
+        //double        getIntensity( const Vector& point ) const { return (*distribution)( pivot, point ); }
 
         bool    contains( const Vector& point ) const;
 
@@ -87,6 +91,7 @@ namespace Silence {
         Ray                 pivot;  // A representative Ray
         std::vector< Ray* > edges;  // Rays to mark Beam boundaries
         RGB                 color;  // Current color of pivot Ray (may change with each bounce)
+        Distribution        distribution; // Provides each point a relative light intensity
 
         int                 depth;  // Number of bounces to live (at most)
         const double        rrLimit;// Limit to keep weak Beams alive in Russian Roulette
