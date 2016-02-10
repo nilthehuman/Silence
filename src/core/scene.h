@@ -97,12 +97,16 @@ namespace Silence {
     public:
         ThingPart( const Thing* parent ) : Surface( (Object*)parent ) { }
         virtual ~ThingPart() { }
+
+        const Thing* getParent() const { return (Thing*)parent; }
     };
 
     class LightPart : virtual public Surface {
     public:
         LightPart( const Light* parent ) : Surface( (Object*)parent ) { }
         virtual ~LightPart() { }
+
+        const Light* getParent() const { return (Light*)parent; }
     };
 
     // Non-light complex objects in the Scene
