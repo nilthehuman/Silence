@@ -35,6 +35,7 @@ namespace Silence {
 
     class Ray;
     class Scene;
+    class Zone;
 
     class Thing;
     class ThingPart;
@@ -106,6 +107,8 @@ namespace Silence {
         LightPart( const Light* parent ) : Surface( (Object*)parent ) { }
         virtual ~LightPart() { }
 
+        void emitZones( std::vector< Zone* >& out );
+
         const Light* getParent() const { return (Light*)parent; }
     };
 
@@ -155,6 +158,8 @@ namespace Silence {
 
         LightPartIt partsBegin() const { return parts.begin(); }
         LightPartIt partsEnd()   const { return parts.end();   }
+
+        void emitZones( std::vector< Zone* >& out );
 
         virtual void move( const Vector& translation ) const;
         virtual void move( double theta, WorldAxis axis ) const;
