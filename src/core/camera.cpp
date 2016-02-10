@@ -25,6 +25,7 @@
 #include <limits>
 
 #include "scene.h"
+#include "zone.h"
 
 namespace Silence {
 
@@ -38,6 +39,23 @@ namespace Silence {
                 pixels[row][col] = RGB::Black;
         if ( modeFlags.verbose )
             std::cerr << "                                            " << '\r' << std::flush;
+    }
+
+    // Receive a Zone's contributions to the final image
+    void Camera::rasterize( const Zone* zone )
+    {
+        RGB* buffer = new RGB[screen.gridwidth];
+        for ( int row = 0; row < screen.gridheight; ++row )
+        {
+            const Vector leftEdge  = screen.window[0] + (screen.window[2] - screen.window[0]) * ((0.5 + row) / screen.gridheight );
+            const Vector rightEdge = leftEdge + (screen.window[1] - screen.window[0]);
+            zone->rasterizeRow( leftEdge, rightEdge, screen.gridwidth, buffer );
+            // Write results directly in pixels array:
+            // contributions from all Zones will be superimposed on each other
+            for ( int col = 0; col < screen.gridwidth; ++col )
+                pixels[row][col] += buffer[col];
+        }
+        delete[] buffer;
     }
 
     void Camera::gammaCorrect( double gamma )

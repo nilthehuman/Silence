@@ -31,6 +31,7 @@
 namespace Silence {
 
     class Scene;
+    class Zone;
 
     class Camera {
     public:
@@ -89,6 +90,7 @@ namespace Silence {
         }
 
         void clear();
+        void rasterize( const Zone* zone );
         void gammaCorrect( double gamma );
 
         void writePixels( std::ostream& os ) const;

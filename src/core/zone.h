@@ -48,6 +48,8 @@ namespace Silence {
                 delete *shadow;
         }
 
+        void rasterizeRow( const Vector& start, const Vector& end, int gridwidth, RGB* buffer ) const;
+
         inline bool russianRoulette( double rrLimit ) const;
 
     private:

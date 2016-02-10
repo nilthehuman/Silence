@@ -62,6 +62,7 @@ namespace Silence {
 
         bool    contains( const Vector& point ) const;
         RGB     getColor( const Vector& point ) const;
+        void    rasterizeRow( const Vector& start, const Vector& end, int gridwidth, RGB* buffer ) const;
 
     private:
         void    paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
