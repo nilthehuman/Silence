@@ -40,12 +40,15 @@ namespace Silence {
             , zoneForest()
             , zoneForestReady( false )
             , rendering( false )
+            , rrLimit( 0 )
         { }
 
         void addCamera( Camera* camera );
         void removeCamera( int i );
 
         void render( int time, int depth, double gamma = 1 );
+
+        void setRussianRouletteLimit( double rrLimit ) { this->rrLimit = rrLimit; }
 
     private:
         void buildZoneTree( int time, int depth );
@@ -61,6 +64,7 @@ namespace Silence {
         // State and housekeeping
         bool zoneForestReady;
         bool rendering;
+        double rrLimit; // Limit to keep weak Zones alive in Russian Roulette
     };
 
 }

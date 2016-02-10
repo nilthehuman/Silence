@@ -33,10 +33,12 @@ namespace Silence {
         Zone( const Beam& light )
             : light( light )
             , shadows()
+            , insideThings()
         { }
         Zone( const Beam& light, const std::vector< Shadow* >& shadows )
             : light( light )
             , shadows( shadows )
+            , insideThings()
         { }
 
         ~Zone()
@@ -46,9 +48,16 @@ namespace Silence {
                 delete *shadow;
         }
 
+        inline bool russianRoulette( double rrLimit ) const;
+
+    private:
+        void bounce();
+
     private:
         Beam light; // Only a single light Beam per Zone is allowed
         std::vector< Shadow* > shadows;
+
+        std::stack< const Thing* > insideThings; // LIFO stack of penetrated Things (passed down from parent Zone)
     };
 
 }

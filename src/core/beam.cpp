@@ -54,14 +54,12 @@ namespace Silence {
         return inside;
     }
 
-    bool Beam::russianRoulette() const
+    RGB Beam::getColor( const Vector& point ) const
     {
-        // Russian roulette is a common heuristic for path termination
-        // Here we use a variant based on current color intensity
-        // A lower rrLimit keeps more Beams alive
-        if ( max(color.x, max(color.y, color.z)) < (double)std::rand() * rrLimit / RAND_MAX )
-            return true;
-        return false;
+        if ( contains(point) )
+            return color * (*distribution)( pivot, point );
+        else
+            return RGB::Black;
     }
 
     double Beam::schlick( double n1, double n2, double cosTheta ) const

@@ -39,7 +39,7 @@ namespace Silence {
     public:
         typedef double (*Distribution)( const Ray& pivot, const Vector& point );
 
-        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray* >& edges, const RGB& color, Distribution distribution, int depth, double rrLimit )
+        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray* >& edges, const RGB& color, Distribution distribution )
             : scene( scene )
             , apex( apex )
             , source( source )
@@ -47,9 +47,6 @@ namespace Silence {
             , edges( edges )
             , color( color )
             , distribution( distribution )
-            , depth( depth )
-            , rrLimit( rrLimit )
-            , insideThings()
         {
             assert( scene );
         }
@@ -61,25 +58,18 @@ namespace Silence {
                 delete *edge;
         }
 
-        // TODO: which of these are really necessary?
-        //const Vector& getApex()  const { return apex; }
-        //const Vector& getPivot() const { return pivot; }
-        //const RGB&    getColor() const { return color; }
-        //int           getDepth() const { return depth; }
-        //double        getIntensity( const Vector& point ) const { return (*distribution)( pivot, point ); }
+        const RGB& getColor() const { return color; }
 
         bool    contains( const Vector& point ) const;
-
-        RGB     trace(); // Trace the Beam until terminated
+        RGB     getColor( const Vector& point ) const;
 
     private:
         void    paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
 
-        inline bool russianRoulette() const;
-        RGB     bounceDiffuse();
-        RGB     bounceMetallic();
-        RGB     bounceReflect();
-        RGB     bounceRefract();
+        void    bounceDiffuse();
+        void    bounceMetallic();
+        void    bounceReflect();
+        void    bounceRefract();
 
         double  schlick( double n1, double n2, double cosTheta ) const;
 
@@ -92,11 +82,6 @@ namespace Silence {
         std::vector< Ray* > edges;  // Rays to mark Beam boundaries
         RGB                 color;  // Current color of pivot Ray (may change with each bounce)
         Distribution        distribution; // Provides each point a relative light intensity
-
-        int                 depth;  // Number of bounces to live (at most)
-        const double        rrLimit;// Limit to keep weak Beams alive in Russian Roulette
-
-        std::stack< const Thing* > insideThings; // LIFO stack of penetrated Things (passed down from parent Beam)
     };
 
 }
