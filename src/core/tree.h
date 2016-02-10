@@ -48,8 +48,15 @@ namespace Silence {
         }
 
         const T& getValue()    const { return value; }
+        const T& operator*()   const { return value; }
         TreeIt childrenBegin() const { return children.begin(); }
         TreeIt childrenEnd()   const { return children.end();   }
+
+        int height() const;
+        //int depth( const Tree<T>* node ) const;
+
+        void addChild( Tree<T>* node ) { children.push_back( node ); }
+        void clearChildren();
 
     private:
         T value;
