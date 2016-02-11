@@ -25,7 +25,6 @@
 #include <limits>
 
 #include "scene.h"
-#include "zone.h"
 
 namespace Silence {
 
@@ -41,21 +40,22 @@ namespace Silence {
             std::cerr << "                                            " << '\r' << std::flush;
     }
 
-    // Receive a Zone's contributions to the final image
-    void Camera::rasterize( const Zone* zone )
+    // Return the dummy Plane the Screen lies on
+    const Plane Camera::getPlane() const
     {
-        RGB* buffer = new RGB[screen.gridwidth];
+        const Vector& normal = ( screen.window[1] - screen.window[0] ).cross( screen.window[2] - screen.window[0] );
+        // ax + by + cz = d
+        const double offset = normal * screen.window[0];
+        return Plane( normal, offset );
+    }
+
+    // Receive a Zone's contributions to the final image
+    void Camera::contribute( const RGB** buffer )
+    {
+        #pragma omp parallel for
         for ( int row = 0; row < screen.gridheight; ++row )
-        {
-            const Vector leftEdge  = screen.window[0] + (screen.window[2] - screen.window[0]) * ((0.5 + row) / screen.gridheight );
-            const Vector rightEdge = leftEdge + (screen.window[1] - screen.window[0]);
-            zone->rasterizeRow( leftEdge, rightEdge, screen.gridwidth, buffer );
-            // Write results directly in pixels array:
-            // contributions from all Zones will be superimposed on each other
             for ( int col = 0; col < screen.gridwidth; ++col )
-                pixels[row][col] += buffer[col];
-        }
-        delete[] buffer;
+                pixels[row][col] += buffer[row][col];
     }
 
     void Camera::gammaCorrect( double gamma )

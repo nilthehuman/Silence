@@ -28,6 +28,9 @@
 
 namespace Silence {
 
+    class Camera;
+    class Plane;
+
     class Zone {
     public:
         Zone( const Beam& light )
@@ -48,12 +51,14 @@ namespace Silence {
                 delete *shadow;
         }
 
-        void rasterizeRow( const Vector& start, const Vector& end, int gridwidth, RGB* buffer ) const;
+        void rasterize( Camera* camera ) const;
 
         inline bool russianRoulette( double rrLimit ) const;
 
     private:
         void bounce();
+
+        void rasterizeRow( const Plane* cameraPlane, const Vector& start, const Vector& end, int width, RGB* row ) const;
 
     private:
         Beam light; // Only a single light Beam per Zone is allowed

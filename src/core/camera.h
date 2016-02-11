@@ -27,11 +27,12 @@
 #include <iostream>
 
 #include "triplet.h"
+#include "zone.h"
 
 namespace Silence {
 
+    class Plane;
     class Scene;
-    class Zone;
 
     class Camera {
     public:
@@ -90,7 +91,6 @@ namespace Silence {
         }
 
         void clear();
-        void rasterize( const Zone* zone );
         void gammaCorrect( double gamma );
 
         void writePixels( std::ostream& os ) const;
@@ -102,6 +102,13 @@ namespace Silence {
         int  getGridwidth ()    const { return screen.gridwidth; }
         int  getGridheight()    const { return screen.gridheight; }
         const RGB** getPixels() const { return (const RGB**)pixels; }
+
+        const Plane getPlane() const;
+
+    private:
+        void contribute( const RGB** buffer );
+
+        friend void Zone::rasterize( Camera* ) const;
 
         friend std::istream& operator>>( std::istream& is, Camera& camera );
 

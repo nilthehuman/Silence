@@ -282,6 +282,12 @@ namespace Silence {
             , IPlane   ( parent )
             , ThingPart( parent )
         { }
+        // Dummy Plane ctor
+        Plane     ( const Vector& normal, double offset )
+            : Surface  ( NULL )
+            , IPlane   ( NULL, normal, offset )
+            , ThingPart( NULL )
+        { }
     };
 
     class LightPlane : public IPlane, public LightPart {
