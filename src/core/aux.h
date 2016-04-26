@@ -29,15 +29,12 @@ namespace Silence {
         bool verbose;
     } modeFlags;
 
-    const double EPSILON    = 10e-10; // Ballpark values, tune later
-    const double INF        = 10e+10;
+    const double EPSILON  = 10e-10; // Ballpark values, tune later
+    const double INF      = 10e+10;
 
-    const double UNITDIST   = 10; // Points at this distance from a Light receive 1.0 times its intensity
+    const double UNITDIST = 10; // Points at this distance from a Light receive 1.0 times its intensity
 
-    const double PI         = 3.141592654;
-
-    const int    SHADOWRAYS = 1; // The number of shadow rays only matters if you're using a small amount of samples.
-                                 // 8 <= SHADOWRAYS should help eliminate any crude variance in the penumbrae
+    const double PI       = 3.141592654;
 
     inline double abs( double x )           { return x < 0 ? -x : x; }
     inline double min( double a, double b ) { return a < b ?  a : b; }
