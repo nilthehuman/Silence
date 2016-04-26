@@ -26,9 +26,9 @@ gui: $(PROGNAME_WITH_GUI)
 $(PROGNAME_WITH_GUI): $(OBJECTS_WITH_GUI)
 	$(CXX) $(LDFLAGS) -o $(PROGNAME_WITH_GUI) $^ -fopenmp $(GLLIBS)
 
-src/main.o: src/core/camera.h src/core/scene.h src/parser/parsescene.h
+src/main.o: src/core/camera.h src/core/renderer.h src/core/scene.h src/parser/parsescene.h
 
-src/main-gui.o: src/main.cpp src/gui/gui.h src/core/camera.h src/core/scene.h src/parser/parsescene.h src/parser/parsemotions.h
+src/main-gui.o: src/gui/gui.h src/core/camera.h src/core/renderer.h src/core/scene.h src/parser/parsescene.h src/parser/parsemotions.h
 	$(CXX) $(CXXFLAGS) -c -o $@ src/main.cpp
 
 src/core/beam.o: src/core/ray.h src/core/scene.h src/core/triplet.h
