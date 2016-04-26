@@ -68,7 +68,6 @@ namespace Silence {
                     self->hudFps = self->hudFrames / self->hudTime + 0.5;
                 else
                     self->hudFps = 0;
-                self->hudRays = width * height * self->hudSpp;
                 self->lastHudRefresh = now;
                 self->hudClockErrorSinceHudRefresh = 0;
             }
@@ -115,7 +114,6 @@ namespace Silence {
         self->clockError                    += renderInfo->clockError;
         self->hudClockErrorSinceHudRefresh  += renderInfo->clockError;
         self->hudClockErrorSinceCameraClear += renderInfo->clockError;
-        self->hudSpp                         = /*spp*/ 0;
         delete renderInfo;
         glutPostRedisplay();
     }
@@ -327,7 +325,6 @@ namespace Silence {
         this->hudClockErrorSinceCameraClear = 0;
         this->hudFrames                     = 0;
         this->hudFps                        = 0;
-        this->hudSpp                        = 0;
         this->hudRays                       = 0;
         this->hudTime                       = 0;
         this->lastMoveObjects = this->lastHudRefresh = this->lastCameraClear = clock();

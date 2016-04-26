@@ -46,7 +46,6 @@ struct flags Silence::modeFlags;
 
 struct arguments {
     char*  progname;
-    int    spp;
     int    depth;
     double rrLimit;
     double gamma;
@@ -64,7 +63,6 @@ void help( std::string progname )
 {
     std::cout << "usage: " << progname << " SCENE_FILENAME [OPTIONS]" << std::endl << std::endl;
     std::cout << "Command line options:" << std::endl;
-    std::cout << "  -s, --spp SAMPLES   Set the number of samples per pixel (default 64)" << std::endl;
     std::cout << "  -d, --depth DEPTH   Set the maximal depth (length) of any path (default 12)" << std::endl;
     std::cout << "  -r, --rr LIMIT      Set the stay-alive limit used in Russian roulette (default 0.25)" << std::endl;
     std::cout << "  -g, --gamma EXP     Set the exponent for post-mortem gamma correction (default 1.0)" << std::endl;
@@ -98,7 +96,7 @@ void version()
 
 void usage( std::string progname )
 {
-    std::cerr << "usage: " << progname << " SCENE_FILENAME [-v|--verbose] [--spp SAMPLES_PER_PIXEL]" << std::endl;
+    std::cerr << "usage: " << progname << " SCENE_FILENAME [-v|--verbose]" << std::endl;
     std::cerr << "  [--depth MAX_DEPTH_OF_PATHS] [--rr RUSSIAN_ROULETTE_LIMIT] [--gamma GAMMA]" << std::endl;
     std::cerr << "  [--out IMAGE_FILENAME]" << std::endl;
 #ifdef COMPILE_WITH_GUI
@@ -123,15 +121,7 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
 #endif
     for ( int i = 1; i < argc; ++i )
     {
-        if( !strcmp(argv[i], "-s") || !strcmp(argv[i], "--spp") )
-        {
-            if ( argc <= ++i )
-                usage( args->progname );
-            args->spp = atoi( argv[i] );
-            if ( !args->spp )
-                usage( args->progname );
-        }
-        else if( !strcmp(argv[i], "-d") || !strcmp(argv[i], "--depth") )
+        if( !strcmp(argv[i], "-d") || !strcmp(argv[i], "--depth") )
         {
             if ( argc <= ++i )
                 usage( args->progname );
@@ -214,8 +204,6 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
 #ifdef COMPILE_WITH_GUI
     if( args->gui )
     {
-        if( args->spp   != 64 )
-            std::cerr << "main: warning: starting in GUI mode, disregarding --spp setting." << std::endl;
         if( strcmp( args->outFilename, "image.ppm" ) )
             std::cerr << "main: warning: starting in GUI mode, disregarding --out setting." << std::endl;
     }
@@ -243,7 +231,6 @@ int main( int argc, char* argv[] )
 
     // Parse command line arguments
     struct arguments args;
-    args.spp             = 64;
     args.depth           = 12;
     args.rrLimit         = 0.25;
     args.gamma           = 1;
@@ -259,7 +246,7 @@ int main( int argc, char* argv[] )
     if( modeFlags.verbose )
     {
         std::cerr << "main: arguments: ";
-        std::cerr << "spp = " << args.spp << ", depth = " << args.depth << ", rrLimit = " << args.rrLimit << ", gamma = " << args.gamma << "," << std::endl;
+        std::cerr << "depth = " << args.depth << ", rrLimit = " << args.rrLimit << ", gamma = " << args.gamma << "," << std::endl;
 #ifdef COMPILE_WITH_GUI
         if( !args.gui )
 #endif

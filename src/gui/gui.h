@@ -68,7 +68,6 @@ namespace Silence {
             , hudClockErrorSinceCameraClear( -1 )
             , hudFrames( -1 )
             , hudFps( -1 )
-            , hudSpp( -1 )
             , hudRays( -1 )
             , hudTime( -1 )
         {
@@ -132,7 +131,6 @@ namespace Silence {
         int         hudClockErrorSinceCameraClear; // Millisecs
         int         hudFrames;
         int         hudFps;
-        int         hudSpp;
         int         hudRays;
         int         hudTime;
     };
