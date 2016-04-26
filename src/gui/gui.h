@@ -68,7 +68,7 @@ namespace Silence {
             , hudClockErrorSinceCameraClear( -1 )
             , hudFrames( -1 )
             , hudFps( -1 )
-            , hudRays( -1 )
+            , hudZones( -1 )
             , hudTime( -1 )
         {
             assert( !self );
@@ -131,7 +131,7 @@ namespace Silence {
         int         hudClockErrorSinceCameraClear; // Millisecs
         int         hudFrames;
         int         hudFps;
-        int         hudRays;
+        int         hudZones;
         int         hudTime;
     };
 

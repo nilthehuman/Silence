@@ -73,21 +73,23 @@ namespace Silence {
             }
             glColor3f( 1.0, 1.0, 0.4 );
             char fpsText[32];
-            char rayText[32];
+            //char zoneText[32];
             char timeText[32];
             snprintf( fpsText,  32, "%d fps",   self->hudFps );
-            snprintf( rayText,  32, "%dk rays", self->hudRays / 1000 );
+            //snprintf( zoneText, 32, "%d zones", self->hudZones );
             snprintf( timeText, 32, "%d secs",  self->hudTime );
             for ( int i = 0; fpsText[i] != 0; ++i )
             {
                 glRasterPos2f( -1.0 + i*20.0 / width, 1.0 - 22.0 / height );
                 glutBitmapCharacter( GLUT_BITMAP_9_BY_15, fpsText[i] );
             }
-            for ( int i = 0; rayText[i] != 0; ++i )
+            /* TODO
+            for ( int i = 0; zoneText[i] != 0; ++i )
             {
                 glRasterPos2f( -1.0 + i*20.0 / width, 1.0 - 44.0 / height );
-                glutBitmapCharacter( GLUT_BITMAP_9_BY_15, rayText[i] );
+                glutBitmapCharacter( GLUT_BITMAP_9_BY_15, zoneText[i] );
             }
+            */
             for ( int i = 0; timeText[i] != 0; ++i )
             {
                 glRasterPos2f( -1.0 + i*20.0 / width, 1.0 - 66.0 / height );
@@ -325,7 +327,7 @@ namespace Silence {
         this->hudClockErrorSinceCameraClear = 0;
         this->hudFrames                     = 0;
         this->hudFps                        = 0;
-        this->hudRays                       = 0;
+        this->hudZones                      = 0;
         this->hudTime                       = 0;
         this->lastMoveObjects = this->lastHudRefresh = this->lastCameraClear = clock();
         glutTimerFunc( refreshTime,     &refresh,           0 );
