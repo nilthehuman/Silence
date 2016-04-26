@@ -1,6 +1,6 @@
 # __Silence__, an experimental 3D renderer
 
-Status: pre-alpha
+Status: pre-alpha (as in "doesn't work yet")
 
 ### What it is
 
