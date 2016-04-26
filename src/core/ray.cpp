@@ -34,32 +34,32 @@ namespace Silence {
         thingPartHit = NULL;
 
         double t = INF;
-        distance = INF;
+        length   = INF;
 
         // Check foreground Surfaces
         for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
             if ( (*thing)->isBackground() == false )
                 for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
-                    if ( (t = (*part)->intersect(*this)) && t < distance )
+                    if ( (t = (*part)->intersect(*this)) && t < length )
                     {
-                        distance     = t;
+                        length       = t;
                         thingPartHit = *part;
                     }
 
         if ( thingPartHit )
-            return distance;
+            return length;
 
         // Check background Surfaces
         for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
             if ( (*thing)->isBackground() == true )
                 for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
-                    if ( (t = (*part)->intersect(*this)) && t < distance )
+                    if ( (t = (*part)->intersect(*this)) && t < length )
                     {
-                        distance     = t;
+                        length       = t;
                         thingPartHit = *part;
                     }
 
-        return distance;
+        return length;
     }
 
 }

@@ -46,7 +46,7 @@ namespace Silence {
 
         const Vector& getOrigin()       const { return origin; }
         const Vector& getDirection()    const { return direction; }
-        const Vector  getIntersection() const { return 0 < distance ? (*this)[distance] : Vector::Invalid; }
+        const Vector  getIntersection() const { return 0 < length ? (*this)[length] : Vector::Invalid; }
 
         Vector operator[]( double t )   const { return origin + direction * t; }
 
@@ -57,7 +57,7 @@ namespace Silence {
 
         Vector  origin;
         Vector  direction;
-        double  distance;
+        double  length;
 
         const ThingPart* thingPartHit;
     };
