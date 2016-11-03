@@ -105,6 +105,8 @@ namespace Silence {
         const RGB** getPixels()      const { return (const RGB**)pixels; }
 
         const Plane getPlane() const;
+        Vector getLeftEdge ( int row ) const;
+        Vector getRightEdge( int row ) const;
 
     private:
         void contribute( const RGB** buffer );

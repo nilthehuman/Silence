@@ -58,6 +58,18 @@ namespace Silence {
                 pixels[row][col] += buffer[row][col];
     }
 
+    Vector Camera::getLeftEdge( int row ) const
+    {
+        const Vector leftEdge = screen.window[0] + (screen.window[2] - screen.window[0]) * ((0.5 + row) / screen.gridheight );
+        return leftEdge;
+    }
+
+    Vector Camera::getRightEdge( int row ) const
+    {
+        const Vector rightEdge = getLeftEdge( row ) + (screen.window[1] - screen.window[0]);
+        return rightEdge;
+    }
+
     void Camera::gammaCorrect( double gamma )
     {
         assert( !rendering );
