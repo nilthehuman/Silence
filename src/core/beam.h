@@ -39,6 +39,16 @@ namespace Silence {
     public:
         typedef double (*Distribution)( const Ray& pivot, const Vector& point );
 
+        static double Uniform( const Ray&, const Vector& )
+        {
+            return 1;
+        }
+        static double Spherical( const Ray& pivot, const Vector& point )
+        {
+            const double distance = (point - pivot.getOrigin()).length();
+            return UNITDIST * UNITDIST / ( distance * distance );
+        }
+
         Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray* >& edges, const Triplet& color, Distribution distribution )
             : scene( scene )
             , apex( apex )
