@@ -23,7 +23,7 @@
 #ifndef SILENCE_RENDERER
 #define SILENCE_RENDERER
 
-#include <map>
+#include <vector>
 
 #include "tree.h"
 
@@ -37,6 +37,7 @@ namespace Silence {
     public:
         Renderer( const Scene* scene )
             : scene( scene )
+            , cameras()
             , zoneForest()
             , zoneForestReady( false )
             , rendering( false )
@@ -59,7 +60,8 @@ namespace Silence {
     private:
         const Scene* const scene;
 
-        std::map< Camera*, Tree<Zone> > zoneForest;
+        std::vector< Camera* >     cameras;
+        std::vector< Tree<Zone>* > zoneForest;
 
         // State and housekeeping
         bool zoneForestReady;
