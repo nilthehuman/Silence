@@ -35,6 +35,7 @@ namespace Silence {
 
     class Ray;
     class Scene;
+    template< class T > class Tree;
     class Zone;
 
     class Thing;
@@ -61,6 +62,8 @@ namespace Silence {
     public:
         bool isBackground() const { return background; }
         bool isBackCulled() const { return backCulled; }
+
+        const Scene* getScene() const { return scene; }
 
         virtual void move( const Vector& translation )    const = 0; // Move each part
         virtual void move( double theta, WorldAxis axis ) const = 0; // Rotate each part
@@ -107,7 +110,7 @@ namespace Silence {
         LightPart( const Light* parent ) : Surface( (Object*)parent ) { }
         virtual ~LightPart() { }
 
-        void emitZones( std::vector< Zone* >& out );
+        virtual void emitZones( std::vector< Tree<Zone>* >& out ) const = 0;
 
         const Light* getParent() const { return (Light*)parent; }
     };
@@ -156,10 +159,11 @@ namespace Silence {
 
         void push_back( LightPart* part ) { parts.push_back( part ); }
 
-        LightPartIt partsBegin() const { return parts.begin(); }
-        LightPartIt partsEnd()   const { return parts.end();   }
+        LightPartIt    partsBegin()  const { return parts.begin(); }
+        LightPartIt    partsEnd()    const { return parts.end();   }
+        const Triplet& getEmission() const { return emission;      }
 
-        void emitZones( std::vector< Zone* >& out );
+        void emitZones( std::vector< Tree<Zone>* >& out ) const;
 
         virtual void move( const Vector& translation ) const;
         virtual void move( double theta, WorldAxis axis ) const;
@@ -205,6 +209,8 @@ namespace Silence {
             , IPoint   ( parent )
             , LightPart( parent )
         { }
+
+        void emitZones( std::vector< Tree<Zone>* >& out ) const;
     };
 
     class ISphere : virtual public Surface {
@@ -247,6 +253,8 @@ namespace Silence {
             , ISphere  ( parent )
             , LightPart( parent )
         { }
+
+        void emitZones( std::vector< Tree<Zone>* >& out ) const;
     };
 
     class IPlane : virtual public Surface {
@@ -297,6 +305,8 @@ namespace Silence {
             , IPlane   ( parent )
             , LightPart( parent )
         { }
+
+        void emitZones( std::vector< Tree<Zone>* >& out ) const;
     };
 
     class ITriangle : virtual public Surface {
@@ -335,7 +345,7 @@ namespace Silence {
             points[2] = c;
         }
 
-    private:
+    protected:
         Vector points[3];
     };
 
@@ -355,6 +365,8 @@ namespace Silence {
             , ITriangle( parent )
             , LightPart( parent )
         { }
+
+        void emitZones( std::vector< Tree<Zone>* >& out ) const;
     };
 
     struct Sky {

@@ -26,7 +26,10 @@
 #include <stdlib.h>
 #include <cassert>
 
+#include "beam.h"
 #include "ray.h"
+#include "tree.h"
+#include "zone.h"
 
 namespace Silence {
 
@@ -58,6 +61,11 @@ namespace Silence {
         point = newPoint;
     }
 
+    void Light::emitZones( std::vector< Tree<Zone>* >& out ) const
+    {
+        for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
+            (*part)->emitZones( out );
+    }
     void Light::move( const Vector& translation ) const
     {
         for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
@@ -153,6 +161,60 @@ namespace Silence {
             return 0;
         else
             return t;
+    }
+
+    void LightPoint::emitZones( std::vector< Tree<Zone>* >& out ) const
+    {
+        const Scene* scene = parent->getScene();
+        Zone left ( new Beam(scene, point, (Surface*)this, Ray(scene, point, -Vector::UnitX), std::vector<Ray*>(), ((Light*)parent)->getEmission(), &Beam::Uniform) );
+        Zone right( new Beam(scene, point, (Surface*)this, Ray(scene, point,  Vector::UnitX), std::vector<Ray*>(), ((Light*)parent)->getEmission(), &Beam::Uniform) );
+        out.push_back( new Tree<Zone>(left ) );
+        out.push_back( new Tree<Zone>(right) );
+    }
+
+    void LightSphere::emitZones( std::vector< Tree<Zone>* >& out ) const
+    {
+        const Scene* scene = parent->getScene();
+        Zone left ( new Beam(scene, center, (Surface*)this, Ray(scene, center, -Vector::UnitX), std::vector<Ray*>(), ((Light*)parent)->getEmission(), &Beam::Uniform) );
+        Zone right( new Beam(scene, center, (Surface*)this, Ray(scene, center,  Vector::UnitX), std::vector<Ray*>(), ((Light*)parent)->getEmission(), &Beam::Uniform) );
+        out.push_back( new Tree<Zone>(left ) );
+        out.push_back( new Tree<Zone>(right) );
+    }
+
+    void LightPlane::emitZones( std::vector< Tree<Zone>* >& out ) const
+    {
+        const Scene* scene = parent->getScene();
+        Zone up( new Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, normal), std::vector<Ray*>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
+        out.push_back( new Tree<Zone>(up) );
+        if ( !parent->isBackCulled() )
+        {
+            Zone down( new Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, -normal), std::vector<Ray*>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
+            out.push_back( new Tree<Zone>(down) );
+        }
+    }
+
+    void LightTriangle::emitZones( std::vector< Tree<Zone>* >& out ) const
+    {
+        const Scene* scene = parent->getScene();
+        const Vector apex = (points[0] + points[1] + points[2]) * 0.333;
+        const Vector edge0 = points[1] - points[0];
+        const Vector edge1 = points[2] - points[0];
+        const Vector normal = edge0.cross( edge1 ).normalize();
+        std::vector<Ray*> edges;
+        edges.push_back( new Ray(scene, points[0], points[0]-apex) );
+        edges.push_back( new Ray(scene, points[1], points[1]-apex) );
+        edges.push_back( new Ray(scene, points[2], points[2]-apex) );
+        Zone up( new Beam(scene, apex, (Surface*)this, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Uniform) );
+        out.push_back( new Tree<Zone>(up) );
+        if ( !parent->isBackCulled() )
+        {
+            std::vector<Ray*> edges;
+            edges.push_back( new Ray(scene, points[0], points[0]-apex) );
+            edges.push_back( new Ray(scene, points[1], points[1]-apex) );
+            edges.push_back( new Ray(scene, points[2], points[2]-apex) );
+            Zone down( new Beam(scene, apex, (Surface*)this, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Uniform) );
+            out.push_back( new Tree<Zone>(down) );
+        }
     }
 
 }
