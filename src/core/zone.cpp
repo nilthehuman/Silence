@@ -24,6 +24,9 @@
 
 #include <cstdlib>
 
+#include "camera.h"
+#include "scene.h"
+
 namespace Silence {
 
     // Contribute to the final image in a Camera
@@ -31,25 +34,54 @@ namespace Silence {
     {
         const int width  = camera->getGridwidth();
         const int height = camera->getGridheight();
+        const Vector viewpoint = camera->getViewpoint();
         RGB** buffer = new RGB*[height];
         for ( int row = 0; row < height; ++row )
             buffer[row] = new RGB[width];
 
-        const Plane cameraPlane = camera->getPlane();
-        #pragma omp parallel for
-        for ( int row = 0; row < screen.gridheight; ++row )
+        bool cameraHit = light->contains( viewpoint );
+
+        if ( cameraHit )
+            for ( std::vector< Shadow* >::const_iterator shadow = shadows.begin(); shadow != shadows.end(); ++shadow )
+            {
+                if ( equal( 1, (*shadow)->occluded(viewpoint) ) )
+                {
+                    cameraHit = false;
+                    break;
+                }
+            }
+
+        if ( cameraHit )
         {
-            const Vector leftEdge  = screen.window[0] + (screen.window[2] - screen.window[0]) * ((0.5 + row) / screen.gridheight );
-            const Vector rightEdge = leftEdge + (screen.window[1] - screen.window[0]);
-            rasterizeRow( cameraPlane, leftEdge, rightEdge, width, buffer[row] );
+            for ( int row = 0; row < height; ++row )
+                rasterizeRow( camera, row, buffer[row] );
+            // Write results directly in Camera's pixels array:
+            // contributions from all Zones will be superimposed on each other
+            camera->contribute( (const RGB**)buffer );
         }
-        // Write results directly in Camera's pixels array:
-        // contributions from all Zones will be superimposed on each other
-        camera->contribute( buffer );
 
         for ( int i = 0; i < height; ++i )
             delete[] buffer[i];
         delete[] buffer;
+    }
+
+    void Zone::rasterizeRow( const Camera* camera, int row, RGB* buffer ) const
+    {
+        // Basic light color
+        light->rasterizeRow( camera, row, buffer );
+
+        // Temper basic incoming light with the occlusion from Shadows
+        const int gridwidth = camera->getGridwidth();
+        const Vector rowVector = camera->getRightEdge( row ) - camera->getLeftEdge( row );
+        double* shadowMask = new double[gridwidth];
+        for ( int col = 0; col < gridwidth; ++col )
+        {
+            const Vector screenPoint = camera->getLeftEdge( row ) + rowVector * ( (double)col/gridwidth );
+            shadowMask[col] = 0;
+            for ( std::vector< Shadow* >::const_iterator shadow = shadows.begin(); shadow != shadows.end(); shadow++ )
+                shadowMask[col] += (*shadow)->occluded( screenPoint );
+            buffer[col] *= (1 - shadowMask[col]);
+        }
     }
 
     bool Zone::russianRoulette( double rrLimit ) const

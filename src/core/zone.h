@@ -58,7 +58,7 @@ namespace Silence {
     private:
         void bounce();
 
-        void rasterizeRow( const Plane* cameraPlane, const Vector& start, const Vector& end, int width, RGB* row ) const;
+        void rasterizeRow( const Camera* camera, int row, RGB* buffer ) const;
 
     private:
         Beam* light; // Only a single light Beam per Zone is allowed
