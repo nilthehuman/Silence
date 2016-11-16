@@ -49,7 +49,7 @@ namespace Silence {
         { }
 
         void addCamera( Camera* camera );
-        void removeCamera( int i );
+        void removeCamera( unsigned int i );
 
         void render( int time, int depth, double gamma = 1 );
 
