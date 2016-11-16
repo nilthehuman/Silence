@@ -32,6 +32,7 @@
 
 namespace Silence {
 
+    class Camera;
     class Surface;
     class Thing;
 
@@ -72,7 +73,7 @@ namespace Silence {
 
         bool    contains( const Vector& point ) const;
         Triplet getColor( const Vector& point ) const;
-        void    rasterizeRow( const Vector& start, const Vector& end, int gridwidth, RGB* buffer ) const;
+        void    rasterizeRow( const Camera* camera, int row, RGB* buffer ) const;
 
     private:
         void    paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
