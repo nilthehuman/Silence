@@ -33,12 +33,12 @@ namespace Silence {
 
     class Zone {
     public:
-        Zone( const Beam& light )
+        Zone( Beam* light )
             : light( light )
             , shadows()
             , insideThings()
         { }
-        Zone( const Beam& light, const std::vector< Shadow* >& shadows )
+        Zone( Beam* light, const std::vector< Shadow* >& shadows )
             : light( light )
             , shadows( shadows )
             , insideThings()
@@ -61,7 +61,7 @@ namespace Silence {
         void rasterizeRow( const Plane* cameraPlane, const Vector& start, const Vector& end, int width, RGB* row ) const;
 
     private:
-        Beam light; // Only a single light Beam per Zone is allowed
+        Beam* light; // Only a single light Beam per Zone is allowed
         std::vector< Shadow* > shadows;
 
         std::stack< const Thing* > insideThings; // LIFO stack of penetrated Things (passed down from parent Zone)
