@@ -42,11 +42,16 @@ namespace Silence {
         Triplet& operator+=( const Triplet& other )       { x += other.x; y += other.y; z += other.z; return *this; }
         Triplet  operator- ( const Triplet& other ) const { return Triplet( x-other.x, y-other.y, z-other.z); }
         Triplet& operator-=( const Triplet& other )       { x -= other.x; y -= other.y; z -= other.z; return *this; }
+        Triplet  operator* ( const Triplet& other ) const { return Triplet( x*other.x, y*other.y, z*other.z); }
+        Triplet& operator*=( const Triplet& other )       { x *= other.x; y *= other.y; z *= other.z; return *this; }
 
         Triplet  operator* ( double r ) const { return Triplet( x*r, y*r, z*r ); }
         Triplet& operator*=( double r )       { x *= r; y *= r; z *= r; return *this; }
         Triplet  operator/ ( double r ) const { return Triplet( x/r, y/r, z/r ); }
         Triplet& operator/=( double r )       { x /= r; y /= r; z /= r; return *this; }
+
+        Triplet& cap       ( const Triplet& other )       { x = min(x, other.x); y = min(y, other.y); z = min(z, other.z); return *this; }
+        Triplet& raise     ( const Triplet& other )       { x = max(x, other.x); y = max(y, other.y); z = max(z, other.z); return *this; }
 
         friend std::istream& operator>>( std::istream& is, Triplet& triplet );
         friend std::ostream& operator<<( std::ostream& os, const Triplet& triplet );
@@ -81,11 +86,6 @@ namespace Silence {
         RGB  operator* ( const Triplet& triplet ) const { return RGB( max(min(x*triplet.x, 1), 0), max(min(y*triplet.y, 1), 0), max(min(z*triplet.z, 1), 0) ); } // Can't use cap here
         RGB& operator*=( const Triplet& triplet )       { x *= triplet.x; y *= triplet.y; z *= triplet.z; cap( RGB::White ); raise( RGB::Black ); return *this; }
 
-        RGB  operator* ( const RGB& other ) const { return RGB( x * other.x, y * other.y, z * other.z ); }
-        RGB& operator*=( const RGB& other )       { x *= other.x; y *= other.y; z *= other.z; return *this; }
-
-        RGB& cap       ( const RGB& other )       { x = min(x, other.x); y = min(y, other.y); z = min(z, other.z); return *this; }
-        RGB& raise     ( const RGB& other )       { x = max(x, other.x); y = max(y, other.y); z = max(z, other.z); return *this; }
         // Values outside (0,0,0) through (1,1,1) are not valid RGB values. Return Triplet instead
         Triplet project( double min, double max ) const { return Triplet( min, min, min ) + ((Triplet)*this) * (max - min); }
         RGB& gamma     ( double gamma ) { x = pow( x, 1/gamma ); y = pow( y, 1/gamma ); z = pow( z, 1/gamma ); return *this; }
