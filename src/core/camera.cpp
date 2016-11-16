@@ -52,7 +52,6 @@ namespace Silence {
     // Receive a Zone's contributions to the final image
     void Camera::contribute( const RGB** buffer )
     {
-        #pragma omp parallel for
         for ( int row = 0; row < screen.gridheight; ++row )
             for ( int col = 0; col < screen.gridwidth; ++col )
                 pixels[row][col] += buffer[row][col];
