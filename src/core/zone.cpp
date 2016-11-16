@@ -57,7 +57,7 @@ namespace Silence {
         // Russian roulette is a common heuristic for path termination
         // Here we use a variant based on current color intensity
         // A lower rrLimit keeps more Zones alive
-        const RGB color = light.getColor();
+        const Triplet color = light->getColor();
         if ( max(color.x, max(color.y, color.z)) < (double)std::rand() * rrLimit / RAND_MAX )
             return true;
         return false;
