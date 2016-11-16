@@ -54,7 +54,7 @@ namespace Silence {
         return inside;
     }
 
-    RGB Beam::getColor( const Vector& point ) const
+    Triplet Beam::getColor( const Vector& point ) const
     {
         if ( contains(point) )
             return color * (*distribution)( pivot, point );

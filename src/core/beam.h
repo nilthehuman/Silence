@@ -39,7 +39,7 @@ namespace Silence {
     public:
         typedef double (*Distribution)( const Ray& pivot, const Vector& point );
 
-        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray* >& edges, const RGB& color, Distribution distribution )
+        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray* >& edges, const Triplet& color, Distribution distribution )
             : scene( scene )
             , apex( apex )
             , source( source )
@@ -58,10 +58,10 @@ namespace Silence {
                 delete *edge;
         }
 
-        const RGB& getColor() const { return color; }
+        const   Triplet& getColor() const { return color; }
 
         bool    contains( const Vector& point ) const;
-        RGB     getColor( const Vector& point ) const;
+        Triplet getColor( const Vector& point ) const;
         void    rasterizeRow( const Vector& start, const Vector& end, int gridwidth, RGB* buffer ) const;
 
     private:
@@ -81,7 +81,7 @@ namespace Silence {
         const Surface*      source; // The Surface the Beam emanates from
         Ray                 pivot;  // A representative Ray
         std::vector< Ray* > edges;  // Rays to mark Beam boundaries
-        RGB                 color;  // Current color of pivot Ray (may change with each bounce)
+        Triplet             color;  // Current color of pivot Ray (may change with each bounce)
         Distribution        distribution; // Provides each point a relative light intensity
     };
 
