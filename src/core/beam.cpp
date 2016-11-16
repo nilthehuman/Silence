@@ -29,19 +29,21 @@ namespace Silence {
 
     bool Beam::contains( const Vector& point ) const
     {
-        if ( edges.size() < 3 )
-            return false;
         const Vector direction = point - apex;
         const Ray ray( scene, apex, direction );
         const Vector testPoint = ray[ source->intersect(ray) ];
-        if ( direction.length() < (testPoint - apex).length() )
+        if ( direction.length() + EPSILON < (testPoint - apex).length() )
             return false;
+        if ( edges.size() < 3 )
+            return true;
         // en.wikipedia.org/wiki/Point_in_polygon#Ray_casting_algorithm
         // TODO: make this work for spherical surfaces too
         const Vector rayCast = (edges[1]->getOrigin() + edges[0]->getOrigin()) * 0.5 - testPoint;
         bool inside = false;
         std::vector< Ray* >::const_iterator edgeA, edgeB;
-        for ( edgeA = edges.begin(), edgeB = edges.begin() + 1; edgeA != edges.end(); ++edgeA, ++edgeB == edges.end() ? edgeB = edges.begin() : edgeB )
+        for ( edgeA = edges.begin(), edgeB = edges.begin() + 1;
+              edgeA != edges.end();
+              ++edgeA, ++edgeB == edges.end() ? edgeB = edges.begin() : edgeB )
         {
             const Vector a = (*edgeA)->getOrigin() - testPoint;
             const Vector b = (*edgeB)->getOrigin() - testPoint;
