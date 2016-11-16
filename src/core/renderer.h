@@ -51,8 +51,8 @@ namespace Silence {
         void setRussianRouletteLimit( double rrLimit ) { this->rrLimit = rrLimit; }
 
     private:
-        void buildZoneTree( int time, int depth );
-        void clearZoneTree();
+        void buildZoneForest( int time, int depth );
+        void clearZoneForest();
 
         void rasterize( int time );
 
