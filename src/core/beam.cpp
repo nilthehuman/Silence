@@ -67,24 +67,20 @@ namespace Silence {
 
     void Beam::rasterizeRow( const Camera* camera, int row, RGB* buffer ) const
     {
-        const int edgesSize = edges.size();
-        const int gridwidth = camera->getGridwidth();
-        for ( int i = 0; i < gridwidth; ++i )
-            buffer[i] = RGB::Black;
-        const Vector viewpoint = camera->getViewpoint();
-        const Vector rowVector = camera->getRightEdge( row ) - camera->getLeftEdge( row );
+        const int    gridwidth    = camera->getGridwidth();
+        const Vector viewpoint    = camera->getViewpoint();
+        const Vector leftEdge     = camera->getLeftEdge ( row );
+        const Vector rowDirection = camera->getRightEdge( row ) - leftEdge;
         for ( int col = 0; col < gridwidth; ++col )
         {
-            const Vector screenPoint = camera->getLeftEdge( row ) + rowVector * ( (double)col/gridwidth );
-            if ( edgesSize < 3 || contains(screenPoint) )
+            const Vector screenPoint = leftEdge + rowDirection * ( (double)col/gridwidth );
+            // TODO: instead of calling contains every time sweep from left to right keeping state.
+            const Ray eyeRay( scene, viewpoint, screenPoint - viewpoint );
+            const double sourceT = source->intersect( eyeRay );
+            if ( 0 != sourceT )
             {
-                const Ray eyeRay( scene, viewpoint, screenPoint - viewpoint );
-                const double sourceT = source->intersect( eyeRay );
-                if ( 0 != sourceT )
-                {
-                    const Vector sourcePoint = eyeRay[ sourceT ];
-                    buffer[col] = getColor( sourcePoint ).cap( RGB::White ).raise( RGB::Black );
-                }
+                const Vector sourcePoint = eyeRay[ sourceT ];
+                buffer[col] = getColor( sourcePoint ).cap( RGB::White ).raise( RGB::Black );
             }
         }
     }

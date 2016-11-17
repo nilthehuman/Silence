@@ -75,11 +75,12 @@ namespace Silence {
 
         // Temper basic incoming light with the occlusion from Shadows
         const int gridwidth = camera->getGridwidth();
-        const Vector rowVector = camera->getRightEdge( row ) - camera->getLeftEdge( row );
+        const Vector leftEdge     = camera->getLeftEdge ( row );
+        const Vector rowDirection = camera->getRightEdge( row ) - leftEdge;
         double* shadowMask = new double[gridwidth];
         for ( int col = 0; col < gridwidth; ++col )
         {
-            const Vector screenPoint = camera->getLeftEdge( row ) + rowVector * ( (double)col/gridwidth );
+            const Vector screenPoint = leftEdge + rowDirection * ( (double)col/gridwidth );
             shadowMask[col] = 0;
             for ( std::vector< Shadow* >::const_iterator shadow = shadows.begin(); shadow != shadows.end(); shadow++ )
                 shadowMask[col] += (*shadow)->occluded( screenPoint );
