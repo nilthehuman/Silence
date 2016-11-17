@@ -36,8 +36,6 @@ namespace Silence {
         for ( int row = 0; row < screen.gridheight; ++row )
             for ( int col = 0; col < screen.gridwidth; ++col )
                 pixels[row][col] = RGB::Black;
-        if ( modeFlags.verbose )
-            std::cerr << "                                            " << '\r' << std::flush;
     }
 
     // Return the dummy Plane the Screen lies on
