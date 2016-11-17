@@ -87,6 +87,7 @@ namespace Silence {
         /* TODO: time control... */
         for ( CameraIt camera = cameras.begin(); camera != cameras.end(); camera++ )
         {
+            (*camera)->clear();
             for ( ForestIt tree = zoneForest.begin(); tree != zoneForest.end(); tree++ )
             {
                 (*tree)->getValue().rasterize( *camera );
