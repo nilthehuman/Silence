@@ -36,7 +36,7 @@ namespace Silence {
         }
         return height;
     }
-            
+
     template< class T >
     void Tree<T>::clearChildren()
     {

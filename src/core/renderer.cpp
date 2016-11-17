@@ -57,13 +57,16 @@ namespace Silence {
     {
         if ( zoneForestReady )
             return;
-        std::cout << "entering Renderer::buildZoneForest\n";
+        if ( modeFlags.verbose )
+            std::cout << "Renderer: tracing Zones from lightsources... ";
         /* TODO: time control... */
         for ( LightIt light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
         {
             // Consider only root Zones for now (no recursion)
             (*light)->emitZones( zoneForest );
         }
+        if ( modeFlags.verbose )
+            std::cout << "done." << std::endl;
         zoneForestReady = true;
     }
 
@@ -75,11 +78,12 @@ namespace Silence {
         zoneForest.clear();
     }
 
-    // Rasterize all Zones in zoneForest to all Cameras
+    // Rasterize all Zones in zoneForest to each Camera
     void Renderer::rasterize( int /*time*/ )
     {
         assert( zoneForestReady );
-        std::cout << "entering Renderer::rasterize\n";
+        if ( modeFlags.verbose )
+            std::cout << "Renderer: rasterizing Zones to Cameras... ";
         /* TODO: time control... */
         for ( CameraIt camera = cameras.begin(); camera != cameras.end(); camera++ )
         {
@@ -89,6 +93,8 @@ namespace Silence {
                 // TODO: Recursion!
             }
         }
+        if ( modeFlags.verbose )
+            std::cout << "done." << std::endl;
     }
 
 }
