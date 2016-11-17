@@ -46,6 +46,8 @@ namespace Silence {
 
         ~Zone()
         {
+            delete light;
+
             std::vector< Shadow* >::const_iterator shadow;
             for ( shadow = shadows.begin(); shadow != shadows.end(); shadow++ )
                 delete *shadow;

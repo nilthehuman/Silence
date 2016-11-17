@@ -82,6 +82,7 @@ namespace Silence {
                 shadowMask[col] += (*shadow)->occluded( screenPoint );
             buffer[col] *= (1 - shadowMask[col]);
         }
+        delete[] shadowMask;
     }
 
     bool Zone::russianRoulette( double rrLimit ) const
