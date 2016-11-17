@@ -49,14 +49,6 @@ namespace Silence {
         return Plane( normal, offset );
     }
 
-    // Receive a Zone's contributions to the final image
-    void Camera::contribute( const RGB** buffer )
-    {
-        for ( int row = 0; row < screen.gridheight; ++row )
-            for ( int col = 0; col < screen.gridwidth; ++col )
-                pixels[row][col] += buffer[row][col];
-    }
-
     Vector Camera::getLeftEdge( int row ) const
     {
         const Vector leftEdge = screen.window[0] + (screen.window[2] - screen.window[0]) * ((0.5 + row) / screen.gridheight );

@@ -57,7 +57,10 @@ namespace Silence {
                 rasterizeRow( camera, row, buffer[row] );
             // Write results directly in Camera's pixels array:
             // contributions from all Zones will be superimposed on each other
-            camera->contribute( (const RGB**)buffer );
+            for ( int row = 0; row < height; ++row )
+                for ( int col = 0; col < width; ++col )
+                    if ( RGB::Black != buffer[row][col] )
+                        camera->pixels[row][col] += buffer[row][col];
         }
 
         for ( int i = 0; i < height; ++i )
