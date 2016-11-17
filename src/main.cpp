@@ -29,6 +29,7 @@
 #include <ctime>
 
 #include "core/camera.h"
+#include "core/renderer.h"
 #include "core/scene.h"
 
 #ifdef COMPILE_WITH_GUI
@@ -353,7 +354,9 @@ int main( int argc, char* argv[] )
         std::cerr << "main: starting the renderer." << std::endl;
     const time_t start = std::time( NULL );
     std::srand( start );
-    /// -- rendering will take place here -- ///
+    Renderer renderer( camera->getScene() );
+    renderer.addCamera( camera );
+    renderer.render( 0, args.depth );
     camera->gammaCorrect( args.gamma );
     if ( modeFlags.verbose )
     {
