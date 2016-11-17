@@ -55,6 +55,7 @@ namespace Silence {
         int height() const;
         //int depth( const Tree<T>* node ) const;
 
+        void addChild( T&       val )  { children.push_back( new Tree<T>(val) ); }
         void addChild( Tree<T>* node ) { children.push_back( node ); }
         void clearChildren();
 
