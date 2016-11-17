@@ -36,7 +36,7 @@ namespace Silence {
         Tree();
 
     public:
-        Tree( const T& value )
+        Tree( T& value )
             : value( value )
             , children()
         { }
@@ -47,8 +47,8 @@ namespace Silence {
                 delete *it;
         }
 
-        const T& getValue()    const { return value; }
-        const T& operator*()   const { return value; }
+        T&     getValue()            { return value; }
+        T&     operator*()           { return value; }
         TreeIt childrenBegin() const { return children.begin(); }
         TreeIt childrenEnd()   const { return children.end();   }
 
