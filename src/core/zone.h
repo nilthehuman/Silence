@@ -33,25 +33,19 @@ namespace Silence {
 
     class Zone {
     public:
-        Zone( Beam* light )
+        Zone( const Beam& light )
             : light( light )
             , shadows()
             , insideThings()
         { }
-        Zone( Beam* light, const std::vector< Shadow* >& shadows )
+        Zone( const Beam& light, const std::vector< Shadow >& shadows )
             : light( light )
             , shadows( shadows )
             , insideThings()
         { }
 
         ~Zone()
-        {
-            delete light;
-
-            std::vector< Shadow* >::const_iterator shadow;
-            for ( shadow = shadows.begin(); shadow != shadows.end(); shadow++ )
-                delete *shadow;
-        }
+        { }
 
         void rasterize( Camera* camera ) const;
 
@@ -63,8 +57,8 @@ namespace Silence {
         void rasterizeRow( const Camera* camera, int row, RGB* buffer ) const;
 
     private:
-        Beam* light; // Only a single light Beam per Zone is allowed
-        std::vector< Shadow* > shadows;
+        Beam light; // Only a single light Beam per Zone is allowed
+        std::vector< Shadow > shadows;
 
         std::stack< const Thing* > insideThings; // LIFO stack of penetrated Things (passed down from parent Zone)
     };

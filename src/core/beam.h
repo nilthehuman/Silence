@@ -50,7 +50,7 @@ namespace Silence {
             return UNITDIST * UNITDIST / ( distance * distance );
         }
 
-        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray* >& edges, const Triplet& color, Distribution distribution )
+        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray >& edges, const Triplet& color, Distribution distribution )
             : scene( scene )
             , apex( apex )
             , source( source )
@@ -63,11 +63,7 @@ namespace Silence {
         }
 
         ~Beam()
-        {
-            std::vector< Ray* >::const_iterator edge;
-            for ( edge = edges.begin(); edge != edges.end(); edge++ )
-                delete *edge;
-        }
+        { }
 
         const   Triplet& getColor() const { return color; }
 
@@ -88,12 +84,12 @@ namespace Silence {
     private:
         const Scene* const  scene;
 
-        Vector              apex;   // The point where all Rays meet
-        const Surface*      source; // The Surface the Beam emanates from
-        Ray                 pivot;  // A representative Ray
-        std::vector< Ray* > edges;  // Rays to mark Beam boundaries
-        Triplet             color;  // Current color of pivot Ray (may change with each bounce)
-        Distribution        distribution; // Provides each point a relative light intensity
+        Vector             apex;   // The point where all Rays meet
+        const Surface*     source; // The Surface the Beam emanates from
+        Ray                pivot;  // A representative Ray
+        std::vector< Ray > edges;  // Rays to mark Beam boundaries
+        Triplet            color;  // Current color of pivot Ray (may change with each bounce)
+        Distribution       distribution; // Provides each point a relative light intensity
     };
 
 }

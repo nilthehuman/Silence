@@ -39,12 +39,12 @@ namespace Silence {
         for ( int row = 0; row < height; ++row )
             buffer[row] = new RGB[width];
 
-        bool cameraHit = light->contains( viewpoint );
+        bool cameraHit = light.contains( viewpoint );
 
         if ( cameraHit )
-            for ( std::vector< Shadow* >::const_iterator shadow = shadows.begin(); shadow != shadows.end(); ++shadow )
+            for ( std::vector< Shadow >::const_iterator shadow = shadows.begin(); shadow != shadows.end(); ++shadow )
             {
-                if ( equal( 1, (*shadow)->occluded(viewpoint) ) )
+                if ( equal( 1, (*shadow).occluded(viewpoint) ) )
                 {
                     cameraHit = false;
                     break;
@@ -71,7 +71,7 @@ namespace Silence {
     void Zone::rasterizeRow( const Camera* camera, int row, RGB* buffer ) const
     {
         // Basic light color
-        light->rasterizeRow( camera, row, buffer );
+        light.rasterizeRow( camera, row, buffer );
 
         // Temper basic incoming light with the occlusion from Shadows
         const int gridwidth = camera->getGridwidth();
@@ -82,8 +82,8 @@ namespace Silence {
         {
             const Vector screenPoint = leftEdge + rowDirection * ( (double)col/gridwidth );
             shadowMask[col] = 0;
-            for ( std::vector< Shadow* >::const_iterator shadow = shadows.begin(); shadow != shadows.end(); shadow++ )
-                shadowMask[col] += (*shadow)->occluded( screenPoint );
+            for ( std::vector< Shadow >::const_iterator shadow = shadows.begin(); shadow != shadows.end(); shadow++ )
+                shadowMask[col] += (*shadow).occluded( screenPoint );
             buffer[col] *= (1 - shadowMask[col]);
         }
         delete[] shadowMask;
@@ -94,7 +94,7 @@ namespace Silence {
         // Russian roulette is a common heuristic for path termination
         // Here we use a variant based on current color intensity
         // A lower rrLimit keeps more Zones alive
-        const Triplet color = light->getColor();
+        const Triplet color = light.getColor();
         if ( max(color.x, max(color.y, color.z)) < (double)std::rand() * rrLimit / RAND_MAX )
             return true;
         return false;
