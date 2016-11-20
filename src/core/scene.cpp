@@ -172,6 +172,11 @@ namespace Silence {
         out.push_back( new Tree<Zone>(right) );
     }
 
+    Vector Sphere::mirror( const Vector& point ) const
+    {
+        return point;
+    }
+
     std::vector< Vector > Sphere::getPoints( const Vector& viewpoint ) const
     {
         const Vector normal = (center - viewpoint).normalize();
@@ -193,6 +198,12 @@ namespace Silence {
         Zone right( Beam(scene, center, (Surface*)this, Ray(scene, center,  Vector::UnitX), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
         out.push_back( new Tree<Zone>(left ) );
         out.push_back( new Tree<Zone>(right) );
+    }
+
+    Vector Plane::mirror( const Vector& point ) const
+    {
+        const double distance = point * normal - offset;
+        return point - normal * 2 * distance;
     }
 
     std::vector< Vector > Plane::getPoints( const Vector& viewpoint ) const
@@ -221,6 +232,14 @@ namespace Silence {
             Zone down( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, -normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
             out.push_back( new Tree<Zone>(down) );
         }
+    }
+
+    Vector Triangle::mirror( const Vector& point ) const
+    {
+        const Vector& normal = ( points[1] - points[0] ).cross( points[2] - points[0] );
+        const double offset = normal * points[0];
+        const double distance = point * normal - offset;
+        return point - normal * 2 * distance;
     }
 
     std::vector< Vector > Triangle::getPoints( const Vector& ) const

@@ -61,10 +61,16 @@ namespace Silence {
             std::cout << "Renderer: tracing Zones from lightsources... ";
         /* TODO: time control... */
         for ( LightIt light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
-        {
-            // Consider only root Zones for now (no recursion)
             (*light)->emitZones( zoneForest );
+        for ( ForestIt tree = zoneForest.begin(); tree != zoneForest.end(); tree++ )
+        {
+            (*tree)->getValue().occlude();
+            // Consider only root Zones for now (no recursion)
+            std::vector< Zone > children = (*tree)->getValue().bounce();
+            for ( std::vector< Zone >::iterator child = children.begin(); child != children.end(); child++ )
+               (*tree)->addChild(*child);
         }
+
         if ( modeFlags.verbose )
             std::cout << "done." << std::endl;
         zoneForestReady = true;
@@ -92,6 +98,8 @@ namespace Silence {
             {
                 (*tree)->getValue().rasterize( *camera );
                 // TODO: Recursion!
+                for ( Tree<Zone>::TreeIt child = (*tree)->childrenBegin(); child != (*tree)->childrenEnd(); child++ )
+                    (*child)->getValue().rasterize( *camera );
             }
         }
         if ( modeFlags.verbose )

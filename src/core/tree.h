@@ -29,7 +29,7 @@ namespace Silence {
 
     template< class T >
     class Tree {
-
+    public:
         typedef class std::vector< Tree<T>* >::const_iterator TreeIt;
 
     private:
@@ -55,7 +55,7 @@ namespace Silence {
         int height() const;
         //int depth( const Tree<T>* node ) const;
 
-        void addChild( T&       val )  { children.push_back( new Tree<T>(val) ); }
+        void addChild( T&       val  ) { children.push_back( new Tree<T>(val) ); }
         void addChild( Tree<T>* node ) { children.push_back( node ); }
         void clearChildren();
 

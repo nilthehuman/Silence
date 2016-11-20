@@ -56,6 +56,7 @@ namespace Silence {
         inline bool russianRoulette( double rrLimit ) const;
 
     private:
+        bool hit     ( const ThingPart* part ) const; // Is a surface element reached by the light?
         bool eclipsed( const ThingPart* part ) const; // Is a surface element completely obscured?
 
         void rasterizeRow( const Camera* camera, int row, RGB* buffer ) const;

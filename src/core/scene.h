@@ -102,6 +102,8 @@ namespace Silence {
         ThingPart( const Thing* parent ) : Surface( (Object*)parent ) { }
         virtual ~ThingPart() { }
 
+        // Return the reflection of a given point off the plane of the shape
+        virtual Vector mirror( const Vector& point ) const = 0;
         // Return the "outline" of the shape from a given direction
         virtual std::vector< Vector > getPoints( const Vector& viewpoint ) const = 0;
 
@@ -135,6 +137,8 @@ namespace Silence {
 
         const RGB& getColor()            const { return material.getColor(); }
         double     getRefractiveIndex()  const { return material.getRefractiveIndex(); }
+
+        double     interact( const Material::Interaction& interaction ) const { return material.interact(interaction); }
 
         virtual void move( const Vector& translation ) const;
         virtual void move( double theta, WorldAxis axis ) const;
@@ -248,6 +252,7 @@ namespace Silence {
             , ThingPart( parent )
         { }
 
+        Vector mirror( const Vector& point ) const;
         std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
@@ -302,6 +307,7 @@ namespace Silence {
             , ThingPart( NULL )
         { }
 
+        Vector mirror( const Vector& point ) const;
         std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
@@ -364,6 +370,7 @@ namespace Silence {
             , ThingPart( parent )
         { }
 
+        Vector mirror( const Vector& point ) const;
         std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 

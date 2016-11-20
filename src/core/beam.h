@@ -27,6 +27,7 @@
 #include <stack>
 #include <vector>
 
+#include "material.h"
 #include "ray.h"
 #include "triplet.h"
 
@@ -73,16 +74,16 @@ namespace Silence {
         Triplet getColor( const Vector& point ) const;
         void    rasterizeRow( const Camera* camera, int row, RGB* buffer ) const;
 
-        void    occlude();
-        Beam    bounce( const ThingPart* part );
+        void    occlude(); // Figure out what ThingParts obstruct the Beam
+        Beam    bounce( const ThingPart* part, const Material::Interaction& interaction ) const; // Spawn next Beam after hitting a ThingPart
 
     private:
         void    paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
 
-        Beam    bounceDiffuse();
-        Beam    bounceMetallic();
-        Beam    bounceReflect();
-        Beam    bounceRefract();
+        inline Beam bounceDiffuse ( const ThingPart* part ) const;
+        inline Beam bounceMetallic( const ThingPart* part ) const;
+        inline Beam bounceReflect ( const ThingPart* part ) const;
+        inline Beam bounceRefract ( const ThingPart* part ) const;
 
         static double schlick( double n1, double n2, double cosTheta );
 

@@ -44,8 +44,13 @@ namespace Silence {
        std::vector< Zone > newZones;
        for ( ThingIt thing = light.getScene()->thingsBegin(); thing != light.getScene()->thingsEnd(); thing++ )
             for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
-                if ( !eclipsed(*part) )
-                    newBeams.push_back( light.bounce(*part) );
+                if ( hit(*part) && !eclipsed(*part) )
+                {
+                    const Thing* thing = (const Thing*)( (*part)->getParent() );
+                    if ( !equal(0, thing->interact(Material::DIFFUSE) ) )
+                        newBeams.push_back( light.bounce(*part, Material::DIFFUSE) );
+                    // if other Interactions...
+                }
         for ( std::vector< Beam >::const_iterator beam = newBeams.begin(); beam != newBeams.end(); beam++ )
             newZones.push_back( Zone(*beam) );
         return newZones;
@@ -88,6 +93,17 @@ namespace Silence {
         for ( int i = 0; i < height; ++i )
             delete[] buffer[i];
         delete[] buffer;
+    }
+
+    bool Zone::hit( const ThingPart* part ) const
+    {
+        // Temporary solution.
+        // TODO: accurate algorithm for narrow Beams.
+        const std::vector< Vector > points = part->getPoints( light.getApex() );
+        for ( std::vector< Vector >::const_iterator point = points.begin(); point != points.end(); point++ )
+            if ( light.contains(*point) )
+                return true;
+        return false;
     }
 
     bool Zone::eclipsed( const ThingPart* part ) const
