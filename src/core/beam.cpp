@@ -96,7 +96,7 @@ namespace Silence {
         return *this;
     }
 
-    double Beam::schlick( double n1, double n2, double cosTheta ) const
+    double Beam::schlick( double n1, double n2, double cosTheta )
     {
         // http://en.wikipedia.org/wiki/Schlick%27s_approximation
         const double R0 = (n1 - n2) * (n1 - n2) / ( (n1 + n2) * (n1 + n2) );

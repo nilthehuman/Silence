@@ -84,7 +84,7 @@ namespace Silence {
         Beam    bounceReflect();
         Beam    bounceRefract();
 
-        double  schlick( double n1, double n2, double cosTheta ) const;
+        static double schlick( double n1, double n2, double cosTheta );
 
     private:
         const Scene* const scene;
