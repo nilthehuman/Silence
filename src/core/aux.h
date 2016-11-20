@@ -36,9 +36,10 @@ namespace Silence {
 
     const double PI       = 3.141592654;
 
-    inline double abs( double x )           { return x < 0 ? -x : x; }
-    inline double min( double a, double b ) { return a < b ?  a : b; }
-    inline double max( double a, double b ) { return a > b ?  a : b; }
+    inline double  abs( double x )           { return x < 0 ? -x : x; }
+    inline double sign( double x )           { return x < 0 ? -1 : x == 0 ? 0 : 1; }
+    inline double  min( double a, double b ) { return a < b ?  a : b; }
+    inline double  max( double a, double b ) { return a > b ?  a : b; }
 
     inline bool equal( double a, double b ) { return abs(a - b) < EPSILON; }
 
