@@ -35,8 +35,8 @@ namespace Silence {
 
     class Renderer {
 
-        typedef std::vector< Tree<Zone>* >::const_iterator ForestIt;
-        typedef std::vector< Camera* >    ::const_iterator CameraIt;
+        typedef std::vector< Tree<Zone>* >::iterator ForestIt;
+        typedef std::vector< Camera* >    ::iterator CameraIt;
 
     public:
         Renderer( const Scene* scene )
