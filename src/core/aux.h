@@ -41,7 +41,7 @@ namespace Silence {
     inline double  min( double a, double b ) { return a < b ?  a : b; }
     inline double  max( double a, double b ) { return a > b ?  a : b; }
 
-    inline bool equal( double a, double b ) { return abs(a - b) < EPSILON; }
+    inline bool  equal( double a, double b ) { return abs(a - b) < EPSILON; }
 
 }
 
