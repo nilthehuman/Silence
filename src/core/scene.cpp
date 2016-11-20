@@ -172,6 +172,20 @@ namespace Silence {
         out.push_back( new Tree<Zone>(right) );
     }
 
+    std::vector< Vector > Sphere::getPoints( const Vector& viewpoint ) const
+    {
+        const Vector normal = (center - viewpoint).normalize();
+        std::vector< Vector > points;
+        if ( Vector::UnitX == normal || -Vector::UnitX == normal )
+            points.push_back( center + normal.cross(Vector::UnitY).normalize() );
+        else
+            points.push_back( center + normal.cross(Vector::UnitX).normalize() );
+        points.push_back( center + normal.cross(points[0] - center) );
+        points.push_back( center + normal.cross(points[1] - center) );
+        points.push_back( center + normal.cross(points[2] - center) );
+        return points;
+    }
+
     void LightSphere::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
@@ -179,6 +193,22 @@ namespace Silence {
         Zone right( Beam(scene, center, (Surface*)this, Ray(scene, center,  Vector::UnitX), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform) );
         out.push_back( new Tree<Zone>(left ) );
         out.push_back( new Tree<Zone>(right) );
+    }
+
+    std::vector< Vector > Plane::getPoints( const Vector& viewpoint ) const
+    {
+        const Vector viewnormal = (normal * offset - viewpoint).normalize();
+        std::vector< Vector > points;
+        if ( Vector::UnitX == viewnormal || -Vector::UnitX == viewnormal )
+            points.push_back( normal * offset + viewnormal.cross(Vector::UnitY).normalize() );
+        else
+            points.push_back( normal * offset + viewnormal.cross(Vector::UnitX).normalize() );
+        points.push_back( normal * offset + viewnormal.cross(points[0] - normal * offset) );
+        points.push_back( normal * offset + viewnormal.cross(points[1] - normal * offset) );
+        points.push_back( normal * offset + viewnormal.cross(points[2] - normal * offset) );
+        for ( int i = 0; i < 4; ++i )
+            points[i] *= INF;
+        return points;
     }
 
     void LightPlane::emitZones( std::vector< Tree<Zone>* >& out ) const
@@ -191,6 +221,15 @@ namespace Silence {
             Zone down( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, -normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
             out.push_back( new Tree<Zone>(down) );
         }
+    }
+
+    std::vector< Vector > Triangle::getPoints( const Vector& ) const
+    {
+        std::vector< Vector > pointsVector;
+        pointsVector.push_back( points[0] );
+        pointsVector.push_back( points[1] );
+        pointsVector.push_back( points[2] );
+        return pointsVector;
     }
 
     void LightTriangle::emitZones( std::vector< Tree<Zone>* >& out ) const

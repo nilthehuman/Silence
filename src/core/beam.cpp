@@ -85,6 +85,17 @@ namespace Silence {
         }
     }
 
+    void Beam::occlude()
+    {
+        // TODO
+    }
+
+    Beam Beam::bounce( const ThingPart* /*part*/ )
+    {
+        // TODO
+        return *this;
+    }
+
     double Beam::schlick( double n1, double n2, double cosTheta ) const
     {
         // http://en.wikipedia.org/wiki/Schlick%27s_approximation

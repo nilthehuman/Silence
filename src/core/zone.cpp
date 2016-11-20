@@ -29,6 +29,28 @@
 
 namespace Silence {
 
+    // Find all Things obstructing the light Beam
+    void Zone::occlude()
+    {
+        for ( ThingIt thing = light.getScene()->thingsBegin(); thing != light.getScene()->thingsEnd(); thing++ )
+            for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                light.occlude();
+    }
+
+    // Create all Zones stemming from this one
+    std::vector< Zone > Zone::bounce()
+    {
+       std::vector< Beam > newBeams;
+       std::vector< Zone > newZones;
+       for ( ThingIt thing = light.getScene()->thingsBegin(); thing != light.getScene()->thingsEnd(); thing++ )
+            for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                if ( !eclipsed(*part) )
+                    newBeams.push_back( light.bounce(*part) );
+        for ( std::vector< Beam >::const_iterator beam = newBeams.begin(); beam != newBeams.end(); beam++ )
+            newZones.push_back( Zone(*beam) );
+        return newZones;
+    }
+
     // Contribute to the final image in a Camera
     void Zone::rasterize( Camera* camera ) const
     {
@@ -66,6 +88,24 @@ namespace Silence {
         for ( int i = 0; i < height; ++i )
             delete[] buffer[i];
         delete[] buffer;
+    }
+
+    bool Zone::eclipsed( const ThingPart* part ) const
+    {
+        for ( std::vector< Shadow >::const_iterator shadow = shadows.begin(); shadow != shadows.end(); shadow++ )
+        {
+            bool eclipsed = true;
+            const std::vector< Vector > points = part->getPoints( light.getApex() );
+            for ( std::vector< Vector >::const_iterator point = points.begin(); point != points.end(); point++ )
+                if ( !equal(1, (*shadow).occluded(*point)) )
+                {
+                    eclipsed = false;
+                    break;
+                }
+            if ( eclipsed )
+                return true;
+        }
+        return false;
     }
 
     void Zone::rasterizeRow( const Camera* camera, int row, RGB* buffer ) const

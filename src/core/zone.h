@@ -30,6 +30,7 @@ namespace Silence {
 
     class Camera;
     class Plane;
+    class ThingPart;
 
     class Zone {
     public:
@@ -47,12 +48,15 @@ namespace Silence {
         ~Zone()
         { }
 
+        void                occlude(); // Generate Shadow beams
+        std::vector< Zone > bounce();  // Generate child Zones
+
         void rasterize( Camera* camera ) const;
 
         inline bool russianRoulette( double rrLimit ) const;
 
     private:
-        void bounce();
+        bool eclipsed( const ThingPart* part ) const; // Is a surface element completely obscured?
 
         void rasterizeRow( const Camera* camera, int row, RGB* buffer ) const;
 

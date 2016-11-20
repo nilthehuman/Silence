@@ -102,6 +102,9 @@ namespace Silence {
         ThingPart( const Thing* parent ) : Surface( (Object*)parent ) { }
         virtual ~ThingPart() { }
 
+        // Return the "outline" of the shape from a given direction
+        virtual std::vector< Vector > getPoints( const Vector& viewpoint ) const = 0;
+
         const Thing* getParent() const { return (Thing*)parent; }
     };
 
@@ -244,6 +247,8 @@ namespace Silence {
             , ISphere  ( parent )
             , ThingPart( parent )
         { }
+
+        std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
     class LightSphere : public ISphere, public LightPart {
@@ -296,6 +301,8 @@ namespace Silence {
             , IPlane   ( NULL, normal, offset )
             , ThingPart( NULL )
         { }
+
+        std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
     class LightPlane : public IPlane, public LightPart {
@@ -356,6 +363,8 @@ namespace Silence {
             , ITriangle( parent )
             , ThingPart( parent )
         { }
+
+        std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
     class LightTriangle : public ITriangle, public LightPart {

@@ -65,24 +65,29 @@ namespace Silence {
         ~Beam()
         { }
 
+        const   Scene*   getScene() const { return scene; }
+        const   Vector&  getApex()  const { return apex;  }
         const   Triplet& getColor() const { return color; }
 
         bool    contains( const Vector& point ) const;
         Triplet getColor( const Vector& point ) const;
         void    rasterizeRow( const Camera* camera, int row, RGB* buffer ) const;
 
+        void    occlude();
+        Beam    bounce( const ThingPart* part );
+
     private:
         void    paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
 
-        void    bounceDiffuse();
-        void    bounceMetallic();
-        void    bounceReflect();
-        void    bounceRefract();
+        Beam    bounceDiffuse();
+        Beam    bounceMetallic();
+        Beam    bounceReflect();
+        Beam    bounceRefract();
 
         double  schlick( double n1, double n2, double cosTheta ) const;
 
     private:
-        const Scene* const  scene;
+        const Scene* const scene;
 
         Vector             apex;   // The point where all Rays meet
         const Surface*     source; // The Surface the Beam emanates from
