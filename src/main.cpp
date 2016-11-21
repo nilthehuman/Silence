@@ -341,7 +341,6 @@ int main( int argc, char* argv[] )
     Renderer renderer( camera->getScene() );
     renderer.addCamera( camera );
     renderer.render( 0, args.depth );
-    camera->gammaCorrect( args.gamma );
     if ( modeFlags.verbose )
     {
         const time_t end = std::time( NULL );
