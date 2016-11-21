@@ -126,15 +126,14 @@ you an estimate of the remaining time:
 ### Options
 
 __Silence__ is only a proof of concept and doesn't have too many knobs on it.
-Basically you can set the upper limit on __recursion depth__, a factor to
-fine-tune __Russian roulette__ and the __gamma correction__ exponent.
+Basically you can set the upper limit on __recursion depth__ and the __gamma
+correction__ exponent.
 Type `./silence -h` for a full list of command line options.
 
-Example to render with a zone tree no deeper than 5, a rather forgiving Russian
-roulette and no gamma correction:
+Example to render with a zone tree no deeper than 5 and no gamma correction:
 
 ```bash
-./silence scene.json -v -d 5 -r 0.125 -g 1
+./silence scene.json -v -d 5 -g 1
 ```
 
 ## Features
@@ -172,7 +171,6 @@ These are mainly implementation details users need not concern themselves with.
 
   * Background objects vs foreground objects
   * Back-face culling
-  * A Russian roulette variant for cutting zone tree branches short
   * Multi-threading (OpenMP)
 
 ### Optional later additions
