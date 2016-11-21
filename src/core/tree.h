@@ -30,7 +30,7 @@ namespace Silence {
     template< class T >
     class Tree {
     public:
-        typedef class std::vector< Tree<T>* >::const_iterator TreeIt;
+        typedef class std::vector< Tree<T>* >::iterator TreeIt;
 
     private:
         Tree();
