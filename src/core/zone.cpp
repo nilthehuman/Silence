@@ -62,9 +62,12 @@ namespace Silence {
         const int width  = camera->getGridwidth();
         const int height = camera->getGridheight();
         const Vector viewpoint = camera->getViewpoint();
-        RGB** buffer = new RGB*[height];
+        RGB** pixelBuffer = new RGB*[height];
         for ( int row = 0; row < height; ++row )
-            buffer[row] = new RGB[width];
+            pixelBuffer[row] = new RGB[width];
+        double** skyBlocked = new double*[height];
+        for ( int row = 0; row < height; ++row )
+            skyBlocked[row] = new double[width];
 
         bool cameraHit = light.contains( viewpoint );
 
@@ -81,24 +84,25 @@ namespace Silence {
         if ( cameraHit )
         {
             for ( int row = 0; row < height; ++row )
-                rasterizeRow( camera, row, buffer[row] );
+                rasterizeRow( camera, row, pixelBuffer[row], skyBlocked[row] );
             // Write results directly in Camera's pixels array:
             // contributions from all Zones will be superimposed on each other
-            const Thing* source = dynamic_cast<const Thing*>( light.getSource() );
-            const double skyBlocked = source ? 1 - source->interact( Material::REFRACT ) : 1;
             for ( int row = 0; row < height; ++row )
                 for ( int col = 0; col < width; ++col )
                 {
-                    if ( RGB::Black != buffer[row][col] )
-                        camera->pixels[row][col] += buffer[row][col];
-                    if ( !equal(0, skyBlocked) )
-                        camera->skyMask[row][col] -= skyBlocked;
+                    if ( RGB::Black != pixelBuffer[row][col] )
+                        camera->pixels[row][col] += pixelBuffer[row][col];
+                    if ( !equal(0, skyBlocked[row][col]) )
+                        camera->skyMask[row][col] -= skyBlocked[row][col];
                 }
         }
 
         for ( int i = 0; i < height; ++i )
-            delete[] buffer[i];
-        delete[] buffer;
+            delete[] pixelBuffer[i];
+        delete[] pixelBuffer;
+        for ( int i = 0; i < height; ++i )
+            delete[] skyBlocked[i];
+        delete[] skyBlocked;
     }
 
     bool Zone::hit( const ThingPart* part ) const
@@ -130,10 +134,10 @@ namespace Silence {
         return false;
     }
 
-    void Zone::rasterizeRow( const Camera* camera, int row, RGB* buffer ) const
+    void Zone::rasterizeRow( const Camera* camera, int row, RGB* pixelBuffer, double* skyBlocked ) const
     {
         // Basic light color
-        light.rasterizeRow( camera, row, buffer );
+        light.rasterizeRow( camera, row, pixelBuffer, skyBlocked );
 
         // Temper basic incoming light with the occlusion from Shadows
         const int gridwidth = camera->getGridwidth();
@@ -146,7 +150,7 @@ namespace Silence {
             shadowMask[col] = 0;
             for ( std::vector< Shadow >::const_iterator shadow = shadows.begin(); shadow != shadows.end(); shadow++ )
                 shadowMask[col] += (*shadow).occluded( screenPoint );
-            buffer[col] *= (1 - shadowMask[col]);
+            pixelBuffer[col] *= (1 - shadowMask[col]);
         }
         delete[] shadowMask;
     }

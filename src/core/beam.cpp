@@ -65,12 +65,13 @@ namespace Silence {
             return RGB::Black;
     }
 
-    void Beam::rasterizeRow( const Camera* camera, int row, RGB* buffer ) const
+    void Beam::rasterizeRow( const Camera* camera, int row, RGB* pixelBuffer, double* skyBlocked ) const
     {
         const int    gridwidth    = camera->getGridwidth();
         const Vector viewpoint    = camera->getViewpoint();
         const Vector leftEdge     = camera->getLeftEdge ( row );
         const Vector rowDirection = camera->getRightEdge( row ) - leftEdge;
+        const double transparency = source->getParent()->getTransparency();
         for ( int col = 0; col < gridwidth; ++col )
         {
             const Vector screenPoint = leftEdge + rowDirection * ( (double)col/gridwidth );
@@ -80,7 +81,8 @@ namespace Silence {
             if ( 0 != sourceT )
             {
                 const Vector sourcePoint = eyeRay[ sourceT ];
-                buffer[col] = getColor( sourcePoint ).cap( RGB::White ).raise( RGB::Black );
+                pixelBuffer[col] = getColor( sourcePoint ).cap( RGB::White ).raise( RGB::Black );
+                skyBlocked [col] = 1 - transparency;
             }
         }
     }

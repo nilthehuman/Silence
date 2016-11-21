@@ -57,7 +57,7 @@ namespace Silence {
         bool hit     ( const ThingPart* part ) const; // Is a surface element reached by the light?
         bool eclipsed( const ThingPart* part ) const; // Is a surface element completely obscured?
 
-        void rasterizeRow( const Camera* camera, int row, RGB* buffer ) const;
+        void rasterizeRow( const Camera* camera, int row, RGB* pixelBuffer, double* skyBlocked ) const;
 
     private:
         Beam light; // Only a single light Beam per Zone is allowed

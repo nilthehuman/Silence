@@ -72,7 +72,7 @@ namespace Silence {
 
         bool    contains( const Vector& point ) const;
         Triplet getColor( const Vector& point ) const;
-        void    rasterizeRow( const Camera* camera, int row, RGB* buffer ) const;
+        void    rasterizeRow( const Camera* camera, int row, RGB* buffer, double* skyBlocked ) const;
 
         void    occlude(); // Figure out what ThingParts obstruct the Beam
         Beam    bounce( const ThingPart* part, const Material::Interaction& interaction ) const; // Spawn next Beam after hitting a ThingPart

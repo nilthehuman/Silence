@@ -65,6 +65,8 @@ namespace Silence {
 
         const Scene* getScene() const { return scene; }
 
+        virtual double getTransparency() const = 0; // How much you can see through the Object
+
         virtual void move( const Vector& translation )    const = 0; // Move each part
         virtual void move( double theta, WorldAxis axis ) const = 0; // Rotate each part
 
@@ -138,7 +140,8 @@ namespace Silence {
         ThingPartIt partsEnd()   const { return parts.end();   }
 
         const RGB& getColor()            const { return material.getColor(); }
-        double     getRefractiveIndex()  const { return material.getRefractiveIndex(); }
+        virtual double getTransparency()    const { return interact(Material::REFRACT); }
+        double         getRefractiveIndex() const { return material.getRefractiveIndex(); }
 
         double     interact( const Material::Interaction& interaction ) const { return material.interact(interaction); }
 
@@ -168,9 +171,10 @@ namespace Silence {
 
         void push_back( LightPart* part ) { parts.push_back( part ); }
 
-        LightPartIt    partsBegin()  const { return parts.begin(); }
-        LightPartIt    partsEnd()    const { return parts.end();   }
-        const Triplet& getEmission() const { return emission;      }
+        LightPartIt    partsBegin()      const { return parts.begin(); }
+        LightPartIt    partsEnd()        const { return parts.end();   }
+        virtual double getTransparency() const { return 0;             }
+        const Triplet& getEmission()     const { return emission;      }
 
         void emitZones( std::vector< Tree<Zone>* >& out ) const;
 
