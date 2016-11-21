@@ -69,7 +69,7 @@ namespace Silence {
         for ( int row = 0; row < height; ++row )
             skyBlocked[row] = new double[width];
 
-        bool cameraHit = light.contains( viewpoint );
+        bool cameraHit = light.contains( viewpoint ) && !camera->behind( light.getApex() );
 
         if ( cameraHit )
             for ( std::vector< Shadow >::const_iterator shadow = shadows.begin(); shadow != shadows.end(); ++shadow )

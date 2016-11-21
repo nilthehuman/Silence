@@ -109,15 +109,16 @@ namespace Silence {
         void move( double delta, Axis chosenAxis );
         void turn( double theta, Axis chosenAxis );
 
-        const Scene* getScene()      const { return scene; }
-        int  getGridwidth ()         const { return screen.gridwidth; }
-        int  getGridheight()         const { return screen.gridheight; }
-        const Vector& getViewpoint() const { return viewpoint; }
-        const RGB** getPixels()      const { return (const RGB**)pixels; }
+        const Scene*  getScene()      const { return scene; }
+        int           getGridwidth () const { return screen.gridwidth; }
+        int           getGridheight() const { return screen.gridheight; }
+        const Vector& getViewpoint()  const { return viewpoint; }
+        const RGB**   getPixels()     const { return (const RGB**)pixels; }
 
-        const Plane getPlane() const;
-        Vector getLeftEdge ( int row ) const;
-        Vector getRightEdge( int row ) const;
+        const Plane   getPlane()                    const;
+        Vector        getLeftEdge ( int row )       const;
+        Vector        getRightEdge( int row )       const;
+        bool          behind( const Vector& point ) const;
 
     private:
         friend void Zone::rasterize( Camera* ) const;

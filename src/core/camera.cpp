@@ -62,6 +62,13 @@ namespace Silence {
         return rightEdge;
     }
 
+    bool Camera::behind( const Vector& point ) const
+    {
+        const Vector apexToScreen      = screen.window[0] - point;
+        const Vector viewpointToScreen = screen.window[0] - viewpoint;
+        return 0 < apexToScreen * viewpointToScreen;
+    }
+
     // Fill in the pixels where the Sky is showing through
     void Camera::paintSky()
     {
