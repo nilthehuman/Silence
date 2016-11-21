@@ -109,8 +109,6 @@ namespace Silence {
         Vector getRightEdge( int row ) const;
 
     private:
-        void contribute( const RGB** buffer );
-
         friend void Zone::rasterize( Camera* ) const;
 
         friend std::istream& operator>>( std::istream& is, Camera& camera );
