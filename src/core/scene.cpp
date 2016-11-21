@@ -166,10 +166,8 @@ namespace Silence {
     void LightPoint::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
-        Zone left ( Beam(scene, point, (Surface*)this, Ray(scene, point, -Vector::UnitX), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
-        Zone right( Beam(scene, point, (Surface*)this, Ray(scene, point,  Vector::UnitX), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
-        out.push_back( new Tree<Zone>(left ) );
-        out.push_back( new Tree<Zone>(right) );
+        Zone zone( Beam(scene, point, (Surface*)this, Ray(scene, point, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
+        out.push_back( new Tree<Zone>(zone) );
     }
 
     Vector Sphere::mirror( const Vector& point ) const
@@ -194,10 +192,8 @@ namespace Silence {
     void LightSphere::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
-        Zone left ( Beam(scene, center, (Surface*)this, Ray(scene, center, -Vector::UnitX), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
-        Zone right( Beam(scene, center, (Surface*)this, Ray(scene, center,  Vector::UnitX), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
-        out.push_back( new Tree<Zone>(left ) );
-        out.push_back( new Tree<Zone>(right) );
+        Zone zone( Beam(scene, center, (Surface*)this, Ray(scene, center, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
+        out.push_back( new Tree<Zone>(zone) );
     }
 
     Vector Plane::mirror( const Vector& point ) const
