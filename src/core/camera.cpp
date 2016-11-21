@@ -76,7 +76,7 @@ namespace Silence {
     void Camera::gammaCorrect( double gamma )
     {
         assert( !rendering );
-        if ( 1 == gamma )
+        if ( equal(1, gamma) )
             return;
         #pragma omp parallel for
         for ( int row = 0; row < screen.gridheight; ++row )
