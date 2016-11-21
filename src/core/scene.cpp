@@ -170,6 +170,11 @@ namespace Silence {
         out.push_back( new Tree<Zone>(zone) );
     }
 
+    double Sphere::getTilt( const Vector& ) const
+    {
+        return 1;
+    }
+
     Vector Sphere::mirror( const Vector& point ) const
     {
         return point;
@@ -194,6 +199,13 @@ namespace Silence {
         const Scene* scene = parent->getScene();
         Zone zone( Beam(scene, center, (Surface*)this, Ray(scene, center, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
         out.push_back( new Tree<Zone>(zone) );
+    }
+
+    double Plane::getTilt( const Vector& pivot ) const
+    {
+        if ( Vector::Zero == pivot )
+            return 1;
+        return abs( normal * pivot );
     }
 
     Vector Plane::mirror( const Vector& point ) const
@@ -228,6 +240,14 @@ namespace Silence {
             Zone down( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, -normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
             out.push_back( new Tree<Zone>(down) );
         }
+    }
+
+    double Triangle::getTilt( const Vector& pivot ) const
+    {
+        if ( Vector::Zero == pivot )
+            return 1;
+        const Vector& normal = ( points[1] - points[0] ).cross( points[2] - points[0] );
+        return abs( normal * pivot );
     }
 
     Vector Triangle::mirror( const Vector& point ) const

@@ -102,8 +102,10 @@ namespace Silence {
         ThingPart( const Thing* parent ) : Surface( (Object*)parent ) { }
         virtual ~ThingPart() { }
 
+        // Return the dot product of the normal and a given pivot (for Phong reflection)
+        virtual double getTilt( const Vector& pivot ) const = 0;
         // Return the reflection of a given point off the plane of the shape
-        virtual Vector mirror( const Vector& point ) const = 0;
+        virtual Vector mirror ( const Vector& point ) const = 0;
         // Return the "outline" of the shape from a given direction
         virtual std::vector< Vector > getPoints( const Vector& viewpoint ) const = 0;
 
@@ -252,7 +254,8 @@ namespace Silence {
             , ThingPart( parent )
         { }
 
-        Vector mirror( const Vector& point ) const;
+        double getTilt( const Vector& pivot ) const;
+        Vector mirror ( const Vector& point ) const;
         std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
@@ -307,7 +310,8 @@ namespace Silence {
             , ThingPart( NULL )
         { }
 
-        Vector mirror( const Vector& point ) const;
+        double getTilt( const Vector& pivot ) const;
+        Vector mirror ( const Vector& point ) const;
         std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
@@ -370,7 +374,8 @@ namespace Silence {
             , ThingPart( parent )
         { }
 
-        Vector mirror( const Vector& point ) const;
+        double getTilt( const Vector& pivot ) const;
+        Vector mirror ( const Vector& point ) const;
         std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
