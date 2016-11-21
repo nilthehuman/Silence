@@ -64,8 +64,9 @@ namespace Silence {
 
     bool Camera::behind( const Vector& point ) const
     {
-        const Vector apexToScreen      = screen.window[0] - point;
-        const Vector viewpointToScreen = screen.window[0] - viewpoint;
+        const Vector screenMiddle      = (screen.window[0] + screen.window[1] + screen.window[2] + screen.window[3]) * 0.25;
+        const Vector apexToScreen      = screenMiddle - point;
+        const Vector viewpointToScreen = screenMiddle - viewpoint;
         return 0 < apexToScreen * viewpointToScreen;
     }
 
