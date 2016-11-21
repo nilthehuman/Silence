@@ -62,12 +62,6 @@ namespace Silence {
         const int width  = camera->getGridwidth();
         const int height = camera->getGridheight();
         const Vector viewpoint = camera->getViewpoint();
-        RGB** pixelBuffer = new RGB*[height];
-        for ( int row = 0; row < height; ++row )
-            pixelBuffer[row] = new RGB[width];
-        double** skyBlocked = new double*[height];
-        for ( int row = 0; row < height; ++row )
-            skyBlocked[row] = new double[width];
 
         bool cameraHit = light.contains( viewpoint ) && !camera->behind( light.getApex() );
 
@@ -83,6 +77,13 @@ namespace Silence {
 
         if ( cameraHit )
         {
+            RGB** pixelBuffer = new RGB*[height];
+            for ( int row = 0; row < height; ++row )
+                pixelBuffer[row] = new RGB[width];
+            double** skyBlocked = new double*[height];
+            for ( int row = 0; row < height; ++row )
+                skyBlocked[row] = new double[width];
+
             for ( int row = 0; row < height; ++row )
                 rasterizeRow( camera, row, pixelBuffer[row], skyBlocked[row] );
             // Write results directly in Camera's pixels array:
@@ -95,14 +96,14 @@ namespace Silence {
                     if ( !equal(0, skyBlocked[row][col]) )
                         camera->skyMask[row][col] -= skyBlocked[row][col];
                 }
-        }
 
-        for ( int i = 0; i < height; ++i )
-            delete[] pixelBuffer[i];
-        delete[] pixelBuffer;
-        for ( int i = 0; i < height; ++i )
-            delete[] skyBlocked[i];
-        delete[] skyBlocked;
+            for ( int i = 0; i < height; ++i )
+                delete[] pixelBuffer[i];
+            delete[] pixelBuffer;
+            for ( int i = 0; i < height; ++i )
+                delete[] skyBlocked[i];
+            delete[] skyBlocked;
+        }
     }
 
     bool Zone::hit( const ThingPart* part ) const
