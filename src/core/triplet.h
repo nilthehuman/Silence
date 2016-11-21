@@ -52,6 +52,8 @@ namespace Silence {
 
         Triplet& cap       ( const Triplet& other )       { x = min(x, other.x); y = min(y, other.y); z = min(z, other.z); return *this; }
         Triplet& raise     ( const Triplet& other )       { x = max(x, other.x); y = max(y, other.y); z = max(z, other.z); return *this; }
+        Triplet& normalize ();
+        Triplet  normalized() const;
 
         friend std::istream& operator>>( std::istream& is, Triplet& triplet );
         friend std::ostream& operator<<( std::ostream& os, const Triplet& triplet );

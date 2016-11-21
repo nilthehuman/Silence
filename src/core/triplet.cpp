@@ -33,6 +33,17 @@ namespace Silence {
         return os;
     }
 
+    Triplet& Triplet::normalize()
+    {
+        return (*this).cap( RGB::White ).raise( RGB::Black );
+    }
+
+    Triplet Triplet::normalized() const
+    {
+        Triplet newTriplet( *this );
+        return newTriplet.normalize();
+    }
+
     // Returns a random unit vector whose dot product with 'normal' is non-negative
     Vector Vector::random( const Vector& normal )
     {

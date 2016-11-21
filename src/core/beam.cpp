@@ -81,7 +81,7 @@ namespace Silence {
             if ( 0 != sourceT )
             {
                 const Vector sourcePoint = eyeRay[ sourceT ];
-                pixelBuffer[col] = getColor( sourcePoint ).cap( RGB::White ).raise( RGB::Black );
+                pixelBuffer[col] = getColor( sourcePoint ).normalize();
                 skyBlocked [col] = 1 - transparency;
             }
         }
