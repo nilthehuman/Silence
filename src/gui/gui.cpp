@@ -310,10 +310,9 @@ namespace Silence {
         glutSwapBuffers();
     }
 
-    void GUI::setup( int depth, double rrLimit, double gamma, int refreshTime, bool hud, const std::vector< Motion* >& motions )
+    void GUI::setup( int depth, double gamma, int refreshTime, bool hud, const std::vector< Motion* >& motions )
     {
         this->depth       = depth;
-        this->rrLimit     = rrLimit;
         this->gamma       = gamma;
         this->refreshTime = refreshTime;
         this->hud         = hud;

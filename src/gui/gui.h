@@ -56,7 +56,6 @@ namespace Silence {
             : camera( camera )
             , windowId( -1 )
             , depth( -1 )
-            , rrLimit( -1 )
             , gamma( -1 )
             , refreshTime( -1 )
             , hud( false )
@@ -88,7 +87,7 @@ namespace Silence {
         }
 
         void initialize( int* argc, char* argv[] );
-        void setup( int depth, double rrLimit, double gamma, int refreshTime /*millisecs*/, bool hud, const std::vector< Motion* >& motions );
+        void setup( int depth, double gamma, int refreshTime /*millisecs*/, bool hud, const std::vector< Motion* >& motions );
         void run();
 
     private:
@@ -116,7 +115,6 @@ namespace Silence {
         KeysPressed keys;
 
         int         depth;
-        double      rrLimit;
         double      gamma;
         int         refreshTime;
         bool        hud;

@@ -48,7 +48,6 @@ struct flags Silence::modeFlags;
 struct arguments {
     char*  progname;
     int    depth;
-    double rrLimit;
     double gamma;
     char*  sceneFilename;
     char*  outFilename;
@@ -65,7 +64,6 @@ void help( std::string progname )
     std::cout << "usage: " << progname << " SCENE_FILENAME [OPTIONS]" << std::endl << std::endl;
     std::cout << "Command line options:" << std::endl;
     std::cout << "  -d, --depth DEPTH   Set the maximal depth (length) of any path (default 12)" << std::endl;
-    std::cout << "  -r, --rr LIMIT      Set the stay-alive limit used in Russian roulette (default 0.25)" << std::endl;
     std::cout << "  -g, --gamma EXP     Set the exponent for post-mortem gamma correction (default 1.0)" << std::endl;
     std::cout << "  -o, --out FILENAME  Set the filename for the output image (default image.ppm)" << std::endl;
 #ifdef COMPILE_WITH_GUI
@@ -97,9 +95,8 @@ void version()
 
 void usage( std::string progname )
 {
-    std::cerr << "usage: " << progname << " SCENE_FILENAME [-v|--verbose]" << std::endl;
-    std::cerr << "  [--depth MAX_DEPTH_OF_PATHS] [--rr RUSSIAN_ROULETTE_LIMIT] [--gamma GAMMA]" << std::endl;
-    std::cerr << "  [--out IMAGE_FILENAME]" << std::endl;
+    std::cerr << "usage: " << progname << " SCENE_FILENAME [-v|--verbose] [--depth MAX_DEPTH_OF_PATHS]" << std::endl;
+    std::cerr << "  [--gamma GAMMA] [--out IMAGE_FILENAME]" << std::endl;
 #ifdef COMPILE_WITH_GUI
     std::cerr << "  [--gui]" << std::endl;
 #endif
@@ -128,14 +125,6 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
                 usage( args->progname );
             args->depth = atoi( argv[i] );
             if ( !args->depth )
-                usage( args->progname );
-        }
-        else if( !strcmp(argv[i], "-r") || !strcmp(argv[i], "--rr") )
-        {
-            if ( argc <= ++i )
-                usage( args->progname );
-            args->rrLimit = atof( argv[i] );
-            if ( !args->rrLimit )
                 usage( args->progname );
         }
         else if( !strcmp(argv[i], "-g") || !strcmp(argv[i], "--gamma") )
@@ -197,11 +186,6 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
     }
     if( !args->sceneFilename )
         usage( args->progname );
-    if( 1.0 < args->rrLimit )
-    {
-        std::cerr << "main: warning: an rrLimit higher than 1.0 will produce unrealistic results." << std::endl;
-        std::cerr << "               This may not be what you intend." << std::endl;
-    }
 #ifdef COMPILE_WITH_GUI
     if( args->gui )
     {
@@ -233,7 +217,6 @@ int main( int argc, char* argv[] )
     // Parse command line arguments
     struct arguments args;
     args.depth           = 12;
-    args.rrLimit         = 0.25;
     args.gamma           = 1;
     args.sceneFilename   = NULL;
     args.outFilename     = (char*)"image.ppm";
@@ -247,11 +230,12 @@ int main( int argc, char* argv[] )
     if( modeFlags.verbose )
     {
         std::cerr << "main: arguments: ";
-        std::cerr << "depth = " << args.depth << ", rrLimit = " << args.rrLimit << ", gamma = " << args.gamma << "," << std::endl;
+        std::cerr << "depth = " << args.depth << ", gamma = " << args.gamma;
 #ifdef COMPILE_WITH_GUI
         if( !args.gui )
 #endif
-            std::cerr << "      outFilename = " << args.outFilename << std::endl;
+            std::cerr << ", outFilename = " << args.outFilename;
+        std::cerr << std::endl;
     }
 
     // Process scene description input
@@ -327,7 +311,7 @@ int main( int argc, char* argv[] )
             std::cerr << "main: creating GUI." << std::endl;
         GUI gui( camera );
         gui.initialize( &argc, argv );
-        gui.setup( args.depth, args.rrLimit, args.gamma, (int)(1000.0 / args.fps), args.hud, motions );
+        gui.setup( args.depth, args.gamma, (int)(1000.0 / args.fps), args.hud, motions );
         atexit( &cleanup );
         if ( modeFlags.verbose )
             std::cerr << "main: starting the renderer." << std::endl;
