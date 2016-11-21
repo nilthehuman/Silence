@@ -66,9 +66,10 @@ namespace Silence {
         ~Beam()
         { }
 
-        const   Scene*   getScene() const { return scene; }
-        const   Vector&  getApex()  const { return apex;  }
-        const   Triplet& getColor() const { return color; }
+        const   Scene*   getScene()  const { return scene;  }
+        const   Vector&  getApex()   const { return apex;   }
+        const   Surface* getSource() const { return source; }
+        const   Triplet& getColor()  const { return color;  }
 
         bool    contains( const Vector& point ) const;
         Triplet getColor( const Vector& point ) const;
