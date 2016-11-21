@@ -65,6 +65,7 @@ namespace Silence {
 
         const Scene* getScene() const { return scene; }
 
+        virtual RGB    getColor()        const = 0; // What color the Object appears when you look at it directly
         virtual double getTransparency() const = 0; // How much you can see through the Object
 
         virtual void move( const Vector& translation )    const = 0; // Move each part
@@ -89,6 +90,8 @@ namespace Silence {
         virtual void   move( const Vector& translation )      = 0; // Translate Surface by an arbitrary world space vector
         virtual void   move( double theta, WorldAxis axis )   = 0; // Rotate Surface around one of the world coordinate axes
 
+        const Object*  getParent() const { return parent; }
+
     protected:
         Surface( const Object* parent ) : parent( parent ) { }
         virtual ~Surface() { }
@@ -110,8 +113,6 @@ namespace Silence {
         virtual Vector mirror ( const Vector& point ) const = 0;
         // Return the "outline" of the shape from a given direction
         virtual std::vector< Vector > getPoints( const Vector& viewpoint ) const = 0;
-
-        const Thing* getParent() const { return (Thing*)parent; }
     };
 
     class LightPart : virtual public Surface {
@@ -120,8 +121,6 @@ namespace Silence {
         virtual ~LightPart() { }
 
         virtual void emitZones( std::vector< Tree<Zone>* >& out ) const = 0;
-
-        const Light* getParent() const { return (Light*)parent; }
     };
 
     // Non-light complex objects in the Scene
@@ -139,8 +138,8 @@ namespace Silence {
         ThingPartIt partsBegin() const { return parts.begin(); }
         ThingPartIt partsEnd()   const { return parts.end();   }
 
-        const RGB& getColor()            const { return material.getColor(); }
         virtual double getTransparency()    const { return interact(Material::REFRACT); }
+        virtual RGB    getColor()           const { return material.getColor(); }
         double         getRefractiveIndex() const { return material.getRefractiveIndex(); }
 
         double     interact( const Material::Interaction& interaction ) const { return material.interact(interaction); }
@@ -173,6 +172,7 @@ namespace Silence {
 
         LightPartIt    partsBegin()      const { return parts.begin(); }
         LightPartIt    partsEnd()        const { return parts.end();   }
+        virtual RGB    getColor()        const { return RGB( emission.normalized() ); }
         virtual double getTransparency() const { return 0;             }
         const Triplet& getEmission()     const { return emission;      }
 
