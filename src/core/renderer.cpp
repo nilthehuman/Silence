@@ -42,13 +42,13 @@ namespace Silence {
         cameras.erase( cameras.begin() + i );
     }
 
-    void Renderer::render( int /*time*/, int /*depth*/, double /*gamma*/ )
+    void Renderer::render( int /*time*/, int /*depth*/, double gamma )
     {
         assert( !rendering );
         rendering = true;
         /* TODO: time control... */
         buildZoneForest(0, 0);
-        rasterize(0);
+        rasterize(0, gamma);
         /*...*/
         rendering = false;
     }
@@ -85,7 +85,7 @@ namespace Silence {
     }
 
     // Rasterize all Zones in zoneForest to each Camera
-    void Renderer::rasterize( int /*time*/ )
+    void Renderer::rasterize( int /*time*/, double gamma )
     {
         assert( zoneForestReady );
         if ( modeFlags.verbose )
@@ -102,6 +102,7 @@ namespace Silence {
                     (*child)->getValue().rasterize( *camera );
             }
             (*camera)->paintSky();
+            (*camera)->gammaCorrect( gamma );
         }
         if ( modeFlags.verbose )
             std::cout << "done." << std::endl;
