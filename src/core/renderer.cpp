@@ -101,6 +101,7 @@ namespace Silence {
                 for ( Tree<Zone>::TreeIt child = (*tree)->childrenBegin(); child != (*tree)->childrenEnd(); child++ )
                     (*child)->getValue().rasterize( *camera );
             }
+            (*camera)->paintSky();
         }
         if ( modeFlags.verbose )
             std::cout << "done." << std::endl;

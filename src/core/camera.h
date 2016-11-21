@@ -66,6 +66,7 @@ namespace Silence {
         Camera( const Scene* scene )
             : scene( scene )
             , pixels( NULL )
+            , skyMask( NULL )
             , rendering( false )
         { }
         Camera( const Scene* scene, Vector viewpoint, Screen screen, int width, int height )
@@ -77,6 +78,9 @@ namespace Silence {
             pixels = new RGB*[height];
             for ( int i = 0; i < height; ++i )
                 pixels[i] = new RGB[width];
+            skyMask = new double*[height];
+            for ( int i = 0; i < height; ++i )
+                skyMask[i] = new double[width];
         }
         ~Camera()
         {
@@ -86,11 +90,18 @@ namespace Silence {
                     delete[] pixels[i];
                 delete[] pixels;
             }
+            if ( skyMask )
+            {
+                for ( int i = 0; i < screen.gridheight; ++i )
+                    delete[] skyMask[i];
+                delete[] skyMask;
+            }
             if ( modeFlags.verbose )
                 std::cerr << "                                            " << '\r' << std::flush;
         }
 
         void clear();
+        void paintSky();
         void gammaCorrect( double gamma );
 
         void writePixels( std::ostream& os ) const;
@@ -116,10 +127,11 @@ namespace Silence {
     private:
         const Scene* const scene;
 
-        Vector viewpoint;
-        Screen screen;
-        RGB**  pixels; // The end results go here
-        bool   rendering;
+        Vector   viewpoint;
+        Screen   screen;
+        RGB**    pixels;  // The end results go here
+        double** skyMask; // Empty parts of the screen space
+        bool     rendering;
     };
 
 }

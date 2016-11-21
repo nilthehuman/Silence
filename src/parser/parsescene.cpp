@@ -118,6 +118,13 @@ namespace Silence {
                 delete[] camera.pixels[i];
             delete[] camera.pixels;
         }
+        if ( camera.skyMask )
+        {
+            // Free skyMask array
+            for ( int i = 0; i < camera.screen.gridheight; ++i )
+                delete[] camera.skyMask[i];
+            delete[] camera.skyMask;
+        }
         bool viewpointDefined      = false;
         bool screenDefined         = false;
         bool gridResolutionDefined = false;
@@ -160,6 +167,10 @@ namespace Silence {
         camera.pixels = new RGB*[camera.screen.gridheight];
         for ( int i = 0; i < camera.screen.gridheight; ++i )
             camera.pixels[i] = new RGB[camera.screen.gridwidth];
+        // Allocate new skyMask array
+        camera.skyMask = new double*[camera.screen.gridheight];
+        for ( int i = 0; i < camera.screen.gridheight; ++i )
+            camera.skyMask[i] = new double[camera.screen.gridwidth];
         return is;
     }
 

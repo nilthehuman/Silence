@@ -35,7 +35,10 @@ namespace Silence {
         #pragma omp parallel for
         for ( int row = 0; row < screen.gridheight; ++row )
             for ( int col = 0; col < screen.gridwidth; ++col )
-                pixels[row][col] = RGB::Black;
+            {
+                pixels [row][col] = RGB::Black;
+                skyMask[row][col] = 1;
+            }
     }
 
     // Return the dummy Plane the Screen lies on
@@ -57,6 +60,17 @@ namespace Silence {
     {
         const Vector rightEdge = getLeftEdge( row ) + (screen.window[1] - screen.window[0]);
         return rightEdge;
+    }
+
+    // Fill in the pixels where the Sky is showing through
+    void Camera::paintSky()
+    {
+        assert( !rendering );
+        #pragma omp parallel for
+        for ( int row = 0; row < screen.gridheight; ++row )
+            for ( int col = 0; col < screen.gridwidth; ++col )
+                if ( 0 < skyMask[row][col] )
+                    pixels[row][col] += scene->getSky().color * skyMask[row][col];
     }
 
     void Camera::gammaCorrect( double gamma )

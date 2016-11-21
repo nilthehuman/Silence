@@ -84,10 +84,16 @@ namespace Silence {
                 rasterizeRow( camera, row, buffer[row] );
             // Write results directly in Camera's pixels array:
             // contributions from all Zones will be superimposed on each other
+            const Thing* source = dynamic_cast<const Thing*>( light.getSource() );
+            const double skyBlocked = source ? 1 - source->interact( Material::REFRACT ) : 1;
             for ( int row = 0; row < height; ++row )
                 for ( int col = 0; col < width; ++col )
+                {
                     if ( RGB::Black != buffer[row][col] )
                         camera->pixels[row][col] += buffer[row][col];
+                    if ( !equal(0, skyBlocked) )
+                        camera->skyMask[row][col] -= skyBlocked;
+                }
         }
 
         for ( int i = 0; i < height; ++i )
