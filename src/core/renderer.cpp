@@ -64,13 +64,13 @@ namespace Silence {
             (*light)->emitZones( zoneForest );
         for ( ForestIt tree = zoneForest.begin(); tree != zoneForest.end(); tree++ )
         {
-            (*tree)->getValue().occlude();
+            (*tree)->getValue()->occlude();
             // Consider only root Zones for now (no recursion)
-            std::vector< Zone > children = (*tree)->getValue().bounce();
-            for ( std::vector< Zone >::iterator child = children.begin(); child != children.end(); child++ )
+            std::vector< Zone* > children = (*tree)->getValue()->bounce();
+            for ( std::vector< Zone* >::iterator child = children.begin(); child != children.end(); child++ )
             {
                 Tree< Zone >* node = (*tree)->addChild(*child);
-                child->setNode( node );
+                (*child)->setNode( node );
             }
         }
 
@@ -99,10 +99,10 @@ namespace Silence {
             (*camera)->clear();
             for ( ForestIt tree = zoneForest.begin(); tree != zoneForest.end(); tree++ )
             {
-                (*tree)->getValue().rasterize( *camera );
+                (*tree)->getValue()->rasterize( *camera );
                 // TODO: Recursion!
                 for ( Tree<Zone>::TreeIt child = (*tree)->childrenBegin(); child != (*tree)->childrenEnd(); child++ )
-                    (*child)->getValue().rasterize( *camera );
+                    (*child)->getValue()->rasterize( *camera );
             }
             (*camera)->paintSky();
             (*camera)->gammaCorrect( gamma );

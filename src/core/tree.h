@@ -38,7 +38,7 @@ namespace Silence {
         Tree();
 
     public:
-        Tree( T& value )
+        Tree( T* value )
             : value( value )
             , parent( NULL )
             , children()
@@ -46,7 +46,7 @@ namespace Silence {
         {
             leaves.push_back( this );
         }
-        Tree( T& value, Tree<T>* parent )
+        Tree( T* value, Tree<T>* parent )
             : value( value )
             , parent( parent )
             , children()
@@ -63,8 +63,9 @@ namespace Silence {
         }
 
         const Tree<T>* getParent() const { return parent; }
-        T&             getValue()        { return value; }
-        T&             operator*()       { return value; }
+        T*             getValue()        { return value; }
+        const T*       getValue()  const { return value; }
+        T*             operator*()       { return value; }
         TreeIt         childrenBegin()   { return children.begin(); }
         TreeIt         childrenEnd()     { return children.end();   }
         TreeIt         leavesBegin()     { return leaves.begin();   }
@@ -83,7 +84,7 @@ namespace Silence {
         }
         //int depth( const Tree<T>* node ) const;
 
-        Tree<T>* addChild( T& val )
+        Tree<T>* addChild( T* val )
         {
             Tree<T>* child = new Tree<T>( val, this );
             child->setParent( this );
@@ -135,7 +136,7 @@ namespace Silence {
         }
 
     private:
-        T                       value;
+        T* const                value;
         Tree<T>*                parent;
         std::vector< Tree<T>* > children;
         std::vector< Tree<T>* > leaves;

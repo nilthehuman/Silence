@@ -168,7 +168,7 @@ namespace Silence {
     void LightPoint::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
-        Zone zone( Beam(scene, point, (Surface*)this, Ray(scene, point, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
+        Zone* zone = new Zone( Beam(scene, point, (Surface*)this, Ray(scene, point, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
         out.push_back( new Tree<Zone>(zone) );
     }
 
@@ -199,7 +199,7 @@ namespace Silence {
     void LightSphere::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
-        Zone zone( Beam(scene, center, (Surface*)this, Ray(scene, center, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
+        Zone* zone = new Zone( Beam(scene, center, (Surface*)this, Ray(scene, center, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
         out.push_back( new Tree<Zone>(zone) );
     }
 
@@ -235,11 +235,11 @@ namespace Silence {
     void LightPlane::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
-        Zone up( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
+        Zone* up = new Zone( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
         out.push_back( new Tree<Zone>(up) );
         if ( !parent->isBackCulled() )
         {
-            Zone down( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, -normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
+            Zone* down = new Zone( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, -normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
             out.push_back( new Tree<Zone>(down) );
         }
     }
@@ -280,7 +280,7 @@ namespace Silence {
         edges.push_back( Ray(scene, points[0], points[0]-apex) );
         edges.push_back( Ray(scene, points[1], points[1]-apex) );
         edges.push_back( Ray(scene, points[2], points[2]-apex) );
-        Zone up( Beam(scene, apex, (Surface*)this, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Spherical) );
+        Zone* up = new Zone( Beam(scene, apex, (Surface*)this, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Planar) );
         out.push_back( new Tree<Zone>(up) );
         if ( !parent->isBackCulled() )
         {
@@ -288,7 +288,7 @@ namespace Silence {
             edges.push_back( Ray(scene, points[0], points[0]-apex) );
             edges.push_back( Ray(scene, points[1], points[1]-apex) );
             edges.push_back( Ray(scene, points[2], points[2]-apex) );
-            Zone down( Beam(scene, apex, (Surface*)this, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Spherical) );
+            Zone* down = new Zone( Beam(scene, apex, (Surface*)this, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Planar) );
             out.push_back( new Tree<Zone>(down) );
         }
     }

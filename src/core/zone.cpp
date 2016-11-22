@@ -38,10 +38,10 @@ namespace Silence {
     }
 
     // Create all Zones stemming from this one
-    std::vector< Zone > Zone::bounce()
+    std::vector< Zone* > Zone::bounce()
     {
        std::vector< Beam > newBeams;
-       std::vector< Zone > newZones;
+       std::vector< Zone* > newZones;
        for ( ThingIt thing = light.getScene()->thingsBegin(); thing != light.getScene()->thingsEnd(); thing++ )
             for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
                 if ( hit(*part) && !eclipsed(*part) )
@@ -52,7 +52,7 @@ namespace Silence {
                     // if other Interactions...
                 }
         for ( std::vector< Beam >::const_iterator beam = newBeams.begin(); beam != newBeams.end(); beam++ )
-            newZones.push_back( Zone(*beam) );
+            newZones.push_back( new Zone(*beam) );
         return newZones;
     }
 
