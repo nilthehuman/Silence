@@ -68,7 +68,10 @@ namespace Silence {
             // Consider only root Zones for now (no recursion)
             std::vector< Zone > children = (*tree)->getValue().bounce();
             for ( std::vector< Zone >::iterator child = children.begin(); child != children.end(); child++ )
-               (*tree)->addChild(*child);
+            {
+                Tree< Zone >* node = (*tree)->addChild(*child);
+                child->setNode( node );
+            }
         }
 
         if ( modeFlags.verbose )

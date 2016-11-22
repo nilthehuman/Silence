@@ -25,6 +25,7 @@
 
 #include "beam.h"
 #include "shadow.h"
+#include "tree.h"
 
 namespace Silence {
 
@@ -35,14 +36,16 @@ namespace Silence {
     class Zone {
     public:
         Zone( const Beam& light )
-            : light( light )
+            : node( NULL ) // To be set later
+            , light( light )
             , shadows()
             , insideThings()
         {
             this->light.setZone( this );
         }
         Zone( const Beam& light, const std::vector< Shadow >& shadows )
-            : light( light )
+            : node( NULL ) // To be set later
+            , light( light )
             , shadows( shadows )
             , insideThings()
         {
@@ -52,18 +55,26 @@ namespace Silence {
         ~Zone()
         { }
 
+        const Tree<Zone>*   getNode() const { return node; }
+
         void                occlude(); // Generate Shadow beams
         std::vector< Zone > bounce();  // Generate child Zones
 
         void rasterize( Camera* camera ) const;
 
     private:
+        void setNode( const Tree<Zone>* n ) { node = n; }
+
+        friend class Renderer;
+
         bool hit     ( const ThingPart* part ) const; // Is a surface element reached by the light?
         bool eclipsed( const ThingPart* part ) const; // Is a surface element completely obscured?
 
         void rasterizeRow( const Camera* camera, int row, RGB* pixelBuffer, double* skyBlocked ) const;
 
     private:
+        const Tree<Zone>* node; // An unfortunate necessity
+
         Beam light; // Only a single light Beam per Zone is allowed
         std::vector< Shadow > shadows;
 
