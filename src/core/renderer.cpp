@@ -64,6 +64,7 @@ namespace Silence {
             (*light)->emitZones( zoneForest );
         for ( ForestIt tree = zoneForest.begin(); tree != zoneForest.end(); tree++ )
         {
+            (*tree)->getValue()->setNode( *tree );
             (*tree)->getValue()->occlude();
             // Consider only root Zones for now (no recursion)
             std::vector< Zone* > children = (*tree)->getValue()->bounce();
