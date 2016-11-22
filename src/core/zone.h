@@ -38,12 +38,16 @@ namespace Silence {
             : light( light )
             , shadows()
             , insideThings()
-        { }
+        {
+            this->light.setZone( this );
+        }
         Zone( const Beam& light, const std::vector< Shadow >& shadows )
             : light( light )
             , shadows( shadows )
             , insideThings()
-        { }
+        {
+            this->light.setZone( this );
+        }
 
         ~Zone()
         { }

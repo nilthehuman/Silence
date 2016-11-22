@@ -36,6 +36,7 @@ namespace Silence {
     class Camera;
     class Surface;
     class Thing;
+    class Zone;
 
     class Beam {
     public:
@@ -53,6 +54,7 @@ namespace Silence {
 
         Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray >& edges, const Triplet& color, Distribution distribution )
             : scene( scene )
+            , zone( NULL ) // To be set later
             , apex( apex )
             , source( source )
             , pivot( pivot )
@@ -78,6 +80,10 @@ namespace Silence {
         Beam    bounce( const ThingPart* part, const Material::Interaction& interaction ) const; // Spawn next Beam after hitting a ThingPart
 
     private:
+        void    setZone( const Zone* z ) { zone = z; }
+
+        friend class Zone;
+
         void    paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
 
         inline Beam bounceDiffuse ( const ThingPart* part ) const;
@@ -89,6 +95,7 @@ namespace Silence {
 
     private:
         const Scene* const scene;
+        const Zone*        zone;
 
         Vector             apex;   // The point where all Rays meet
         const Surface*     source; // The Surface the Beam emanates from
