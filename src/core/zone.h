@@ -55,10 +55,11 @@ namespace Silence {
         ~Zone()
         { }
 
-        const Tree<Zone>*   getNode() const { return node; }
+        const Tree<Zone>*    getNode()  const { return node; }
+        const Beam&          getLight() const { return light; }
 
-        void                occlude(); // Generate Shadow beams
-        std::vector< Zone > bounce();  // Generate child Zones
+        void                 occlude(); // Generate Shadow beams
+        std::vector< Zone* > bounce();  // Generate child Zones
 
         void rasterize( Camera* camera ) const;
 

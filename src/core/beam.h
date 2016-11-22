@@ -79,8 +79,9 @@ namespace Silence {
         const   Vector&  getApex()  const { return apex;  }
         const   Triplet& getColor() const { return color; }
 
-        bool    contains( const Vector& point ) const;
-        Triplet getColor( const Vector& point ) const;
+        bool    contains    ( const Vector& point ) const;
+        Triplet getColor    ( const Ray&   eyeray ) const;
+        double  getIntensity( const Ray&   eyeray ) const;
         void    rasterizeRow( const Camera* camera, int row, RGB* buffer, double* skyBlocked ) const;
 
         void    occlude(); // Figure out what ThingParts obstruct the Beam
@@ -91,7 +92,7 @@ namespace Silence {
 
         friend class Zone;
 
-        void    paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
+        void paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
 
         inline Beam bounceDiffuse ( const ThingPart* part ) const;
         inline Beam bounceMetallic( const ThingPart* part ) const;

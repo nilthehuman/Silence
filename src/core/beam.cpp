@@ -24,6 +24,7 @@
 
 #include "camera.h"
 #include "scene.h"
+#include "tree.h"
 
 namespace Silence {
 
@@ -57,12 +58,29 @@ namespace Silence {
         return inside;
     }
 
-    Triplet Beam::getColor( const Vector& point ) const
+    Triplet Beam::getColor( const Ray& eyeray ) const
     {
-        if ( contains(point) )
-            return color * (*distribution)( pivot, point );
-        else
+        if ( !contains(eyeray.getOrigin()) )
             return RGB::Black;
+        return color * getIntensity( eyeray );
+    }
+
+    double Beam::getIntensity( const Ray& eyeray ) const
+    {
+        // WARNING: experimental code
+        const double sourceT = source->intersect( eyeray );
+        if ( sourceT < EPSILON )
+            return 0;
+        const Tree<Zone>* parent = zone->getNode()->getParent();
+        if ( NULL == parent )
+            return 1; // We are in a root Zone
+        const Vector sourcePoint = eyeray[ sourceT ];
+        const Beam&  parentBeam  = (**parent).getLight();
+        // Recursion
+        // (This only works for diffuse reflections yet)
+        const Ray    nextEyeray( scene, sourcePoint, parentBeam.getApex() - sourcePoint );
+        const double aggregateIntensity = parentBeam.getIntensity( nextEyeray ) * (*parentBeam.distribution)( parentBeam.pivot, nextEyeray.getOrigin() );
+        return aggregateIntensity;
     }
 
     void Beam::rasterizeRow( const Camera* camera, int row, RGB* pixelBuffer, double* skyBlocked ) const
@@ -75,15 +93,10 @@ namespace Silence {
         for ( int col = 0; col < gridwidth; ++col )
         {
             const Vector screenPoint = leftEdge + rowDirection * ( (double)col/gridwidth );
+            const Ray eyeRay( scene, screenPoint, screenPoint - viewpoint );
             // TODO: instead of calling contains every time sweep from left to right keeping state.
-            const Ray eyeRay( scene, viewpoint, screenPoint - viewpoint );
-            const double sourceT = source->intersect( eyeRay );
-            if ( 0 != sourceT )
-            {
-                const Vector sourcePoint = eyeRay[ sourceT ];
-                pixelBuffer[col] = getColor( sourcePoint ).normalize();
-                skyBlocked [col] = 1 - transparency;
-            }
+            pixelBuffer[col] = getColor( eyeRay ).normalize(); // Squash values into (0, 0, 0)..(1, 1, 1)
+            skyBlocked [col] = 1 - transparency;
         }
     }
 
