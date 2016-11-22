@@ -51,6 +51,13 @@ namespace Silence {
             const double distance = (point - pivot.getOrigin()).length();
             return UNITDIST * UNITDIST / ( distance * distance );
         }
+        static double Planar( const Ray& pivot, const Vector& point )
+        {
+            const Vector toPoint  = point - pivot.getOrigin();
+            const double distance = toPoint.length();
+            const double cosine   = pivot.getDirection() * toPoint.normalized();
+            return cosine * UNITDIST * UNITDIST / ( distance * distance );
+        }
 
         Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray >& edges, const Triplet& color, Distribution distribution )
             : scene( scene )
