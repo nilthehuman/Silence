@@ -59,6 +59,7 @@ namespace Silence {
             return;
         if ( modeFlags.verbose )
             std::cout << "Renderer: tracing Zones from lightsources... ";
+        zoneForest.clear();
         /* TODO: time control... */
         for ( LightIt light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
             (*light)->emitZones( zoneForest );
