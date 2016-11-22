@@ -63,6 +63,8 @@ namespace Silence {
 
     void Light::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
+        if ( RGB::Black == emission )
+            return;
         for ( LightPartIt part = partsBegin(); part != partsEnd(); part++ )
             (*part)->emitZones( out );
     }
