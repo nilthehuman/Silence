@@ -42,18 +42,18 @@ namespace Silence {
         cameras.erase( cameras.begin() + i );
     }
 
-    void Renderer::render( int /*time*/, int /*depth*/, double gamma )
+    void Renderer::render( int /*time*/, int depth, double gamma )
     {
         assert( !rendering );
         rendering = true;
         /* TODO: time control... */
-        buildZoneForest(0, 0);
+        buildZoneForest( 0, depth );
         rasterize(0, gamma);
         /*...*/
         rendering = false;
     }
 
-    void Renderer::buildZoneForest( int /*time*/, int /*depth*/ )
+    void Renderer::buildZoneForest( int /*time*/, int depth )
     {
         if ( zoneForestReady )
             return;
@@ -67,12 +67,18 @@ namespace Silence {
         {
             (*tree)->getValue()->setNode( *tree );
             (*tree)->getValue()->occlude();
-            // Consider only root Zones for now (no recursion)
-            std::vector< Zone* > children = (*tree)->getValue()->bounce();
-            for ( std::vector< Zone* >::iterator child = children.begin(); child != children.end(); child++ )
+            for ( int d = 1; d < depth; ++d )
             {
-                Tree< Zone >* node = (*tree)->addChild(*child);
-                (*child)->setNode( node );
+                std::vector< Tree<Zone>* > leaves = (*tree)->getLeaves();
+                for ( std::vector< Tree<Zone>* >::iterator leaf = leaves.begin(); leaf != leaves.end(); leaf++ )
+                {
+                    std::vector< Zone* > children = (*leaf)->getValue()->bounce();
+                    for ( std::vector< Zone* >::iterator child = children.begin(); child != children.end(); child++ )
+                    {
+                        Tree< Zone >* node = (*leaf)->addChild(*child);
+                        (*child)->setNode( node );
+                    }
+                }
             }
         }
 

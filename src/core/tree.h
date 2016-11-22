@@ -65,11 +65,13 @@ namespace Silence {
         const Tree<T>* getParent() const { return parent; }
         T*             getValue()        { return value; }
         const T*       getValue()  const { return value; }
-        T*             operator*()       { return value; }
+        const T&       operator*() const { return *value; }
         TreeIt         childrenBegin()   { return children.begin(); }
         TreeIt         childrenEnd()     { return children.end();   }
         TreeIt         leavesBegin()     { return leaves.begin();   }
         TreeIt         leavesEnd()       { return leaves.end();     }
+
+        std::vector< Tree<T>* > getLeaves() const { return leaves; }
 
         int height() const
         {
