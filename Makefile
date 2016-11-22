@@ -37,9 +37,9 @@ src/core/camera.o: src/core/camera.h src/core/triplet.h
 
 src/core/ray.o: src/core/ray.h src/core/aux.h src/core/scene.h src/core/triplet.h
 
-src/core/renderer.o: src/core/renderer.h src/core/camera.h src/core/scene.h src/core/zone.h
+src/core/renderer.o: src/core/renderer.h src/core/camera.h src/core/scene.h src/core/tree.h src/core/zone.h
 
-src/core/scene.o: src/core/scene.h src/core/aux.h src/core/material.h src/core/ray.h src/core/triplet.h
+src/core/scene.o: src/core/scene.h src/core/aux.h src/core/material.h src/core/ray.h src/core/tree.h src/core/triplet.h
 
 src/core/shadow.o: src/core/shadow.h src/core/beam.h
 
