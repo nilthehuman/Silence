@@ -93,7 +93,7 @@ namespace Silence {
             leaves  .push_back( child );
             if ( parent )
                 parent->updateLeaves();
-            return this;
+            return child;
         }
         Tree<T>* addChild( Tree<T>* child )
         {
@@ -104,7 +104,7 @@ namespace Silence {
             leaves  .push_back( child );
             if ( parent )
                 parent->updateLeaves();
-            return this;
+            return child;
         }
 
         void clearChildren()
