@@ -59,7 +59,9 @@ namespace Silence {
             return cosine * UNITDIST * UNITDIST / ( distance * distance );
         }
 
-        Beam( const Scene* scene, const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray >& edges, const Triplet& color, Distribution distribution )
+        Beam( const Scene* scene,
+              const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray >& edges,
+              const Triplet& color, Distribution distribution, Material::Interaction kind = Material::DIFFUSE )
             : scene( scene )
             , zone( NULL ) // To be set later
             , apex( apex )
@@ -68,6 +70,7 @@ namespace Silence {
             , edges( edges )
             , color( color )
             , distribution( distribution )
+            , kind( kind )
         {
             assert( scene );
         }
@@ -105,12 +108,13 @@ namespace Silence {
         const Scene* const scene;
         const Zone*        zone;
 
-        Vector             apex;   // The point where all Rays meet
-        const Surface*     source; // The Surface the Beam emanates from
-        Ray                pivot;  // A representative Ray
-        std::vector< Ray > edges;  // Rays to mark Beam boundaries
-        Triplet            color;  // Current color of pivot Ray (may change with each bounce)
-        Distribution       distribution; // Provides each point a relative light intensity
+        Vector                apex;   // The point where all Rays meet
+        const Surface*        source; // The Surface the Beam emanates from
+        Ray                   pivot;  // A representative Ray
+        std::vector< Ray >    edges;  // Rays to mark Beam boundaries
+        Triplet               color;  // Current color of pivot Ray (may change with each bounce)
+        Distribution          distribution; // Provides each point a relative light intensity
+        Material::Interaction kind;   // The reason for the latest bounce
     };
 
 }

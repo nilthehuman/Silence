@@ -78,7 +78,16 @@ namespace Silence {
         const Beam&  parentBeam  = (**parent).getLight();
         // Recursion
         // (This only works for diffuse reflections yet)
-        const Ray    nextEyeray( scene, sourcePoint, parentBeam.getApex() - sourcePoint );
+        Vector nextDirection;
+        switch ( kind )
+        {
+            case Material::DIFFUSE:  nextDirection = parentBeam.getApex() - sourcePoint; break;
+            case Material::METALLIC: nextDirection = sourcePoint - dynamic_cast<const ThingPart*>(source)->mirror(eyeray.getOrigin()); break;
+            case Material::REFLECT:  nextDirection = sourcePoint - dynamic_cast<const ThingPart*>(source)->mirror(eyeray.getOrigin()); break;
+            case Material::REFRACT:  nextDirection = /*TODO...*/Vector::random(eyeray.getDirection()); break;
+            default: assert( false );
+        }
+        const Ray    nextEyeray( scene, sourcePoint, nextDirection );
         const double aggregateIntensity = parentBeam.getIntensity( nextEyeray ) * (*parentBeam.distribution)( parentBeam.pivot, nextEyeray.getOrigin() );
         return aggregateIntensity;
     }
@@ -122,7 +131,7 @@ namespace Silence {
         const Vector newApex = part->mirror( apex );
         const Ray    newPivot( scene, newApex, pivot[part->intersect(pivot)] - newApex );
         const std::vector< Ray > empty;
-        Beam newBeam( scene, newApex, part, newPivot, empty, color, distribution );
+        Beam newBeam( scene, newApex, part, newPivot, empty, color, distribution, Material::DIFFUSE );
         const Thing* thing = (const Thing*)( part->getParent() );
         newBeam.paint( part->getParent()->getColor() * thing->interact(Material::DIFFUSE) );
         return newBeam;
