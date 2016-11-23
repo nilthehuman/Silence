@@ -89,6 +89,7 @@ namespace Silence {
         virtual double intersect( const Ray& ray )      const = 0; // Returns distance from Ray origin; a return value of zero will mean a miss
         virtual Vector getNormal( const Vector& point ) const = 0; // Returns the outward pointing surface normal
         virtual const BoundingBox     getBoundingBox( const Camera* camera    ) const = 0; // Returns 2D bounding box in screen space
+        virtual std::vector< Vector > getPoints     ( const Vector& viewpoint ) const = 0; // Returns the "outline" of the shape from a given direction
         virtual void   move( const Vector& translation )      = 0; // Translate Surface by an arbitrary world space vector
         virtual void   move( double theta, WorldAxis axis )   = 0; // Rotate Surface around one of the world coordinate axes
 
@@ -111,7 +112,6 @@ namespace Silence {
 
         virtual double getTilt( const Vector& pivot ) const = 0; // Returns the dot product of the normal and a given pivot (for Phong reflection)
         virtual Vector mirror ( const Vector& point ) const = 0; // Returns the reflection of a given point off the plane of the shape
-        virtual std::vector< Vector > getPoints( const Vector& viewpoint ) const = 0; // Returns the "outline" of the shape from a given direction
     };
 
     class LightPart : virtual public Surface {
@@ -205,6 +205,7 @@ namespace Silence {
         { }
 
         virtual const BoundingBox getBoundingBox( const Camera* camera    ) const;
+        std::vector< Vector >     getPoints     ( const Vector& viewpoint ) const;
         virtual void move( const Vector& translation ) { point += translation; }
         virtual void move( double theta, WorldAxis axis ) { rotate( point, theta, axis ); }
 
@@ -240,6 +241,7 @@ namespace Silence {
         { }
 
         virtual const BoundingBox getBoundingBox( const Camera* camera    ) const;
+        std::vector< Vector >     getPoints     ( const Vector& viewpoint ) const;
         virtual void move( const Vector& translation ) { center += translation; }
         virtual void move( double theta, WorldAxis axis ) { rotate( center, theta, axis ); }
 
@@ -261,7 +263,6 @@ namespace Silence {
 
         double getTilt( const Vector& pivot ) const;
         Vector mirror ( const Vector& point ) const;
-        std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
     class LightSphere : public ISphere, public LightPart {
@@ -291,6 +292,7 @@ namespace Silence {
         }
 
         virtual const BoundingBox getBoundingBox( const Camera* camera    ) const;
+        std::vector< Vector >     getPoints     ( const Vector& viewpoint ) const;
         virtual void move( const Vector& translation ) { offset += normal * translation; }
         virtual void move( double theta, WorldAxis axis ) { rotate( normal, theta, axis ); }
 
@@ -318,7 +320,6 @@ namespace Silence {
 
         double getTilt( const Vector& pivot ) const;
         Vector mirror ( const Vector& point ) const;
-        std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
     class LightPlane : public IPlane, public LightPart {
@@ -343,6 +344,7 @@ namespace Silence {
         }
 
         virtual const BoundingBox getBoundingBox( const Camera* camera    ) const;
+        std::vector< Vector >     getPoints     ( const Vector& viewpoint ) const;
         virtual void move( const Vector& translation )
         {
             points[0] += translation;
@@ -383,7 +385,6 @@ namespace Silence {
 
         double getTilt( const Vector& pivot ) const;
         Vector mirror ( const Vector& point ) const;
-        std::vector< Vector > getPoints( const Vector& viewpoint ) const;
     };
 
     class LightTriangle : public ITriangle, public LightPart {

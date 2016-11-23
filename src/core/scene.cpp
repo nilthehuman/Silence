@@ -171,6 +171,13 @@ namespace Silence {
         return BoundingBox( screenpoint, screenpoint );
     }
 
+    std::vector< Vector > IPoint::getPoints( const Vector& ) const
+    {
+        std::vector< Vector > points;
+        points.push_back( point );
+        return points;
+    }
+
     void LightPoint::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
@@ -194,6 +201,20 @@ namespace Silence {
         return BoundingBox( topLeft, bottomRight );
     }
 
+    std::vector< Vector > ISphere::getPoints( const Vector& viewpoint ) const
+    {
+        const Vector normal = (center - viewpoint).normalize();
+        std::vector< Vector > points;
+        if ( Vector::UnitX == normal || -Vector::UnitX == normal )
+            points.push_back( center + normal.cross(Vector::UnitY).normalize() * radius );
+        else
+            points.push_back( center + normal.cross(Vector::UnitX).normalize() * radius );
+        points.push_back( center + normal.cross((points[0] - center).normalize()) * radius );
+        points.push_back( center + normal.cross((points[1] - center).normalize()) * radius );
+        points.push_back( center + normal.cross((points[2] - center).normalize()) * radius );
+        return points;
+    }
+
     double Sphere::getTilt( const Vector& ) const
     {
         return 1;
@@ -202,20 +223,6 @@ namespace Silence {
     Vector Sphere::mirror( const Vector& point ) const
     {
         return point;
-    }
-
-    std::vector< Vector > Sphere::getPoints( const Vector& viewpoint ) const
-    {
-        const Vector normal = (center - viewpoint).normalize();
-        std::vector< Vector > points;
-        if ( Vector::UnitX == normal || -Vector::UnitX == normal )
-            points.push_back( center + normal.cross(Vector::UnitY).normalize() );
-        else
-            points.push_back( center + normal.cross(Vector::UnitX).normalize() );
-        points.push_back( center + normal.cross(points[0] - center) );
-        points.push_back( center + normal.cross(points[1] - center) );
-        points.push_back( center + normal.cross(points[2] - center) );
-        return points;
     }
 
     void LightSphere::emitZones( std::vector< Tree<Zone>* >& out ) const
@@ -232,7 +239,7 @@ namespace Silence {
         return BoundingBox( topLeft, bottomRight );
     }
 
-    std::vector< Vector > Plane::getPoints( const Vector& viewpoint ) const
+    std::vector< Vector > IPlane::getPoints( const Vector& viewpoint ) const
     {
         const Vector viewnormal = (normal * offset - viewpoint).normalize();
         std::vector< Vector > points;
@@ -283,7 +290,7 @@ namespace Silence {
         return BoundingBox( ScreenPoint(minCol, minRow), ScreenPoint(maxCol, maxRow) );
     }
 
-    std::vector< Vector > Triangle::getPoints( const Vector& ) const
+    std::vector< Vector > ITriangle::getPoints( const Vector& ) const
     {
         std::vector< Vector > pointsVector;
         pointsVector.push_back( points[0] );
