@@ -102,10 +102,55 @@ namespace Silence {
         for ( int col = 0; col < gridwidth; ++col )
         {
             const Vector screenPoint = leftEdge + rowDirection * ( (double)col/gridwidth );
-            const Ray eyeRay( scene, screenPoint, screenPoint - viewpoint );
+            const Ray eyeray( scene, screenPoint, screenPoint - viewpoint );
             // TODO: instead of calling contains every time sweep from left to right keeping state.
-            pixelBuffer[col] = getColor( eyeRay ).normalize(); // Squash values into (0, 0, 0)..(1, 1, 1)
-            skyBlocked [col] = 1 - transparency;
+            // WARNING: Experimental!
+            const double sourceT = source->intersect( eyeray );
+            double nearestT = INF;
+            for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
+                if ( (*thing)->isBackground() == false )
+                {
+                    for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                    {
+                        double t = (*part)->intersect(eyeray);
+                        if ( 0 < t )
+                            nearestT = min(nearestT, t);
+                    }
+                    if ( nearestT < sourceT )
+                        break;
+                }
+            for ( LightIt light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
+                if ( (*light)->isBackground() == false )
+                {
+                    for ( LightPartIt part = (*light)->partsBegin(); part != (*light)->partsEnd(); part++ )
+                    {
+                        double t = (*part)->intersect(eyeray);
+                        if ( 0 < t )
+                            nearestT = min(nearestT, t);
+                    }
+                    if ( nearestT < sourceT )
+                        break;
+                }
+            if ( sourceT < nearestT )
+            {
+                for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
+                    if ( (*thing)->isBackground() == true )
+                    {
+                        for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                        {
+                            double t = (*part)->intersect(eyeray);
+                            if ( 0 < t )
+                                nearestT = min(nearestT, t);
+                        }
+                        if ( nearestT < sourceT )
+                            break;
+                    }
+            }
+            if ( 0 != sourceT && sourceT == nearestT )
+            {
+                pixelBuffer[col] = getColor( eyeray ).normalize(); // Squash values into (0, 0, 0)..(1, 1, 1)
+                skyBlocked [col] = 1 - transparency;
+            }
         }
     }
 
@@ -129,11 +174,13 @@ namespace Silence {
     Beam Beam::bounceDiffuse( const ThingPart* part ) const
     {
         const Vector newApex = part->mirror( apex );
-        const Ray    newPivot( scene, newApex, pivot[part->intersect(pivot)] - newApex );
+        // TODO: This is wrong, fix it:
+        //const Ray    newPivot( scene, newApex, pivot[part->intersect(pivot)] - newApex );
+        const Ray newPivot( scene, newApex, Vector::random(Vector::UnitY) ); // for kicks
         const std::vector< Ray > empty;
         Beam newBeam( scene, newApex, part, newPivot, empty, color, distribution, Material::DIFFUSE );
-        const Thing* thing = (const Thing*)( part->getParent() );
-        newBeam.paint( part->getParent()->getColor() * thing->interact(Material::DIFFUSE) );
+        const Thing* thing = static_cast<const Thing*>( part->getParent() );
+        newBeam.paint( thing->getColor() * thing->interact(Material::DIFFUSE) /** part->getTilt(pivot.getDirection())*/ );
         return newBeam;
     }
 

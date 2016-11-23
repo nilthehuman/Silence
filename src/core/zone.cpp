@@ -43,16 +43,18 @@ namespace Silence {
        std::vector< Beam > newBeams;
        std::vector< Zone* > newZones;
        for ( ThingIt thing = light.getScene()->thingsBegin(); thing != light.getScene()->thingsEnd(); thing++ )
-            for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
-                if ( hit(*part) && !eclipsed(*part) )
-                {
-                    const Thing* thing = (const Thing*)( (*part)->getParent() );
-                    if ( !equal(0, thing->interact(Material::DIFFUSE) ) )
-                        newBeams.push_back( light.bounce(*part, Material::DIFFUSE) );
-                    // if other Interactions...
-                }
+           for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+               if ( hit(*part) && !eclipsed(*part) )
+               {
+                   const Thing* thing = static_cast<const Thing*>( (*part)->getParent() );
+                   // WARNING: Experimental stuff.
+                   // Spawn a separate Zone for each type of Material the Thing has
+                   for ( int i = 0; i <= Material::REFRACT; i++ )
+                       if ( !equal(0, thing->interact(Material::Interaction(i)) ) )
+                           newBeams.push_back( light.bounce(*part, Material::Interaction(i)) );
+               }
         for ( std::vector< Beam >::const_iterator beam = newBeams.begin(); beam != newBeams.end(); beam++ )
-            newZones.push_back( new Zone(*beam) );
+            newZones.push_back( new Zone(*beam, shadows) );
         return newZones;
     }
 
