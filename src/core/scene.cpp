@@ -205,8 +205,6 @@ namespace Silence {
 
     double Plane::getTilt( const Vector& pivot ) const
     {
-        if ( Vector::Zero == pivot )
-            return 1;
         return abs( normal * pivot );
     }
 
@@ -246,8 +244,6 @@ namespace Silence {
 
     double Triangle::getTilt( const Vector& pivot ) const
     {
-        if ( Vector::Zero == pivot )
-            return 1;
         const Vector& normal = ( points[1] - points[0] ).cross( points[2] - points[0] );
         return abs( normal * pivot );
     }
