@@ -31,35 +31,27 @@ namespace Silence {
 
     double Ray::findNearestIntersection()
     {
-        thingPartHit = NULL;
-
-        double t = INF;
-        length   = INF;
+        double nearestT = INF;
+        double t        = INF;
 
         // Check foreground Surfaces
         for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
             if ( (*thing)->isBackground() == false )
                 for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
-                    if ( (t = (*part)->intersect(*this)) && t < length )
-                    {
-                        length       = t;
-                        thingPartHit = *part;
-                    }
+                    if ( (t = (*part)->intersect(*this)) && t < nearestT )
+                        nearestT = t;
 
         if ( thingPartHit )
-            return length;
+            return nearestT;
 
         // Check background Surfaces
         for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
             if ( (*thing)->isBackground() == true )
                 for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
-                    if ( (t = (*part)->intersect(*this)) && t < length )
-                    {
-                        length       = t;
-                        thingPartHit = *part;
-                    }
+                    if ( (t = (*part)->intersect(*this)) && t < nearestT )
+                        nearestT = t;
 
-        return length;
+        return nearestT;
     }
 
 }

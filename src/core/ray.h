@@ -37,16 +37,13 @@ namespace Silence {
         Ray( const Scene* scene, const Vector& origin, const Vector& direction )
             : scene( scene )
             , origin( origin )
-            , direction( direction )
-            , thingPartHit( NULL )
+            , direction( direction.normalized() )
         {
             assert( scene );
-            this->direction.normalize();
         }
 
         const Vector& getOrigin()       const { return origin; }
         const Vector& getDirection()    const { return direction; }
-        const Vector  getIntersection() const { return 0 < length ? (*this)[length] : Vector::Invalid; }
 
         Vector operator[]( double t )   const { return origin + direction * t; }
 
@@ -55,11 +52,8 @@ namespace Silence {
     private:
         const Scene* const scene;
 
-        Vector  origin;
-        Vector  direction;
-        double  length;
-
-        const ThingPart* thingPartHit;
+        const Vector origin;
+        const Vector direction;
     };
 
 }
