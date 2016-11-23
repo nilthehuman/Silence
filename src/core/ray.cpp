@@ -31,6 +31,73 @@ namespace Silence {
 
     const Ray Ray::Invalid = Ray( NULL, Vector::Invalid, Vector::Invalid );
 
+    Ray Ray::bounceDiffuse( const ThingPart* part ) const
+    {
+        const double t = part->intersect( *this );
+        if ( equal(0, t) )
+            return Ray::Invalid;
+        const Vector hitPoint      = (*this)[t];
+        const Vector surfaceNormal = part->getNormal( hitPoint );
+        return Ray( scene, hitPoint, surfaceNormal );
+    }
+
+    Ray Ray::bounceMetallic( const ThingPart* part ) const
+    {
+        const double t = part->intersect( *this );
+        if ( equal(0, t) )
+            return Ray::Invalid;
+        const Vector hitPoint      = (*this)[t];
+        const Vector surfaceNormal = part->getNormal( hitPoint );
+        const Vector newDirection  = direction - surfaceNormal * (direction * surfaceNormal) * 2;
+        return Ray( scene, hitPoint, newDirection );
+    }
+
+    Ray Ray::bounceReflect( const ThingPart* part ) const
+    {
+        const double t = part->intersect( *this );
+        if ( equal(0, t) )
+            return Ray::Invalid;
+        const Vector hitPoint      = (*this)[t];
+        const Vector surfaceNormal = part->getNormal( hitPoint );
+        const Vector newDirection  = direction - surfaceNormal * (direction * surfaceNormal) * 2;
+        return Ray( scene, hitPoint, newDirection );
+    }
+
+    Ray Ray::bounceRefract( const ThingPart* part ) const
+    {
+        const double t = part->intersect( *this );
+        if ( equal(0, t) )
+            return Ray::Invalid;
+        const Vector hitPoint = (*this)[t];
+        // en.wikipedia.org/wiki/Snell's_law
+        // http://graphics.stanford.edu/courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf
+        double n1, n2;
+        if ( medium )
+        {
+            n1 = medium->getRefractiveIndex();
+            n2 = 1.0; // Vacuum
+        }
+        else
+        {
+            n1 = 1.0; // Vacuum
+            n2 = static_cast<const Thing*>(part->getParent())->getRefractiveIndex();
+        }
+        const double eta = n1 / n2;
+        const Vector surfaceNormal = part->getNormal( origin );
+        const double cosTheta1 = abs( direction * surfaceNormal );
+        const double sinTheta2Squared = eta * eta * ( 1.0 - cosTheta1 * cosTheta1 ); // sin(x)^2 + cos(x)^2 == 1
+        if ( 1 < sinTheta2Squared )
+        {
+            // Total internal reflection
+            const Vector newDirection = direction + surfaceNormal * (direction * surfaceNormal) * 2;
+            return Ray( scene, hitPoint, newDirection );
+        }
+        // Actual refractive transmission
+        const double cosTheta2 = sqrt( 1.0 - sinTheta2Squared );
+        const Vector newDirection = direction * eta + surfaceNormal * ( eta * cosTheta1 - cosTheta2 ) * ( direction * surfaceNormal < 0 ? 1.0 : -1.0 );
+        return Ray( scene, hitPoint, newDirection );
+    }
+
     double Ray::findNearestIntersection()
     {
         double nearestT = INF;

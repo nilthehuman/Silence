@@ -51,6 +51,11 @@ namespace Silence {
 
         Vector operator[]( double t ) const { return origin + direction * t; }
 
+        Ray    bounceDiffuse ( const ThingPart* part ) const;
+        Ray    bounceMetallic( const ThingPart* part ) const;
+        Ray    bounceReflect ( const ThingPart* part ) const;
+        Ray    bounceRefract ( const ThingPart* part ) const;
+
         double findNearestIntersection();
 
     private:
