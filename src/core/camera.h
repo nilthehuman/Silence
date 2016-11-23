@@ -96,8 +96,6 @@ namespace Silence {
                     delete[] skyMask[i];
                 delete[] skyMask;
             }
-            if ( modeFlags.verbose )
-                std::cerr << "                                            " << '\r' << std::flush;
         }
 
         void clear();
