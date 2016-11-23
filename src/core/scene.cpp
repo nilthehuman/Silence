@@ -235,7 +235,7 @@ namespace Silence {
     const BoundingBox IPlane::getBoundingBox( const Camera* camera ) const
     {
         const ScreenPoint topLeft( 0, 0 );
-        const ScreenPoint bottomRight( camera->getGridwidth() - 1, camera->getGridheight() - 1 );
+        const ScreenPoint bottomRight( camera->getGridwidth(), camera->getGridheight() );
         return BoundingBox( topLeft, bottomRight );
     }
 
