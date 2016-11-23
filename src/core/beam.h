@@ -33,10 +33,11 @@
 
 namespace Silence {
 
-    class Camera;
-    class Surface;
-    class Thing;
-    class Zone;
+    struct BoundingBox;
+    class  Camera;
+    class  Surface;
+    class  Thing;
+    class  Zone;
 
     class Beam {
     public:
@@ -85,7 +86,7 @@ namespace Silence {
         bool    contains    ( const Vector& point ) const;
         Triplet getColor    ( const Ray&   eyeray ) const;
         double  getIntensity( const Ray&   eyeray ) const;
-        void    rasterizeRow( const Camera* camera, int row, RGB* buffer, double* skyBlocked ) const;
+        void    rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* buffer, double* skyBlocked ) const;
 
         void    occlude(); // Figure out what ThingParts obstruct the Beam
         Beam    bounce( const ThingPart* part, const Material::Interaction& interaction ) const; // Spawn next Beam after hitting a ThingPart

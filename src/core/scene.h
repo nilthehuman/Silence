@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "aux.h"
+#include "camera.h"
 #include "material.h"
 #include "triplet.h"
 
@@ -87,6 +88,7 @@ namespace Silence {
     public:
         virtual double intersect( const Ray& ray )      const = 0; // Returns distance from Ray origin; a return value of zero will mean a miss
         virtual Vector getNormal( const Vector& point ) const = 0; // Returns the outward pointing surface normal
+        virtual const BoundingBox     getBoundingBox( const Camera* camera    ) const = 0; // Returns 2D bounding box in screen space
         virtual void   move( const Vector& translation )      = 0; // Translate Surface by an arbitrary world space vector
         virtual void   move( double theta, WorldAxis axis )   = 0; // Rotate Surface around one of the world coordinate axes
 
@@ -202,6 +204,7 @@ namespace Silence {
             , point( point )
         { }
 
+        virtual const BoundingBox getBoundingBox( const Camera* camera    ) const;
         virtual void move( const Vector& translation ) { point += translation; }
         virtual void move( double theta, WorldAxis axis ) { rotate( point, theta, axis ); }
 
@@ -236,6 +239,7 @@ namespace Silence {
             , radius( radius )
         { }
 
+        virtual const BoundingBox getBoundingBox( const Camera* camera    ) const;
         virtual void move( const Vector& translation ) { center += translation; }
         virtual void move( double theta, WorldAxis axis ) { rotate( center, theta, axis ); }
 
@@ -286,6 +290,7 @@ namespace Silence {
             this->normal.normalize();
         }
 
+        virtual const BoundingBox getBoundingBox( const Camera* camera    ) const;
         virtual void move( const Vector& translation ) { offset += normal * translation; }
         virtual void move( double theta, WorldAxis axis ) { rotate( normal, theta, axis ); }
 
@@ -337,6 +342,7 @@ namespace Silence {
             return edge0.cross( edge1 ).normalize();
         }
 
+        virtual const BoundingBox getBoundingBox( const Camera* camera    ) const;
         virtual void move( const Vector& translation )
         {
             points[0] += translation;

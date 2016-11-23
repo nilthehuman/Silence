@@ -28,6 +28,11 @@
 
 namespace Silence {
 
+    std::ostream& operator<<( std::ostream& os, const ScreenPoint& screenpoint )
+    {
+        os << "( " << screenpoint.col << ", " << screenpoint.row << ")"; return os;
+    }
+
     // Reset pixel buffer to all black
     void Camera::clear()
     {
@@ -50,6 +55,18 @@ namespace Silence {
         return Plane( normal, offset );
     }
 
+    Vector Camera::getScreenX() const
+    {
+        const Vector screenX = (screen.window[1] - screen.window[0]).normalize();
+        return screenX;
+    }
+
+    Vector Camera::getScreenY() const
+    {
+        const Vector screenY = (screen.window[0] - screen.window[2]).normalize();
+        return screenY;
+    }
+
     Vector Camera::getLeftEdge( int row ) const
     {
         const Vector leftEdge = screen.window[0] + (screen.window[2] - screen.window[0]) * ((0.5 + row) / screen.gridheight );
@@ -60,6 +77,21 @@ namespace Silence {
     {
         const Vector rightEdge = getLeftEdge( row ) + (screen.window[1] - screen.window[0]);
         return rightEdge;
+    }
+
+    ScreenPoint Camera::project( const Vector& point ) const
+    {
+        // Assume the point is in front of the Screen. It won't matter if we're wrong
+        const Ray toPoint( scene, viewpoint, point - viewpoint );
+        const Vector normal = ( screen.window[2] - screen.window[0] ).cross( screen.window[1] - screen.window[0] ).normalize();
+        const double offset = normal * screen.window[0];
+        const Plane flippedPlane( normal, offset );
+        const Vector image      = toPoint[ flippedPlane.intersect(toPoint) ];
+        const double xComponent = (image - viewpoint) * getScreenX();
+        const double yComponent = (image - viewpoint) * getScreenY();
+        const int col = screen.gridwidth  * ( 0.5 + xComponent / (screen.window[1] - screen.window[0]).length() );
+        const int row = screen.gridheight * ( 0.5 - yComponent / (screen.window[0] - screen.window[2]).length() );
+        return ScreenPoint( col, row );
     }
 
     bool Camera::behind( const Vector& point ) const

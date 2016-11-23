@@ -34,6 +34,24 @@ namespace Silence {
     class Plane;
     class Scene;
 
+    struct ScreenPoint {
+        ScreenPoint( int col, int row )
+            : col( col )
+            , row( row )
+        { }
+
+        friend std::ostream& operator<<( std::ostream& os, const ScreenPoint& screenpoint );
+
+        int col, row; // Can represent points outside the actual screen too
+    };
+    struct BoundingBox {
+        BoundingBox( const ScreenPoint& topLeft, const ScreenPoint& bottomRight )
+            : topLeft( topLeft )
+            , bottomRight( bottomRight )
+        { }
+        ScreenPoint topLeft, bottomRight;
+    };
+
     class Camera {
     public:
         enum Axis { AXIS_X, AXIS_Y, AXIS_Z };
@@ -113,10 +131,13 @@ namespace Silence {
         const Vector& getViewpoint()  const { return viewpoint; }
         const RGB**   getPixels()     const { return (const RGB**)pixels; }
 
-        const Plane   getPlane()                    const;
-        Vector        getLeftEdge ( int row )       const;
-        Vector        getRightEdge( int row )       const;
-        bool          behind( const Vector& point ) const;
+        const Plane   getPlane()                     const;
+        Vector        getScreenX()                   const;
+        Vector        getScreenY()                   const;
+        Vector        getLeftEdge ( int row )        const;
+        Vector        getRightEdge( int row )        const;
+        ScreenPoint   project( const Vector& point ) const;
+        bool          behind ( const Vector& point ) const;
 
     private:
         friend void Zone::rasterize( Camera* ) const;

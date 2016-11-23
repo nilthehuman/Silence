@@ -92,18 +92,17 @@ namespace Silence {
         return aggregateIntensity;
     }
 
-    void Beam::rasterizeRow( const Camera* camera, int row, RGB* pixelBuffer, double* skyBlocked ) const
+    void Beam::rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* pixelBuffer, double* skyBlocked ) const
     {
         const int    gridwidth    = camera->getGridwidth();
         const Vector viewpoint    = camera->getViewpoint();
         const Vector leftEdge     = camera->getLeftEdge ( row );
         const Vector rowDirection = camera->getRightEdge( row ) - leftEdge;
         const double transparency = source->getParent()->getTransparency();
-        for ( int col = 0; col < gridwidth; ++col )
+        for ( int col = max(0, bb.topLeft.col); col < min(gridwidth, bb.bottomRight.col); ++col )
         {
             const Vector screenPoint = leftEdge + rowDirection * ( (double)col/gridwidth );
             const Ray eyeray( scene, screenPoint, screenPoint - viewpoint );
-            // TODO: instead of calling contains every time sweep from left to right keeping state.
             // WARNING: Experimental!
             const double sourceT = source->intersect( eyeray );
             double nearestT = INF;
@@ -176,7 +175,7 @@ namespace Silence {
         const Vector newApex = part->mirror( apex );
         // TODO: This is wrong, fix it:
         //const Ray    newPivot( scene, newApex, pivot[part->intersect(pivot)] - newApex );
-        const Ray newPivot( scene, newApex, Vector::random(Vector::UnitY) ); // for kicks
+        const Ray newPivot( scene, newApex, part->getNormal( pivot[part->intersect(pivot)] ) );
         const std::vector< Ray > empty;
         Beam newBeam( scene, newApex, part, newPivot, empty, color, distribution, Material::DIFFUSE );
         const Thing* thing = static_cast<const Thing*>( part->getParent() );

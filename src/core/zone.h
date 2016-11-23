@@ -29,9 +29,9 @@
 
 namespace Silence {
 
-    class Camera;
-    class Plane;
-    class ThingPart;
+    struct BoundingBox;
+    class  Plane;
+    class  ThingPart;
 
     class Zone {
     public:
@@ -71,7 +71,7 @@ namespace Silence {
         bool hit     ( const ThingPart* part ) const; // Is a surface element reached by the light?
         bool eclipsed( const ThingPart* part ) const; // Is a surface element completely obscured?
 
-        void rasterizeRow( const Camera* camera, int row, RGB* pixelBuffer, double* skyBlocked ) const;
+        void rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* pixelBuffer, double* skyBlocked ) const;
 
     private:
         const Tree<Zone>* node; // An unfortunate necessity

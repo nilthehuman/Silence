@@ -24,7 +24,6 @@
 
 #include <cstdlib>
 
-#include "camera.h"
 #include "scene.h"
 
 namespace Silence {
@@ -86,8 +85,9 @@ namespace Silence {
             for ( int row = 0; row < height; ++row )
                 skyBlocked[row] = new double[width];
 
-            for ( int row = 0; row < height; ++row )
-                rasterizeRow( camera, row, pixelBuffer[row], skyBlocked[row] );
+            const BoundingBox bb = light.source->getBoundingBox( camera );
+            for ( int row = max(0, bb.topLeft.row); row < min(height, bb.bottomRight.row); ++row )
+                rasterizeRow( camera, bb, row, pixelBuffer[row], skyBlocked[row] );
             // Write results directly in Camera's pixels array:
             // contributions from all Zones will be superimposed on each other
             for ( int row = 0; row < height; ++row )
@@ -137,17 +137,17 @@ namespace Silence {
         return false;
     }
 
-    void Zone::rasterizeRow( const Camera* camera, int row, RGB* pixelBuffer, double* skyBlocked ) const
+    void Zone::rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* pixelBuffer, double* skyBlocked ) const
     {
         // Basic light color
-        light.rasterizeRow( camera, row, pixelBuffer, skyBlocked );
+        light.rasterizeRow( camera, bb, row, pixelBuffer, skyBlocked );
 
         // Temper basic incoming light with the occlusion from Shadows
         const int gridwidth = camera->getGridwidth();
         const Vector leftEdge     = camera->getLeftEdge ( row );
         const Vector rowDirection = camera->getRightEdge( row ) - leftEdge;
         double* shadowMask = new double[gridwidth];
-        for ( int col = 0; col < gridwidth; ++col )
+        for ( int col = max(0, bb.topLeft.col); col < min(gridwidth, bb.bottomRight.col); ++col )
         {
             const Vector screenPoint = leftEdge + rowDirection * ( (double)col/gridwidth );
             shadowMask[col] = 0;

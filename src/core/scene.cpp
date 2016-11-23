@@ -165,11 +165,33 @@ namespace Silence {
             return t;
     }
 
+    const BoundingBox IPoint::getBoundingBox( const Camera* camera ) const
+    {
+        ScreenPoint screenpoint = camera->project( point );
+        return BoundingBox( screenpoint, screenpoint );
+    }
+
     void LightPoint::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
         Zone* zone = new Zone( Beam(scene, point, (Surface*)this, Ray(scene, point, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
         out.push_back( new Tree<Zone>(zone) );
+    }
+
+    const BoundingBox ISphere::getBoundingBox( const Camera* camera ) const
+    {
+        const Vector normal = (center - camera->getViewpoint()).normalize();
+        Vector points[4];
+        if ( camera->getScreenX() == normal || -camera->getScreenX() == normal )
+            points[0] = center + normal.cross(camera->getScreenY()).normalize() * radius;
+        else
+            points[0] = center + normal.cross(camera->getScreenX()).normalize() * radius;
+        points[1] = center + normal.cross((points[0] - center).normalize()) * radius;
+        points[2] = center + normal.cross((points[1] - center).normalize()) * radius;
+        points[3] = center + normal.cross((points[2] - center).normalize()) * radius;
+        ScreenPoint topLeft    ( camera->project(points[1]).col - 1, camera->project(points[2]).row - 1);
+        ScreenPoint bottomRight( camera->project(points[3]).col + 1, camera->project(points[0]).row + 1);
+        return BoundingBox( topLeft, bottomRight );
     }
 
     double Sphere::getTilt( const Vector& ) const
@@ -203,15 +225,11 @@ namespace Silence {
         out.push_back( new Tree<Zone>(zone) );
     }
 
-    double Plane::getTilt( const Vector& pivot ) const
+    const BoundingBox IPlane::getBoundingBox( const Camera* camera ) const
     {
-        return abs( normal * pivot );
-    }
-
-    Vector Plane::mirror( const Vector& point ) const
-    {
-        const double distance = point * normal - offset;
-        return point - normal * 2 * distance;
+        const ScreenPoint topLeft( 0, 0 );
+        const ScreenPoint bottomRight( camera->getGridwidth() - 1, camera->getGridheight() - 1 );
+        return BoundingBox( topLeft, bottomRight );
     }
 
     std::vector< Vector > Plane::getPoints( const Vector& viewpoint ) const
@@ -230,6 +248,17 @@ namespace Silence {
         return points;
     }
 
+    double Plane::getTilt( const Vector& pivot ) const
+    {
+        return abs( normal * pivot );
+    }
+
+    Vector Plane::mirror( const Vector& point ) const
+    {
+        const double distance = point * normal - offset;
+        return point - normal * 2 * distance;
+    }
+
     void LightPlane::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
@@ -240,6 +269,27 @@ namespace Silence {
             Zone* down = new Zone( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, -normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
             out.push_back( new Tree<Zone>(down) );
         }
+    }
+
+    const BoundingBox ITriangle::getBoundingBox( const Camera* camera ) const
+    {
+        const ScreenPoint screenpoint0 = camera->project( points[0] );
+        const ScreenPoint screenpoint1 = camera->project( points[1] );
+        const ScreenPoint screenpoint2 = camera->project( points[2] );
+        const int minCol = min( min(screenpoint0.col, screenpoint1.col), screenpoint2.col ) - 1;
+        const int minRow = min( min(screenpoint0.row, screenpoint1.row), screenpoint2.row ) - 1;
+        const int maxCol = max( max(screenpoint0.col, screenpoint1.col), screenpoint2.col ) + 1;
+        const int maxRow = max( max(screenpoint0.row, screenpoint1.row), screenpoint2.row ) + 1;
+        return BoundingBox( ScreenPoint(minCol, minRow), ScreenPoint(maxCol, maxRow) );
+    }
+
+    std::vector< Vector > Triangle::getPoints( const Vector& ) const
+    {
+        std::vector< Vector > pointsVector;
+        pointsVector.push_back( points[0] );
+        pointsVector.push_back( points[1] );
+        pointsVector.push_back( points[2] );
+        return pointsVector;
     }
 
     double Triangle::getTilt( const Vector& pivot ) const
@@ -254,15 +304,6 @@ namespace Silence {
         const double offset = normal * points[0];
         const double distance = point * normal - offset;
         return point - normal * 2 * distance;
-    }
-
-    std::vector< Vector > Triangle::getPoints( const Vector& ) const
-    {
-        std::vector< Vector > pointsVector;
-        pointsVector.push_back( points[0] );
-        pointsVector.push_back( points[1] );
-        pointsVector.push_back( points[2] );
-        return pointsVector;
     }
 
     void LightTriangle::emitZones( std::vector< Tree<Zone>* >& out ) const
