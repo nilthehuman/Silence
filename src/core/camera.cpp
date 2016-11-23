@@ -49,7 +49,7 @@ namespace Silence {
     // Return the dummy Plane the Screen lies on
     const Plane Camera::getPlane() const
     {
-        const Vector& normal = ( screen.window[1] - screen.window[0] ).cross( screen.window[2] - screen.window[0] );
+        const Vector normal = ( screen.window[1] - screen.window[0] ).cross( screen.window[2] - screen.window[0] ).normalize();
         // ax + by + cz = d
         const double offset = normal * screen.window[0];
         return Plane( normal, offset );
