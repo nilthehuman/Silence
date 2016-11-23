@@ -39,15 +39,15 @@ namespace Silence {
             : node( NULL ) // To be set later
             , light( light )
             , shadows()
-            , insideThings()
+            , medium( NULL )
         {
             this->light.setZone( this );
         }
-        Zone( const Beam& light, const std::vector< Shadow >& shadows )
+        Zone( const Beam& light, const std::vector< Shadow >& shadows, const Thing* medium = NULL )
             : node( NULL ) // To be set later
             , light( light )
             , shadows( shadows )
-            , insideThings()
+            , medium( medium )
         {
             this->light.setZone( this );
         }
@@ -55,8 +55,9 @@ namespace Silence {
         ~Zone()
         { }
 
-        const Tree<Zone>*    getNode()  const { return node; }
-        const Beam&          getLight() const { return light; }
+        const Tree<Zone>*    getNode()   const { return node; }
+        const Beam&          getLight()  const { return light; }
+        const Thing*         getMedium() const { return medium; }
 
         void                 occlude(); // Generate Shadow beams
         std::vector< Zone* > bounce();  // Generate child Zones
@@ -79,7 +80,7 @@ namespace Silence {
         Beam light; // Only a single light Beam per Zone is allowed
         std::vector< Shadow > shadows;
 
-        std::stack< const Thing* > insideThings; // LIFO stack of penetrated Things (passed down from parent Zone)
+        const Thing* medium; // The Thing the Zone travels inside (if any)
     };
 
 }
