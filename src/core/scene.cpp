@@ -121,7 +121,7 @@ namespace Silence {
             return 0;
         else {
             double nominator = offset - normal * ray.getOrigin();
-            if ( parent->isBackCulled() && EPSILON < nominator )
+            if ( (NULL == parent || parent->isBackCulled()) && EPSILON < nominator )
                 return 0;
             double t = nominator / denominator;
             if ( EPSILON < t )
