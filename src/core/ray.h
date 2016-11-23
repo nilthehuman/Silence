@@ -29,15 +29,17 @@
 
 namespace Silence {
 
+    class Thing;
     class ThingPart;
     class Scene;
 
     class Ray {
     public:
-        Ray( const Scene* scene, const Vector& origin, const Vector& direction )
+        Ray( const Scene* scene, const Vector& origin, const Vector& direction, const Thing* medium = NULL )
             : scene( scene )
             , origin( origin )
             , direction( direction.normalized() )
+            , medium( medium )
         {
             assert( scene );
         }
@@ -56,6 +58,7 @@ namespace Silence {
 
         const Vector origin;
         const Vector direction;
+        const Thing* medium; // The Thing the Ray is born inside
     };
 
 }
