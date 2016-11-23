@@ -58,7 +58,7 @@ namespace Silence {
         if ( zoneForestReady )
             return;
         if ( modeFlags.verbose )
-            std::cout << "Renderer: tracing Zones from lightsources... ";
+            std::cerr << "Renderer: tracing Zones from lightsources... " << std::flush;
         zoneForest.clear();
         /* TODO: time control... */
         for ( LightIt light = scene->lightsBegin(); light != scene->lightsEnd(); light++ )
@@ -83,7 +83,7 @@ namespace Silence {
         }
 
         if ( modeFlags.verbose )
-            std::cout << "done." << std::endl;
+            std::cerr << "done." << std::endl;
         zoneForestReady = true;
     }
 
@@ -100,7 +100,7 @@ namespace Silence {
     {
         assert( zoneForestReady );
         if ( modeFlags.verbose )
-            std::cout << "Renderer: rasterizing Zones to Cameras... ";
+            std::cerr << "Renderer: rasterizing Zones to Cameras... " << std::flush;
         /* TODO: time control... */
         for ( CameraIt camera = cameras.begin(); camera != cameras.end(); camera++ )
         {
@@ -116,7 +116,7 @@ namespace Silence {
             (*camera)->gammaCorrect( gamma );
         }
         if ( modeFlags.verbose )
-            std::cout << "done." << std::endl;
+            std::cerr << "done." << std::endl;
     }
 
 }
