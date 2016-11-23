@@ -42,10 +42,12 @@ namespace Silence {
             assert( scene );
         }
 
-        const Vector& getOrigin()       const { return origin; }
-        const Vector& getDirection()    const { return direction; }
+        static const Ray Invalid;
 
-        Vector operator[]( double t )   const { return origin + direction * t; }
+        const Vector& getOrigin()     const { return origin; }
+        const Vector& getDirection()  const { return direction; }
+
+        Vector operator[]( double t ) const { return origin + direction * t; }
 
         double findNearestIntersection();
 

@@ -29,6 +29,8 @@
 
 namespace Silence {
 
+    const Ray Ray::Invalid = Ray( NULL, Vector::Invalid, Vector::Invalid );
+
     double Ray::findNearestIntersection()
     {
         double nearestT = INF;
