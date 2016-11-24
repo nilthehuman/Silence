@@ -75,8 +75,8 @@ namespace Silence {
 
         int height() const
         {
-            int height = 0;
-            for ( TreeIt child = children.begin(); child != children.end(); ++child )
+            int height = 1;
+            for ( typename std::vector< Tree<T>* >::const_iterator child = children.begin(); child != children.end(); ++child )
             {
                 const int childHeight = (*child)->height();
                 if( height < childHeight + 1 )
