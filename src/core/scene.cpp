@@ -310,8 +310,7 @@ namespace Silence {
 
     Beam Plane::bounce( const Beam& beam, const Material::Interaction& interaction ) const
     {
-        const double distance = normal * beam.getPivot().getOrigin() - offset;
-        const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(), beam.getPivot().getOrigin() - normal * distance );
+        const Ray adjustedPivot( beam.getScene(), adjustedPivot.getDirection(), -normal );
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
         const Triplet newColor = beam.getColor() *
