@@ -98,8 +98,9 @@ namespace Silence {
 
         friend class Zone;
 
-        void paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
+        void    paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
 
+        double  fresnelIntensity( const Ray& eyeray, const Vector& point = Vector::Invalid ) const;
         static double schlick( double n1, double n2, double cosTheta );
 
     private:

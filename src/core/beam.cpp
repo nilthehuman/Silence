@@ -76,19 +76,20 @@ namespace Silence {
             return 1; // We are in a root Zone
         const Vector sourcePoint = eyeray[ sourceT ];
         const Beam&  parentBeam  = (**parent).getLight();
-        // Recursion
-        // (This only works for diffuse reflections yet)
         Vector nextDirection;
         switch ( kind )
         {
             case Material::DIFFUSE:  nextDirection = parentBeam.getApex() - sourcePoint; break;
-            case Material::METALLIC: nextDirection = sourcePoint - dynamic_cast<const ThingPart*>(source)->mirror(eyeray.getOrigin()); break;
-            case Material::REFLECT:  nextDirection = sourcePoint - dynamic_cast<const ThingPart*>(source)->mirror(eyeray.getOrigin()); break;
-            case Material::REFRACT:  nextDirection = /*TODO...*/Vector::random(eyeray.getDirection()); break;
+            case Material::METALLIC: nextDirection = eyeray.bounceMetallic( dynamic_cast<const ThingPart*>(source), sourcePoint ).getDirection(); break;
+            case Material::REFLECT:  nextDirection = eyeray.bounceMetallic( dynamic_cast<const ThingPart*>(source), sourcePoint ).getDirection(); break;
+            case Material::REFRACT:  nextDirection = eyeray.bounceRefract ( dynamic_cast<const ThingPart*>(source), sourcePoint ).getDirection(); break;
             default: assert( false );
         }
-        const Ray    nextEyeray( scene, sourcePoint, nextDirection );
-        const double aggregateIntensity = parentBeam.getIntensity( nextEyeray ) * (*parentBeam.distribution)( parentBeam.pivot, nextEyeray.getOrigin() );
+        Ray nextEyeray( scene, sourcePoint, nextDirection );
+        const double diffuseTerm = Material::DIFFUSE  == kind ? (*parentBeam.distribution)( parentBeam.pivot, nextEyeray.getOrigin() ) : 1;
+        const double fresnelTerm = Material::METALLIC == kind ? fresnelIntensity( eyeray ) : 1;
+        // Recursion
+        const double aggregateIntensity = parentBeam.getIntensity( nextEyeray ) * diffuseTerm * fresnelTerm;
         return aggregateIntensity;
     }
 
@@ -158,6 +159,35 @@ namespace Silence {
         // TODO
     }
 
+    double Beam::fresnelIntensity( const Ray& eyeray, const Vector& point ) const
+    {
+        const Thing* medium = zone->getMedium();
+        double n1, n2;
+        if ( medium )
+        {
+            n1 = medium->getRefractiveIndex();
+            n2 = 1.0;
+        }
+        else
+        {
+            n1 = 1.0;
+            n2 = static_cast<const Thing*>(source->getParent())->getRefractiveIndex();
+        }
+        Vector hitPoint;
+        if ( Vector::Invalid != point )
+            hitPoint = point;
+        else
+        {
+            const double t = source->intersect( eyeray );
+            if ( t < EPSILON )
+                return 0;
+            hitPoint = eyeray[t];
+        }
+        const Vector surfaceNormal = source->getNormal( hitPoint );
+        const Vector direction     = eyeray.getDirection() - surfaceNormal * (eyeray.getDirection() * surfaceNormal) * 2;
+        const double cosTheta = direction * surfaceNormal;
+        return schlick( n1, n2, cosTheta );
+    }
 
     double Beam::schlick( double n1, double n2, double cosTheta )
     {
