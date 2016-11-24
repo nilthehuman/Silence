@@ -110,7 +110,7 @@ namespace Silence {
                     if ( (t = (*part)->intersect(*this)) && t < nearestT )
                         nearestT = t;
 
-        if ( thingPartHit )
+        if ( !equal(nearestT, INF) )
             return nearestT;
 
         // Check background Surfaces
