@@ -76,13 +76,14 @@ namespace Silence {
             return 1; // We are in a root Zone
         const Vector sourcePoint = eyeray[ sourceT ];
         const Beam&  parentBeam  = (**parent).getLight();
+        const ThingPart* part = dynamic_cast<const ThingPart*>( source );
         Vector nextDirection;
         switch ( kind )
         {
             case Material::DIFFUSE:  nextDirection = parentBeam.getApex() - sourcePoint; break;
-            case Material::METALLIC: nextDirection = eyeray.bounceMetallic( dynamic_cast<const ThingPart*>(source), sourcePoint ).getDirection(); break;
-            case Material::REFLECT:  nextDirection = eyeray.bounceMetallic( dynamic_cast<const ThingPart*>(source), sourcePoint ).getDirection(); break;
-            case Material::REFRACT:  nextDirection = eyeray.bounceRefract ( dynamic_cast<const ThingPart*>(source), sourcePoint ).getDirection(); break;
+            case Material::METALLIC: nextDirection = eyeray.bounceMetallic( part, sourcePoint ).getDirection(); break;
+            case Material::REFLECT:  nextDirection = eyeray.bounceMetallic( part, sourcePoint ).getDirection(); break;
+            case Material::REFRACT:  nextDirection = eyeray.bounceRefract ( part, sourcePoint ).getDirection(); break;
             default: assert( false );
         }
         Ray nextEyeray( scene, sourcePoint, nextDirection );
