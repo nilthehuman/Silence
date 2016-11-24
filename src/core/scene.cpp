@@ -190,12 +190,12 @@ namespace Silence {
         const Vector normal = (center - camera->getViewpoint()).normalize();
         Vector points[4];
         if ( camera->getScreenX() == normal || -camera->getScreenX() == normal )
-            points[0] = center + normal.cross(camera->getScreenY()).normalize() * radius;
+            points[0] = center + normal.cross(camera->getScreenY()).normalize() * radius * 1.05; // TODO: Resolve this hack.
         else
-            points[0] = center + normal.cross(camera->getScreenX()).normalize() * radius;
-        points[1] = center + normal.cross((points[0] - center).normalize()) * radius;
-        points[2] = center + normal.cross((points[1] - center).normalize()) * radius;
-        points[3] = center + normal.cross((points[2] - center).normalize()) * radius;
+            points[0] = center + normal.cross(camera->getScreenX()).normalize() * radius * 1.05;
+        points[1] = center + normal.cross((points[0] - center).normalize()) * radius * 1.05;
+        points[2] = center + normal.cross((points[1] - center).normalize()) * radius * 1.05;
+        points[3] = center + normal.cross((points[2] - center).normalize()) * radius * 1.05;
         ScreenPoint topLeft    ( camera->project(points[1]).col - 1, camera->project(points[2]).row - 1);
         ScreenPoint bottomRight( camera->project(points[3]).col + 1, camera->project(points[0]).row + 1);
         return BoundingBox( topLeft, bottomRight );
