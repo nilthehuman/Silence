@@ -73,6 +73,13 @@ namespace Silence {
 
         std::vector< Tree<T>* > getLeaves() const { return leaves; }
 
+        int count() const
+        {
+            int count = 1;
+            for ( typename std::vector< Tree<T>* >::const_iterator child = children.begin(); child != children.end(); ++child )
+                count += (*child)->count();
+            return count;
+        }
         int height() const
         {
             int height = 1;
