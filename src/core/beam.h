@@ -43,9 +43,10 @@ namespace Silence {
     public:
         typedef double (*Distribution)( const Ray& pivot, const Vector& point );
 
-        static double Uniform( const Ray&, const Vector& )
+        static double Uniform( const Ray& pivot, const Vector& point )
         {
-            return 1;
+            const double distance = pivot.getDirection() * point - pivot.getDirection() * pivot.getOrigin();
+            return UNITDIST * UNITDIST / ( distance * distance );
         }
         static double Spherical( const Ray& pivot, const Vector& point )
         {
