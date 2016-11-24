@@ -41,7 +41,7 @@ namespace Silence {
             , direction( direction.normalized() )
             , medium( medium )
         {
-            assert( scene );
+            assert( scene || (Vector::Invalid == origin && Vector::Invalid == direction) );
         }
 
         static const Ray Invalid;
