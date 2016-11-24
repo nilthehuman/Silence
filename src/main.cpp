@@ -48,6 +48,7 @@ struct flags Silence::modeFlags;
 struct arguments {
     char*  progname;
     int    depth;
+    int    level;
     double gamma;
     char*  sceneFilename;
     char*  outFilename;
@@ -64,6 +65,7 @@ void help( std::string progname )
     std::cout << "usage: " << progname << " SCENE_FILENAME [OPTIONS]" << std::endl << std::endl;
     std::cout << "Command line options:" << std::endl;
     std::cout << "  -d, --depth DEPTH   Set the maximal depth (length) of any path (default 6)" << std::endl;
+    std::cout << "  -l, --level LEVEL   Show only an exact level of the tree (unset by default)" << std::endl;
     std::cout << "  -g, --gamma EXP     Set the exponent for post-mortem gamma correction (default 1.0)" << std::endl;
     std::cout << "  -o, --out FILENAME  Set the filename for the output image (default image.ppm)" << std::endl;
 #ifdef COMPILE_WITH_GUI
@@ -96,7 +98,7 @@ void version()
 void usage( std::string progname )
 {
     std::cerr << "usage: " << progname << " SCENE_FILENAME [-v|--verbose] [--depth MAX_DEPTH_OF_PATHS]" << std::endl;
-    std::cerr << "  [--gamma GAMMA] [--out IMAGE_FILENAME]" << std::endl;
+    std::cerr << "  [--level LEVEL] [--gamma GAMMA] [--out IMAGE_FILENAME]" << std::endl;
 #ifdef COMPILE_WITH_GUI
     std::cerr << "  [--gui]" << std::endl;
 #endif
@@ -125,6 +127,14 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
                 usage( args->progname );
             args->depth = atoi( argv[i] );
             if ( !args->depth )
+                usage( args->progname );
+        }
+        else if( !strcmp(argv[i], "-l") || !strcmp(argv[i], "--level") )
+        {
+            if ( argc <= ++i )
+                usage( args->progname );
+            args->level = atoi( argv[i] );
+            if ( args->level < 0 )
                 usage( args->progname );
         }
         else if( !strcmp(argv[i], "-g") || !strcmp(argv[i], "--gamma") )
@@ -200,6 +210,12 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
             std::cerr << "main: warning: starting in CLI mode, disregarding --hud setting." << std::endl;
     }
 #endif
+    if( args->depth - 1 < args->level )
+    {
+        std::cerr << "You requested to see --level " << args->level << " of the render but --depth is set to " << args->depth << "." << std::endl;
+        std::cerr << "(Note that levels start at 0.)" << std::endl;
+        usage( args->progname );
+    }
 }
 
 Camera* camera = NULL;
@@ -216,8 +232,9 @@ int main( int argc, char* argv[] )
 
     // Parse command line arguments
     struct arguments args;
-    args.depth           = 6;
-    args.gamma           = 1;
+    args.depth           =  6;
+    args.level           = -1;
+    args.gamma           =  1;
     args.sceneFilename   = NULL;
     args.outFilename     = (char*)"image.ppm";
 #ifdef COMPILE_WITH_GUI
@@ -230,7 +247,7 @@ int main( int argc, char* argv[] )
     if( modeFlags.verbose )
     {
         std::cerr << "main: arguments: ";
-        std::cerr << "depth = " << args.depth << ", gamma = " << args.gamma;
+        std::cerr << "depth = " << args.depth << "level = " << args.level << ", gamma = " << args.gamma;
 #ifdef COMPILE_WITH_GUI
         if( !args.gui )
 #endif
@@ -311,7 +328,7 @@ int main( int argc, char* argv[] )
             std::cerr << "main: creating GUI." << std::endl;
         GUI gui( camera );
         gui.initialize( &argc, argv );
-        gui.setup( args.depth, args.gamma, (int)(1000.0 / args.fps), args.hud, motions );
+        gui.setup( args.depth, args.level, args.gamma, (int)(1000.0 / args.fps), args.hud, motions );
         atexit( &cleanup );
         if ( modeFlags.verbose )
             std::cerr << "main: starting the renderer." << std::endl;
@@ -340,7 +357,7 @@ int main( int argc, char* argv[] )
     std::srand( start );
     Renderer renderer( camera->getScene() );
     renderer.addCamera( camera );
-    renderer.render( 0, args.depth, args.gamma );
+    renderer.render( 0, args.depth, args.level, args.gamma );
     if ( modeFlags.verbose )
     {
         const time_t end = std::time( NULL );

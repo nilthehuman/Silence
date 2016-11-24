@@ -42,18 +42,18 @@ namespace Silence {
         cameras.erase( cameras.begin() + i );
     }
 
-    void Renderer::render( int /*time*/, int depth, double gamma )
+    void Renderer::render( int /*time*/, int depth, int level, double gamma )
     {
         assert( !rendering );
         rendering = true;
         /* TODO: time control... */
-        buildZoneForest( 0, depth );
-        rasterize(0, gamma);
+        buildZoneForest( 0, depth, level );
+        rasterize(0, level, gamma);
         /*...*/
         rendering = false;
     }
 
-    void Renderer::buildZoneForest( int /*time*/, int depth )
+    void Renderer::buildZoneForest( int /*time*/, int depth, int level )
     {
         if ( zoneForestReady )
             return;
@@ -67,7 +67,7 @@ namespace Silence {
         {
             (*tree)->getValue()->setNode( *tree );
             (*tree)->getValue()->occlude();
-            for ( int d = 1; d < depth; ++d )
+            for ( int d = 1; d < depth && (-1 == level || d - 1 <= level); ++d )
             {
                 std::vector< Tree<Zone>* > leaves = (*tree)->getLeaves();
                 for ( std::vector< Tree<Zone>* >::iterator leaf = leaves.begin(); leaf != leaves.end(); leaf++ )
@@ -96,7 +96,7 @@ namespace Silence {
     }
 
     // Rasterize all Zones in zoneForest to each Camera
-    void Renderer::rasterize( int /*time*/, double gamma )
+    void Renderer::rasterize( int /*time*/, int level, double gamma )
     {
         assert( zoneForestReady );
         if ( modeFlags.verbose )
@@ -109,12 +109,13 @@ namespace Silence {
             {
                 std::vector< Tree<Zone>* > children;
                 children.push_back( *tree );
-                while ( !children.empty() )
+                for ( int thisLevel = 0; (-1 == level || thisLevel <= level) && !children.empty(); ++thisLevel )
                 {
                     std::vector< Tree<Zone>* > grandchildren;
                     for ( Tree<Zone>::TreeIt child = children.begin(); child != children.end(); child++ )
                     {
-                        (*child)->getValue()->rasterize( *camera );
+                        if ( -1 == level || thisLevel == level )
+                            (*child)->getValue()->rasterize( *camera );
                         for ( Tree<Zone>::TreeIt grandchild = (*child)->childrenBegin(); grandchild != (*child)->childrenEnd(); grandchild++ )
                             grandchildren.push_back( *grandchild );
                     }

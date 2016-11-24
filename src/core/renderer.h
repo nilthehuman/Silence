@@ -50,13 +50,13 @@ namespace Silence {
         void addCamera( Camera* camera );
         void removeCamera( unsigned int i );
 
-        void render( int time, int depth, double gamma = 1 );
+        void render( int time, int depth, int level = -1, double gamma = 1 );
 
     private:
-        void buildZoneForest( int time, int depth );
+        void buildZoneForest( int time, int depth, int level = -1 );
         void clearZoneForest();
 
-        void rasterize( int time, double gamma );
+        void rasterize( int time, int level, double gamma );
 
     private:
         const Scene* const scene;
