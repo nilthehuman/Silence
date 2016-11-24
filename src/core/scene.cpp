@@ -394,7 +394,7 @@ namespace Silence {
 
     Vector Triangle::mirror( const Vector& point ) const
     {
-        const Vector& normal = ( points[1] - points[0] ).cross( points[2] - points[0] );
+        const Vector normal = ( points[1] - points[0] ).cross( points[2] - points[0] ).normalize();
         const double offset = normal * points[0];
         const double distance = point * normal - offset;
         return point - normal * 2 * distance;
