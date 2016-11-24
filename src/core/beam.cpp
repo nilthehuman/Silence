@@ -106,7 +106,10 @@ namespace Silence {
         {
             const Vector screenPoint = leftEdge + rowDirection * ( (double)col/gridwidth );
             const Ray eyeray( scene, screenPoint, screenPoint - viewpoint );
-            // WARNING: Experimental!
+            // -------- * -------- * -------- * -------- * -------- * -------- * -------- * --------
+            //  WARNING: Temporary brute force rendering! The following loops will be replaced with
+            //              a much more efficient algorithm when we have Shadows ready.
+            // -------- * -------- * -------- * -------- * -------- * -------- * -------- * --------
             const double sourceT = source->intersect( eyeray );
             double nearestT = INF;
             for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
@@ -148,6 +151,9 @@ namespace Silence {
                             break;
                     }
             }
+            // -------- * -------- * -------- * -------- * -------- * -------- * -------- * --------
+            //                      END of brute force intersection detection.
+            // -------- * -------- * -------- * -------- * -------- * -------- * -------- * --------
             if ( 0 != sourceT && sourceT == nearestT )
             {
                 pixelBuffer[col] = getColor( eyeray ).normalize(); // Squash values into (0, 0, 0)..(1, 1, 1)
