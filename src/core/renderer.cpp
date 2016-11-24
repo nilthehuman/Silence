@@ -107,10 +107,19 @@ namespace Silence {
             (*camera)->clear();
             for ( ForestIt tree = zoneForest.begin(); tree != zoneForest.end(); tree++ )
             {
-                (*tree)->getValue()->rasterize( *camera );
-                // TODO: Recursion!
-                for ( Tree<Zone>::TreeIt child = (*tree)->childrenBegin(); child != (*tree)->childrenEnd(); child++ )
-                    (*child)->getValue()->rasterize( *camera );
+                std::vector< Tree<Zone>* > children;
+                children.push_back( *tree );
+                while ( !children.empty() )
+                {
+                    std::vector< Tree<Zone>* > grandchildren;
+                    for ( Tree<Zone>::TreeIt child = children.begin(); child != children.end(); child++ )
+                    {
+                        (*child)->getValue()->rasterize( *camera );
+                        for ( Tree<Zone>::TreeIt grandchild = (*child)->childrenBegin(); grandchild != (*child)->childrenEnd(); grandchild++ )
+                            grandchildren.push_back( *grandchild );
+                    }
+                    children = grandchildren;
+                }
             }
             (*camera)->paintSky();
             (*camera)->gammaCorrect( gamma );
