@@ -340,7 +340,7 @@ int main( int argc, char* argv[] )
     std::srand( start );
     Renderer renderer( camera->getScene() );
     renderer.addCamera( camera );
-    renderer.render( 0, args.depth );
+    renderer.render( 0, args.depth, args.gamma );
     if ( modeFlags.verbose )
     {
         const time_t end = std::time( NULL );
