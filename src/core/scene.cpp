@@ -215,6 +215,11 @@ namespace Silence {
         return points;
     }
 
+    double Sphere::getTilt( const Vector& ) const
+    {
+        return 1;
+    }
+
     Vector Sphere::mirror( const Vector& point ) const
     {
         // TODO: Right this wrong.
@@ -226,8 +231,7 @@ namespace Silence {
         const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(), center - beam.getPivot().getOrigin() );
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
-        const Triplet newColor = beam.getColor() *
-                                 thing->getColor() * thing->interact( interaction ); // The tilt factor is 1 here
+        const Triplet newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
 
         Vector             newApex  = Vector::Invalid;
         const Ray*         newPivot = NULL;
@@ -302,6 +306,11 @@ namespace Silence {
         return points;
     }
 
+    double Plane::getTilt( const Vector& direction ) const
+    {
+        return abs( normal * direction.normalized() );
+    }
+
     Vector Plane::mirror( const Vector& point ) const
     {
         const double distance = point * normal - offset;
@@ -313,9 +322,7 @@ namespace Silence {
         const Ray adjustedPivot( beam.getScene(), adjustedPivot.getDirection(), -normal );
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
-        const Triplet newColor = beam.getColor() *
-                                 thing->getColor() * thing->interact( interaction ) *
-                                 abs( normal * adjustedPivot.getDirection() );
+        const Triplet newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
 
         Vector             newApex  = Vector::Invalid;
         const Ray*         newPivot = NULL;
@@ -391,6 +398,12 @@ namespace Silence {
         return pointsVector;
     }
 
+    double Triangle::getTilt( const Vector& direction ) const
+    {
+        const Vector normal = ( points[1] - points[0] ).cross( points[2] - points[0] ).normalize();
+        return abs( normal * direction.normalized() );
+    }
+
     Vector Triangle::mirror( const Vector& point ) const
     {
         const Vector normal = ( points[1] - points[0] ).cross( points[2] - points[0] ).normalize();
@@ -401,13 +414,10 @@ namespace Silence {
 
     Beam Triangle::bounce( const Beam& beam, const Material::Interaction& interaction ) const
     {
-        const Vector normal = ( points[1] - points[0] ).cross( points[2] - points[0] ).normalize();
         const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(), (points[0] + points[1] + points[2]) * 0.333 - beam.getPivot().getOrigin() );
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
-        const Triplet newColor = beam.getColor() *
-                                 thing->getColor() * thing->interact( interaction ) *
-                                 abs( normal * adjustedPivot.getDirection() );
+        const Triplet newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
 
         Vector             newApex  = Vector::Invalid;
         const Ray*         newPivot = NULL;

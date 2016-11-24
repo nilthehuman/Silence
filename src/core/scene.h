@@ -111,8 +111,9 @@ namespace Silence {
         ThingPart( const Thing* parent ) : Surface( (Object*)parent ) { }
         virtual ~ThingPart() { }
 
-        virtual Vector mirror( const Vector& point ) const = 0; // Returns the reflection of a given point off the plane of the shape
-        virtual Beam   bounce( const Beam& beam, const Material::Interaction& interaction ) const = 0; // Spawn next Beam after hitting this ThingPart
+        virtual double getTilt( const Vector& direction ) const = 0; // Returns the dot product of the normal and a given pivot (for Phong reflection)
+        virtual Vector mirror ( const Vector& point     ) const = 0; // Returns the reflection of a given point off the plane of the shape
+        virtual Beam   bounce ( const Beam& beam, const Material::Interaction& interaction ) const = 0; // Spawn next Beam after hitting this ThingPart
     };
 
     class LightPart : virtual public Surface {
@@ -264,8 +265,9 @@ namespace Silence {
             , ThingPart( parent )
         { }
 
-        Vector mirror( const Vector& point ) const;
-        Beam   bounce( const Beam& beam, const Material::Interaction& interaction ) const;
+        double getTilt( const Vector& direction ) const;
+        Vector mirror ( const Vector& point     ) const;
+        Beam   bounce ( const Beam& beam, const Material::Interaction& interaction ) const;
     };
 
     class LightSphere : public ISphere, public LightPart {
@@ -322,8 +324,9 @@ namespace Silence {
             , ThingPart( NULL )
         { }
 
-        Vector mirror( const Vector& point ) const;
-        Beam   bounce( const Beam& beam, const Material::Interaction& interaction ) const;
+        double getTilt( const Vector& direction ) const;
+        Vector mirror ( const Vector& point     ) const;
+        Beam   bounce ( const Beam& beam, const Material::Interaction& interaction ) const;
     };
 
     class LightPlane : public IPlane, public LightPart {
@@ -392,7 +395,8 @@ namespace Silence {
             , ThingPart( parent )
         { }
 
-        Vector mirror ( const Vector& point ) const;
+        double getTilt( const Vector& direction ) const;
+        Vector mirror ( const Vector& point     ) const;
         Beam   bounce ( const Beam& beam, const Material::Interaction& interaction ) const;
     };
 

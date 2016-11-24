@@ -88,9 +88,10 @@ namespace Silence {
         }
         Ray nextEyeray( scene, sourcePoint, nextDirection );
         const double diffuseTerm = Material::DIFFUSE  == kind ? (*parentBeam.distribution)( parentBeam.pivot, nextEyeray.getOrigin() ) : 1;
+        const double    tiltTerm = Material::DIFFUSE  == kind ? part->getTilt( sourcePoint - parentBeam.getApex() ) : 1;
         const double fresnelTerm = Material::METALLIC == kind ? fresnelIntensity( eyeray ) : 1;
         // Recursion
-        const double aggregateIntensity = parentBeam.getIntensity( nextEyeray ) * diffuseTerm * fresnelTerm;
+        const double aggregateIntensity = parentBeam.getIntensity( nextEyeray ) * diffuseTerm * tiltTerm * fresnelTerm;
         return aggregateIntensity;
     }
 
