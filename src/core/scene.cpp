@@ -419,7 +419,7 @@ namespace Silence {
             case Material::DIFFUSE:
                 newApex  = mirror( beam.getApex() );
                 newPivot = new Ray( beam.getScene(), hitPoint, getNormal(hitPoint) );
-                newDistribution = Beam::Uniform;
+                newDistribution = Beam::Planar;
                 break;
             case Material::METALLIC:
                 newApex  = mirror( beam.getApex() );
