@@ -231,11 +231,11 @@ namespace Silence {
         const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(), center - beam.getPivot().getOrigin() );
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
-        const Triplet newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
 
         Vector             newApex  = Vector::Invalid;
         const Ray*         newPivot = NULL;
         std::vector< Ray > newEdges;
+        const Triplet      newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
         Beam::Distribution newDistribution;
         switch ( interaction )
         {
@@ -322,11 +322,11 @@ namespace Silence {
         const Ray adjustedPivot( beam.getScene(), adjustedPivot.getDirection(), -normal );
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
-        const Triplet newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
 
         Vector             newApex  = Vector::Invalid;
         const Ray*         newPivot = NULL;
         std::vector< Ray > newEdges;
+        const Triplet      newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
         Beam::Distribution newDistribution;
         switch ( interaction )
         {
@@ -417,11 +417,11 @@ namespace Silence {
         const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(), (points[0] + points[1] + points[2]) * 0.333 - beam.getPivot().getOrigin() );
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
-        const Triplet newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
 
         Vector             newApex  = Vector::Invalid;
         const Ray*         newPivot = NULL;
         std::vector< Ray > newEdges;
+        const Triplet      newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
         Beam::Distribution newDistribution;
         switch ( interaction )
         {
