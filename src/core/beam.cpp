@@ -77,6 +77,7 @@ namespace Silence {
         const Vector sourcePoint = eyeray[ sourceT ];
         const Beam&  parentBeam  = (**parent).getLight();
         const ThingPart* part = dynamic_cast<const ThingPart*>( source );
+        assert( part );
         Vector nextDirection;
         switch ( kind )
         {
