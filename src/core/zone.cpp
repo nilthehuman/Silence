@@ -50,7 +50,7 @@ namespace Silence {
                    // Spawn a separate Zone for each type of Material the Thing has
                    for ( int i = 0; i <= Material::REFRACT; i++ )
                        if ( !equal(0, thing->interact(Material::Interaction(i)) ) )
-                           newBeams.push_back( light.bounce(*part, Material::Interaction(i)) );
+                           newBeams.push_back( (*part)->bounce(light, Material::Interaction(i)) );
                }
         for ( std::vector< Beam >::const_iterator beam = newBeams.begin(); beam != newBeams.end(); beam++ )
             newZones.push_back( new Zone(*beam, shadows) );

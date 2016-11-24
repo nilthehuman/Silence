@@ -215,14 +215,61 @@ namespace Silence {
         return points;
     }
 
-    double Sphere::getTilt( const Vector& ) const
-    {
-        return 1;
-    }
-
     Vector Sphere::mirror( const Vector& point ) const
     {
+        // TODO: Right this wrong.
         return point;
+    }
+
+    Beam Sphere::bounce( const Beam& beam, const Material::Interaction& interaction ) const
+    {
+        const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(), center - beam.getPivot().getOrigin() );
+        const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
+        const Thing* thing = static_cast<const Thing*>( parent );
+        const Triplet newColor = beam.getColor() *
+                                 thing->getColor() * thing->interact( interaction ); // The tilt factor is 1 here
+
+        Vector             newApex  = Vector::Invalid;
+        const Ray*         newPivot = NULL;
+        std::vector< Ray > newEdges;
+        Beam::Distribution newDistribution;
+        switch ( interaction )
+        {
+            case Material::DIFFUSE:
+                newApex  = center;
+                newPivot = new Ray( beam.getScene(), hitPoint, getNormal(hitPoint) );
+                newDistribution = Beam::Spherical;
+                break;
+            case Material::METALLIC:
+                newApex  = center;
+                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
+                    newEdges.push_back( e->bounceMetallic(this) );
+                newDistribution = beam.getDistribution();
+                // Loss of intensity will be taken into account during rasterization,
+                // see Beam::fresnelIntensity
+                break;
+            case Material::REFLECT:
+                newApex  = center;
+                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
+                    newEdges.push_back( e->bounceReflect(this) );
+                newDistribution = beam.getDistribution();
+                break;
+            case Material::REFRACT:
+                newApex  = beam.getApex();
+                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
+                    newEdges.push_back( e->bounceRefract(this) );
+                newDistribution = beam.getDistribution();
+                break;
+            default:
+                assert( false );
+        }
+        Beam newBeam( beam.getScene(),
+                      newApex, this, *newPivot, newEdges,
+                      newColor, newDistribution, interaction );
+        return newBeam;
     }
 
     void LightSphere::emitZones( std::vector< Tree<Zone>* >& out ) const
@@ -255,15 +302,61 @@ namespace Silence {
         return points;
     }
 
-    double Plane::getTilt( const Vector& pivot ) const
-    {
-        return abs( normal * pivot );
-    }
-
     Vector Plane::mirror( const Vector& point ) const
     {
         const double distance = point * normal - offset;
         return point - normal * 2 * distance;
+    }
+
+    Beam Plane::bounce( const Beam& beam, const Material::Interaction& interaction ) const
+    {
+        const double distance = normal * beam.getPivot().getOrigin() - offset;
+        const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(), beam.getPivot().getOrigin() - normal * distance );
+        const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
+        const Thing* thing = static_cast<const Thing*>( parent );
+        const Triplet newColor = beam.getColor() *
+                                 thing->getColor() * thing->interact( interaction ) *
+                                 abs( normal * adjustedPivot.getDirection() );
+
+        Vector             newApex  = Vector::Invalid;
+        const Ray*         newPivot = NULL;
+        std::vector< Ray > newEdges;
+        Beam::Distribution newDistribution;
+        switch ( interaction )
+        {
+            case Material::DIFFUSE:
+                newApex  = mirror( beam.getApex() );
+                newPivot = new Ray( beam.getScene(), hitPoint, getNormal(hitPoint) );
+                newDistribution = Beam::Uniform;
+                break;
+            case Material::METALLIC:
+                newApex  = mirror( beam.getApex() );
+                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
+                    newEdges.push_back( e->bounceMetallic(this) );
+                newDistribution = beam.getDistribution();
+                break;
+            case Material::REFLECT:
+                newApex  = mirror( beam.getApex() );
+                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
+                    newEdges.push_back( e->bounceReflect(this) );
+                newDistribution = beam.getDistribution();
+                break;
+            case Material::REFRACT:
+                newApex  = beam.getApex();
+                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
+                    newEdges.push_back( e->bounceRefract(this) );
+                newDistribution = beam.getDistribution();
+                break;
+            default:
+                assert( false );
+        }
+        Beam newBeam( beam.getScene(),
+                      newApex, this, *newPivot, newEdges,
+                      newColor, newDistribution, interaction );
+        return newBeam;
     }
 
     void LightPlane::emitZones( std::vector< Tree<Zone>* >& out ) const
@@ -299,12 +392,6 @@ namespace Silence {
         return pointsVector;
     }
 
-    double Triangle::getTilt( const Vector& pivot ) const
-    {
-        const Vector& normal = ( points[1] - points[0] ).cross( points[2] - points[0] );
-        return abs( normal * pivot );
-    }
-
     Vector Triangle::mirror( const Vector& point ) const
     {
         const Vector& normal = ( points[1] - points[0] ).cross( points[2] - points[0] );
@@ -313,6 +400,56 @@ namespace Silence {
         return point - normal * 2 * distance;
     }
 
+    Beam Triangle::bounce( const Beam& beam, const Material::Interaction& interaction ) const
+    {
+        const Vector normal = ( points[1] - points[0] ).cross( points[2] - points[0] ).normalize();
+        const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(), (points[0] + points[1] + points[2]) * 0.333 - beam.getPivot().getOrigin() );
+        const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
+        const Thing* thing = static_cast<const Thing*>( parent );
+        const Triplet newColor = beam.getColor() *
+                                 thing->getColor() * thing->interact( interaction ) *
+                                 abs( normal * adjustedPivot.getDirection() );
+
+        Vector             newApex  = Vector::Invalid;
+        const Ray*         newPivot = NULL;
+        std::vector< Ray > newEdges;
+        Beam::Distribution newDistribution;
+        switch ( interaction )
+        {
+            case Material::DIFFUSE:
+                newApex  = mirror( beam.getApex() );
+                newPivot = new Ray( beam.getScene(), hitPoint, getNormal(hitPoint) );
+                newDistribution = Beam::Uniform;
+                break;
+            case Material::METALLIC:
+                newApex  = mirror( beam.getApex() );
+                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
+                    newEdges.push_back( e->bounceMetallic(this) );
+                newDistribution = beam.getDistribution();
+                break;
+            case Material::REFLECT:
+                newApex  = mirror( beam.getApex() );
+                newPivot = new Ray( adjustedPivot.bounceReflect(this, hitPoint) );
+                for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
+                    newEdges.push_back( e->bounceReflect(this) );
+                newDistribution = beam.getDistribution();
+                break;
+            case Material::REFRACT:
+                newApex  = beam.getApex();
+                newPivot = new Ray( adjustedPivot.bounceRefract(this, hitPoint) );
+                for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
+                    newEdges.push_back( e->bounceRefract(this) );
+                newDistribution = beam.getDistribution();
+                break;
+            default:
+                assert( false );
+        }
+        Beam newBeam( beam.getScene(),
+                      newApex, this, *newPivot, newEdges,
+                      newColor, newDistribution, interaction );
+        return newBeam;
+    }
     void LightTriangle::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();

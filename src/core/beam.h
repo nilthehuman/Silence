@@ -79,9 +79,12 @@ namespace Silence {
         ~Beam()
         { }
 
-        const   Scene*   getScene() const { return scene; }
-        const   Vector&  getApex()  const { return apex;  }
-        const   Triplet& getColor() const { return color; }
+        const   Scene*              getScene()        const { return scene; }
+        const   Vector&             getApex()         const { return apex;  }
+        const   Ray&                getPivot()        const { return pivot; }
+        const   std::vector< Ray >& getEdges()        const { return edges; }
+        const   Triplet&            getColor()        const { return color; }
+                Distribution        getDistribution() const { return distribution; }
 
         bool    contains    ( const Vector& point ) const;
         Triplet getColor    ( const Ray&   eyeray ) const;
@@ -89,7 +92,6 @@ namespace Silence {
         void    rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* buffer, double* skyBlocked ) const;
 
         void    occlude(); // Figure out what ThingParts obstruct the Beam
-        Beam    bounce( const ThingPart* part, const Material::Interaction& interaction ) const; // Spawn next Beam after hitting a ThingPart
 
     private:
         void    setZone( const Zone* z ) { zone = z; }
@@ -97,11 +99,6 @@ namespace Silence {
         friend class Zone;
 
         void paint( const Triplet& otherColor ) { color *= otherColor; } // Incorporate the color of a Surface that was hit
-
-        inline Beam bounceDiffuse ( const ThingPart* part ) const;
-        inline Beam bounceMetallic( const ThingPart* part ) const;
-        inline Beam bounceReflect ( const ThingPart* part ) const;
-        inline Beam bounceRefract ( const ThingPart* part ) const;
 
         static double schlick( double n1, double n2, double cosTheta );
 

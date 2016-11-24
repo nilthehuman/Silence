@@ -158,48 +158,6 @@ namespace Silence {
         // TODO
     }
 
-    Beam Beam::bounce( const ThingPart* part, const Material::Interaction& interaction ) const
-    {
-        switch ( interaction )
-        {
-            case Material::DIFFUSE:  return bounceDiffuse ( part );
-            case Material::METALLIC: return bounceMetallic( part );
-            case Material::REFLECT:  return bounceReflect ( part );
-            case Material::REFRACT:  return bounceRefract ( part );
-            default:                 assert( false );
-        }
-    }
-
-    Beam Beam::bounceDiffuse( const ThingPart* part ) const
-    {
-        const Vector newApex = part->mirror( apex );
-        // TODO: This is wrong, fix it:
-        //const Ray    newPivot( scene, newApex, pivot[part->intersect(pivot)] - newApex );
-        const Ray newPivot( scene, newApex, part->getNormal( pivot[part->intersect(pivot)] ) );
-        const std::vector< Ray > empty;
-        Beam newBeam( scene, newApex, part, newPivot, empty, color, distribution, Material::DIFFUSE );
-        const Thing* thing = static_cast<const Thing*>( part->getParent() );
-        newBeam.paint( thing->getColor() * thing->interact(Material::DIFFUSE) /** part->getTilt(pivot.getDirection())*/ );
-        return newBeam;
-    }
-
-    Beam Beam::bounceMetallic( const ThingPart* /*part*/ ) const
-    {
-        // TODO
-        return *this;
-    }
-
-    Beam Beam::bounceReflect( const ThingPart* /*part*/ ) const
-    {
-        // TODO
-        return *this;
-    }
-
-    Beam Beam::bounceRefract( const ThingPart* /*part*/ ) const
-    {
-        // TODO
-        return *this;
-    }
 
     double Beam::schlick( double n1, double n2, double cosTheta )
     {
