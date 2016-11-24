@@ -31,44 +31,72 @@ namespace Silence {
 
     const Ray Ray::Invalid = Ray( NULL, Vector::Invalid, Vector::Invalid );
 
-    Ray Ray::bounceDiffuse( const ThingPart* part ) const
+    Ray Ray::bounceDiffuse( const ThingPart* part, const Vector& point ) const
     {
-        const double t = part->intersect( *this );
-        if ( equal(0, t) )
-            return Ray::Invalid;
-        const Vector hitPoint      = (*this)[t];
+        assert( part );
+        Vector hitPoint;
+        if ( Vector::Invalid != point )
+            hitPoint = point;
+        else
+        {
+            const double t = part->intersect( *this );
+            if ( equal(0, t) )
+                return Ray::Invalid;
+            hitPoint = (*this)[t];
+        }
         const Vector surfaceNormal = part->getNormal( hitPoint );
         return Ray( scene, hitPoint, surfaceNormal );
     }
 
-    Ray Ray::bounceMetallic( const ThingPart* part ) const
+    Ray Ray::bounceMetallic( const ThingPart* part, const Vector& point ) const
     {
-        const double t = part->intersect( *this );
-        if ( equal(0, t) )
-            return Ray::Invalid;
-        const Vector hitPoint      = (*this)[t];
+        assert( part );
+        Vector hitPoint;
+        if ( Vector::Invalid != point )
+            hitPoint = point;
+        else
+        {
+            const double t = part->intersect( *this );
+            if ( equal(0, t) )
+                return Ray::Invalid;
+            hitPoint = (*this)[t];
+        }
         const Vector surfaceNormal = part->getNormal( hitPoint );
         const Vector newDirection  = direction - surfaceNormal * (direction * surfaceNormal) * 2;
         return Ray( scene, hitPoint, newDirection );
     }
 
-    Ray Ray::bounceReflect( const ThingPart* part ) const
+    Ray Ray::bounceReflect( const ThingPart* part, const Vector& point ) const
     {
-        const double t = part->intersect( *this );
-        if ( equal(0, t) )
-            return Ray::Invalid;
-        const Vector hitPoint      = (*this)[t];
+        assert( part );
+        Vector hitPoint;
+        if ( Vector::Invalid != point )
+            hitPoint = point;
+        else
+        {
+            const double t = part->intersect( *this );
+            if ( equal(0, t) )
+                return Ray::Invalid;
+            hitPoint = (*this)[t];
+        }
         const Vector surfaceNormal = part->getNormal( hitPoint );
         const Vector newDirection  = direction - surfaceNormal * (direction * surfaceNormal) * 2;
         return Ray( scene, hitPoint, newDirection );
     }
 
-    Ray Ray::bounceRefract( const ThingPart* part ) const
+    Ray Ray::bounceRefract( const ThingPart* part, const Vector& point ) const
     {
-        const double t = part->intersect( *this );
-        if ( equal(0, t) )
-            return Ray::Invalid;
-        const Vector hitPoint = (*this)[t];
+        assert( part );
+        Vector hitPoint;
+        if ( Vector::Invalid != point )
+            hitPoint = point;
+        else
+        {
+            const double t = part->intersect( *this );
+            if ( equal(0, t) )
+                return Ray::Invalid;
+            hitPoint = (*this)[t];
+        }
         // en.wikipedia.org/wiki/Snell's_law
         // http://graphics.stanford.edu/courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf
         double n1, n2;
