@@ -251,14 +251,14 @@ namespace Silence {
                 break;
             case Material::REFLECT:
                 newApex  = center;
-                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                newPivot = new Ray( adjustedPivot.bounceReflect(this, hitPoint) );
                 for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
                     newEdges.push_back( e->bounceReflect(this) );
                 newDistribution = beam.getDistribution();
                 break;
             case Material::REFRACT:
                 newApex  = beam.getApex();
-                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                newPivot = new Ray( adjustedPivot.bounceRefract(this, hitPoint) );
                 for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
                     newEdges.push_back( e->bounceRefract(this) );
                 newDistribution = beam.getDistribution();
@@ -338,14 +338,14 @@ namespace Silence {
                 break;
             case Material::REFLECT:
                 newApex  = mirror( beam.getApex() );
-                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                newPivot = new Ray( adjustedPivot.bounceReflect(this, hitPoint) );
                 for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
                     newEdges.push_back( e->bounceReflect(this) );
                 newDistribution = beam.getDistribution();
                 break;
             case Material::REFRACT:
                 newApex  = beam.getApex();
-                newPivot = new Ray( adjustedPivot.bounceMetallic(this, hitPoint) );
+                newPivot = new Ray( adjustedPivot.bounceRefract(this, hitPoint) );
                 for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
                     newEdges.push_back( e->bounceRefract(this) );
                 newDistribution = beam.getDistribution();
