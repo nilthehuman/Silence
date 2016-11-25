@@ -49,6 +49,7 @@ struct arguments {
     char*  progname;
     int    depth;
     int    level;
+    double cutoff;
     double gamma;
     char*  sceneFilename;
     char*  outFilename;
@@ -66,6 +67,7 @@ void help( std::string progname )
     std::cout << "Command line options:" << std::endl;
     std::cout << "  -d, --depth DEPTH   Set the maximal depth (length) of any path (default 6)" << std::endl;
     std::cout << "  -l, --level LEVEL   Show only an exact level of the tree (unset by default)" << std::endl;
+    std::cout << "  -c, --cutoff LIMIT  Stop following Zones with less intensity than LIMIT (unset by default)" << std::endl;
     std::cout << "  -g, --gamma EXP     Set the exponent for post-mortem gamma correction (default 1.0)" << std::endl;
     std::cout << "  -o, --out FILENAME  Set the filename for the output image (default image.ppm)" << std::endl;
 #ifdef COMPILE_WITH_GUI
@@ -98,7 +100,7 @@ void version()
 void usage( std::string progname )
 {
     std::cerr << "usage: " << progname << " SCENE_FILENAME [-v|--verbose] [--depth MAX_DEPTH_OF_PATHS]" << std::endl;
-    std::cerr << "  [--level LEVEL] [--gamma GAMMA] [--out IMAGE_FILENAME]" << std::endl;
+    std::cerr << "  [--level LEVEL] [--cutoff LIMIT] [--gamma GAMMA] [--out IMAGE_FILENAME]" << std::endl;
 #ifdef COMPILE_WITH_GUI
     std::cerr << "  [--gui]" << std::endl;
 #endif
@@ -135,6 +137,14 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
                 usage( args->progname );
             args->level = atoi( argv[i] );
             if ( args->level < 0 )
+                usage( args->progname );
+        }
+        else if( !strcmp(argv[i], "-c") || !strcmp(argv[i], "--cutoff") )
+        {
+            if ( argc <= ++i )
+                usage( args->progname );
+            args->cutoff = atof( argv[i] );
+            if ( !args->cutoff < 0 )
                 usage( args->progname );
         }
         else if( !strcmp(argv[i], "-g") || !strcmp(argv[i], "--gamma") )
@@ -234,6 +244,7 @@ int main( int argc, char* argv[] )
     struct arguments args;
     args.depth           =  6;
     args.level           = -1;
+    args.cutoff          =  0;
     args.gamma           =  1;
     args.sceneFilename   = NULL;
     args.outFilename     = (char*)"image.ppm";
@@ -247,7 +258,7 @@ int main( int argc, char* argv[] )
     if( modeFlags.verbose )
     {
         std::cerr << "main: arguments: ";
-        std::cerr << "depth = " << args.depth << ", level = " << args.level << ", gamma = " << args.gamma;
+        std::cerr << "depth = " << args.depth << ", level = " << args.level << ", cutoff = " << args.cutoff << ", gamma = " << args.gamma;
 #ifdef COMPILE_WITH_GUI
         if( !args.gui )
 #endif
@@ -328,7 +339,7 @@ int main( int argc, char* argv[] )
             std::cerr << "main: creating GUI." << std::endl;
         GUI gui( camera );
         gui.initialize( &argc, argv );
-        gui.setup( args.depth, args.level, args.gamma, (int)(1000.0 / args.fps), args.hud, motions );
+        gui.setup( args.depth, args.level, args.cutoff, args.gamma, (int)(1000.0 / args.fps), args.hud, motions );
         atexit( &cleanup );
         if ( modeFlags.verbose )
             std::cerr << "main: starting the renderer." << std::endl;
@@ -357,7 +368,7 @@ int main( int argc, char* argv[] )
     std::srand( start );
     Renderer renderer( camera->getScene() );
     renderer.addCamera( camera );
-    renderer.render( 0, args.depth, args.level, args.gamma );
+    renderer.render( 0, args.depth, args.level, args.cutoff, args.gamma );
     if ( modeFlags.verbose )
     {
         const time_t end = std::time( NULL );

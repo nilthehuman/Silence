@@ -42,18 +42,18 @@ namespace Silence {
         cameras.erase( cameras.begin() + i );
     }
 
-    void Renderer::render( int /*time*/, int depth, int level, double gamma )
+    void Renderer::render( int /*time*/, int depth, int level, double cutoff, double gamma )
     {
         assert( !rendering );
         rendering = true;
         /* TODO: time control... */
-        buildZoneForest( 0, depth, level );
+        buildZoneForest( 0, depth, level, cutoff );
         rasterizeByZone(0, level, gamma);
         /*...*/
         rendering = false;
     }
 
-    void Renderer::buildZoneForest( int /*time*/, int depth, int level )
+    void Renderer::buildZoneForest( int /*time*/, int depth, int level, double cutoff )
     {
         if ( zoneForestReady )
             return;
@@ -72,6 +72,9 @@ namespace Silence {
                 std::vector< Tree<Zone>* > leaves = (*tree)->getLeaves();
                 for ( std::vector< Tree<Zone>* >::iterator leaf = leaves.begin(); leaf != leaves.end(); leaf++ )
                 {
+                    const Triplet& color = (*leaf)->getValue()->getLight().getColor();
+                    if ( color.x + color.y + color.z < cutoff )
+                        continue;
                     std::vector< Zone* > children = (*leaf)->getValue()->bounce();
                     for ( std::vector< Zone* >::iterator child = children.begin(); child != children.end(); child++ )
                     {
