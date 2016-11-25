@@ -247,7 +247,7 @@ int main( int argc, char* argv[] )
     if( modeFlags.verbose )
     {
         std::cerr << "main: arguments: ";
-        std::cerr << "depth = " << args.depth << "level = " << args.level << ", gamma = " << args.gamma;
+        std::cerr << "depth = " << args.depth << ", level = " << args.level << ", gamma = " << args.gamma;
 #ifdef COMPILE_WITH_GUI
         if( !args.gui )
 #endif
