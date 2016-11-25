@@ -67,7 +67,7 @@ namespace Silence {
         {
             (*tree)->getValue()->setNode( *tree );
             (*tree)->getValue()->occlude();
-            for ( int d = 1; d < depth && (-1 == level || d - 1 <= level); ++d )
+            for ( int d = 1; d < depth && (-1 == level || d - 1 < level); ++d )
             {
                 std::vector< Tree<Zone>* > leaves = (*tree)->getLeaves();
                 for ( std::vector< Tree<Zone>* >::iterator leaf = leaves.begin(); leaf != leaves.end(); leaf++ )
