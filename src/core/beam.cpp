@@ -68,12 +68,15 @@ namespace Silence {
     double Beam::getIntensity( const Ray& eyeray ) const
     {
         // WARNING: experimental code
+        // LightPoints are a special case, they normally can't be hit
+        const LightPoint* lightpoint = dynamic_cast<const LightPoint*>( source );
+        // Need to test if we hit the emitter at all first
+        const double sourceT = lightpoint ? (lightpoint->getPoint() - eyeray.getOrigin()).length() : source->intersect( eyeray );
+        if ( sourceT < EPSILON )
+            return 0;
         const Tree<Zone>* parent = zone->getNode()->getParent();
         if ( NULL == parent )
             return 1; // We are in a root Zone
-        const double sourceT = source->intersect( eyeray );
-        if ( sourceT < EPSILON )
-            return 0;
         const Vector sourcePoint = eyeray[ sourceT ];
         const Beam&  parentBeam  = (**parent).getLight();
         const ThingPart* part = dynamic_cast<const ThingPart*>( source );
