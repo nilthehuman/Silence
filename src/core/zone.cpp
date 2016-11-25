@@ -43,6 +43,10 @@ namespace Silence {
        std::vector< Zone* > newZones;
        for ( ThingIt thing = light.getScene()->thingsBegin(); thing != light.getScene()->thingsEnd(); thing++ )
            for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+           {
+               if ( Material::REFRACT != light.getKind() && (*part)->getParent() == light.getSource()->getParent() )
+                   continue; // Can't hit the same Thing twice in a row
+
                if ( hit(*part) && !eclipsed(*part) )
                {
                    const Thing* thing = static_cast<const Thing*>( (*part)->getParent() );
@@ -52,6 +56,7 @@ namespace Silence {
                        if ( !equal(0, thing->interact(Material::Interaction(i)) ) )
                            newBeams.push_back( (*part)->bounce(light, Material::Interaction(i)) );
                }
+           }
         for ( std::vector< Beam >::const_iterator beam = newBeams.begin(); beam != newBeams.end(); beam++ )
             newZones.push_back( new Zone(*beam, shadows) );
         return newZones;
