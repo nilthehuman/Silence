@@ -188,7 +188,9 @@ namespace Silence {
     bool ISphere::behind( const Surface* source ) const
     {
         // C++ lacks multi-dispatch. We make do with dynamic_cast instead
-        if      ( const ISphere*   sphere   = dynamic_cast<const ISphere*  >(source) )
+        if      ( const IPoint*    point    = dynamic_cast<const IPoint*   >(source) )
+            return (point->getPoint() - center).length() < radius + EPSILON;
+        else if ( const ISphere*   sphere   = dynamic_cast<const ISphere*  >(source) )
             return (sphere->center - center).length() + sphere->radius < radius + EPSILON;
         else if (                             dynamic_cast<const IPlane*   >(source) )
             return false;
@@ -305,7 +307,9 @@ namespace Silence {
     bool IPlane::behind( const Surface* source ) const
     {
         // C++ lacks multi-dispatch. We make do with dynamic_cast instead
-        if      ( const ISphere*   sphere   = dynamic_cast<const ISphere*  >(source) )
+        if      ( const IPoint*    point    = dynamic_cast<const IPoint*   >(source) )
+            return normal * point->getPoint() < offset + EPSILON;
+        else if ( const ISphere*   sphere   = dynamic_cast<const ISphere*  >(source) )
             return normal * sphere->getCenter() + sphere->getRadius() < offset + EPSILON;
         else if ( const IPlane*    plane    = dynamic_cast<const IPlane*   >(source) )
         {
@@ -427,7 +431,9 @@ namespace Silence {
         const Vector normal = ( points[1] - points[0] ).cross( points[2] - points[0] ).normalize();
         const double offset = normal * points[0];
         // C++ lacks multi-dispatch. We make do with dynamic_cast instead
-        if      ( const ISphere*   sphere   = dynamic_cast<const ISphere*  >(source) )
+        if      ( const IPoint*    point    = dynamic_cast<const IPoint*   >(source) )
+            return normal * point->getPoint() < offset + EPSILON;
+        else if ( const ISphere*   sphere   = dynamic_cast<const ISphere*  >(source) )
             return normal * sphere->getCenter() + sphere->getRadius() < offset + EPSILON;
         else if ( const IPlane*    plane    = dynamic_cast<const IPlane*   >(source) )
         {

@@ -200,6 +200,8 @@ namespace Silence {
         virtual Vector getNormal( const Vector& )  const { return Vector::Zero; }
         virtual bool   behind   ( const Surface* ) const { return false; }
 
+        const Vector&  getPoint() const { return point; }
+
     protected:
         IPoint( const Object* parent ) : Surface( parent ) { }
         IPoint( const Object* parent, const Vector& point )
