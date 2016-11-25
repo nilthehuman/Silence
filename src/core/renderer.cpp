@@ -83,7 +83,13 @@ namespace Silence {
         }
 
         if ( modeFlags.verbose )
+        {
             std::cerr << "done." << std::endl;
+            int totalCount = 0;
+            for ( ForestIt tree = zoneForest.begin(); tree != zoneForest.end(); tree++ )
+                totalCount += (*tree)->count();
+            std::cerr << "Renderer: created " << totalCount << " Zones total in " << zoneForest.size() << " Trees." << std::endl;
+        }
         zoneForestReady = true;
     }
 
