@@ -48,7 +48,7 @@ namespace Silence {
         rendering = true;
         /* TODO: time control... */
         buildZoneForest( 0, depth, level );
-        rasterize(0, level, gamma);
+        rasterizeByZone(0, level, gamma);
         /*...*/
         rendering = false;
     }
@@ -102,7 +102,17 @@ namespace Silence {
     }
 
     // Rasterize all Zones in zoneForest to each Camera
-    void Renderer::rasterize( int /*time*/, int level, double gamma )
+    // (Pixel by pixel method)
+    /*
+    void Renderer::rasterizeByPixel( int time, int level, double gamma )
+    {
+        TODO implement
+    }
+    */
+
+    // Rasterize all Zones in zoneForest to each Camera
+    // (Pixel by pixel method)
+    void Renderer::rasterizeByZone( int /*time*/, int level, double gamma )
     {
         assert( zoneForestReady );
         if ( modeFlags.verbose )

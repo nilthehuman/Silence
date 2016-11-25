@@ -56,7 +56,8 @@ namespace Silence {
         void buildZoneForest( int time, int depth, int level = -1 );
         void clearZoneForest();
 
-        void rasterize( int time, int level, double gamma );
+        void rasterizeByPixel( int time, int level, double gamma );
+        void rasterizeByZone ( int time, int level, double gamma );
 
     private:
         const Scene* const scene;
