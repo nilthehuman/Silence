@@ -62,14 +62,15 @@ namespace Silence {
                 delete *it;
         }
 
-        const Tree<T>* getParent() const { return parent; }
-        T*             getValue()        { return value; }
-        const T*       getValue()  const { return value; }
-        const T&       operator*() const { return *value; }
-        TreeIt         childrenBegin()   { return children.begin(); }
-        TreeIt         childrenEnd()     { return children.end();   }
-        TreeIt         leavesBegin()     { return leaves.begin();   }
-        TreeIt         leavesEnd()       { return leaves.end();     }
+        const Tree<T>* getParent()     const { return parent; }
+        T*             getValue()            { return value; }
+        const T*       getValue()      const { return value; }
+        const T&       operator*()     const { return *value; }
+        int            childrenCount() const { return children.size();  }
+        TreeIt         childrenBegin()       { return children.begin(); }
+        TreeIt         childrenEnd()         { return children.end();   }
+        TreeIt         leavesBegin()         { return leaves.begin();   }
+        TreeIt         leavesEnd()           { return leaves.end();     }
 
         std::vector< Tree<T>* > getLeaves() const { return leaves; }
 
@@ -78,6 +79,15 @@ namespace Silence {
             int count = 1;
             for ( typename std::vector< Tree<T>* >::const_iterator child = children.begin(); child != children.end(); ++child )
                 count += (*child)->count();
+            return count;
+        }
+        int leavesCount() const
+        {
+            if ( children.empty() )
+                return 1;
+            int count = 0;
+            for ( typename std::vector< Tree<T>* >::const_iterator child = children.begin(); child != children.end(); ++child )
+                count += (*child)->leavesCount();
             return count;
         }
         int height() const
@@ -90,6 +100,17 @@ namespace Silence {
                     height = childHeight + 1;
             }
             return height;
+        }
+        int maxBreadth() const
+        {
+            int breadth = childrenCount();
+            for ( typename std::vector< Tree<T>* >::const_iterator child = children.begin(); child != children.end(); ++child )
+            {
+                const int childBreadth = (*child)->maxBreadth();
+                if( breadth < childBreadth )
+                    breadth = childBreadth;
+            }
+            return breadth;
         }
         //int depth( const Tree<T>* node ) const;
 
