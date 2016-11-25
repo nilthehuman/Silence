@@ -115,7 +115,7 @@ namespace Silence {
         const std::vector< Vector > points = part->getPoints( light.getApex() );
         for ( std::vector< Vector >::const_iterator point = points.begin(); point != points.end(); point++ )
             if ( light.contains(*point) )
-                if ( !part->getParent()->isBackCulled() || !part->behind(light.getApex()) )
+                if ( !part->getParent()->isBackCulled() || !part->behind(light.getSource()) )
                     return true;
         return false;
     }

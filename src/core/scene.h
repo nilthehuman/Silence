@@ -86,9 +86,9 @@ namespace Silence {
     // Generic surface primitive class. This is what every lightsource and thing in the Scene needs to be able to do
     class Surface {
     public:
-        virtual double intersect( const Ray&    ray   ) const = 0; // Returns distance from Ray origin; a return value of zero will mean a miss
-        virtual Vector getNormal( const Vector& point ) const = 0; // Returns the outward pointing surface normal
-        virtual bool   behind   ( const Vector& point ) const = 0; // Is the point before the Surface or behind it?
+        virtual double intersect( const Ray&     ray    ) const = 0; // Returns distance from Ray origin; a return value of zero will mean a miss
+        virtual Vector getNormal( const Vector&  point  ) const = 0; // Returns the outward pointing surface normal
+        virtual bool   behind   ( const Surface* source ) const = 0; // Is the point before the Surface or behind it?
         virtual const BoundingBox     getBoundingBox( const Camera* camera    ) const = 0; // Returns 2D bounding box in screen space
         virtual std::vector< Vector > getPoints     ( const Vector& viewpoint ) const = 0; // Returns the "outline" of the shape from a given direction
         virtual void   move( const Vector& translation )      = 0; // Translate Surface by an arbitrary world space vector
@@ -196,9 +196,9 @@ namespace Silence {
 
     class IPoint : virtual public Surface {
     public:
-        virtual double intersect( const Ray& )    const { return 0; } // Cannot be hit
-        virtual Vector getNormal( const Vector& ) const { return Vector::Zero; }
-        virtual bool   behind   ( const Vector& ) const { return false; }
+        virtual double intersect( const Ray& )     const { return 0; } // Cannot be hit
+        virtual Vector getNormal( const Vector& )  const { return Vector::Zero; }
+        virtual bool   behind   ( const Surface* ) const { return false; }
 
     protected:
         IPoint( const Object* parent ) : Surface( parent ) { }
@@ -234,7 +234,10 @@ namespace Silence {
     public:
         virtual double intersect( const Ray& ray ) const;
         virtual Vector getNormal( const Vector& point ) const { return (point - center).normalize(); }
-        virtual bool   behind   ( const Vector& point ) const { return (point - center).length() < radius; }
+        virtual bool   behind   ( const Surface* source ) const;
+
+        const Vector&  getCenter() const { return center; }
+        double         getRadius() const { return radius; }
 
     protected:
         ISphere( const Object* parent ) : Surface( parent ) { }
@@ -285,7 +288,10 @@ namespace Silence {
     public:
         virtual double intersect( const Ray& ray ) const;
         virtual Vector getNormal( const Vector& ) const { return normal; }
-        virtual bool   behind   ( const Vector& point ) const { return normal * point < offset; }
+        virtual bool   behind   ( const Surface* source ) const;
+
+        const Vector&  getNormal() const { return normal; }
+        double         getOffset() const { return offset; }
 
     protected:
         IPlane( const Object* parent ) : Surface( parent ) { }
@@ -349,11 +355,7 @@ namespace Silence {
             Vector edge1 = this->points[2] - this->points[0];
             return edge0.cross( edge1 ).normalize();
         }
-        virtual bool behind( const Vector& point ) const
-        {
-            const Vector normal = getNormal( Vector::Zero );
-            return normal * point < normal * points[0];
-        }
+        virtual bool behind( const Surface* source ) const;
 
         virtual const BoundingBox getBoundingBox( const Camera* camera    ) const;
         std::vector< Vector >     getPoints     ( const Vector& viewpoint ) const;

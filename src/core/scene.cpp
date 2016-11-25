@@ -185,6 +185,25 @@ namespace Silence {
         out.push_back( new Tree<Zone>(zone) );
     }
 
+    bool ISphere::behind( const Surface* source ) const
+    {
+        // C++ lacks multi-dispatch. We make do with dynamic_cast instead
+        if      ( const ISphere*   sphere   = dynamic_cast<const ISphere*  >(source) )
+            return (sphere->center - center).length() + sphere->radius < radius + EPSILON;
+        else if (                             dynamic_cast<const IPlane*   >(source) )
+            return false;
+        else if ( const ITriangle* triangle = dynamic_cast<const ITriangle*>(source) )
+        {
+            const std::vector< Vector > points = triangle->getPoints( Vector::Zero );
+            for ( int i = 0; i < 3; ++i )
+                if ( radius + EPSILON < (points[i] - center).length() )
+                    return false;
+            return true;
+        }
+        else
+            assert( false );
+    }
+
     const BoundingBox ISphere::getBoundingBox( const Camera* camera ) const
     {
         const Vector normal = (center - camera->getViewpoint()).normalize();
@@ -283,6 +302,32 @@ namespace Silence {
         out.push_back( new Tree<Zone>(zone) );
     }
 
+    bool IPlane::behind( const Surface* source ) const
+    {
+        // C++ lacks multi-dispatch. We make do with dynamic_cast instead
+        if      ( const ISphere*   sphere   = dynamic_cast<const ISphere*  >(source) )
+            return normal * sphere->getCenter() + sphere->getRadius() < offset + EPSILON;
+        else if ( const IPlane*    plane    = dynamic_cast<const IPlane*   >(source) )
+        {
+            if      ( normal ==  plane->normal )
+                return  plane->offset < offset + EPSILON;
+            else if ( normal == -plane->normal )
+                return -plane->offset < offset + EPSILON;
+            else
+                return false;
+        }
+        else if ( const ITriangle* triangle = dynamic_cast<const ITriangle*>(source) )
+        {
+            const std::vector< Vector > points = triangle->getPoints( Vector::Zero );
+            for ( int i = 0; i < 3; ++i )
+                if ( offset + EPSILON < normal * points[i] )
+                    return false;
+            return true;
+        }
+        else
+            assert( false );
+    }
+
     const BoundingBox IPlane::getBoundingBox( const Camera* camera ) const
     {
         const ScreenPoint topLeft( 0, 0 );
@@ -375,6 +420,34 @@ namespace Silence {
             Zone* down = new Zone( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, -normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
             out.push_back( new Tree<Zone>(down) );
         }
+    }
+
+    bool ITriangle::behind( const Surface* source ) const
+    {
+        const Vector normal = ( points[1] - points[0] ).cross( points[2] - points[0] ).normalize();
+        const double offset = normal * points[0];
+        // C++ lacks multi-dispatch. We make do with dynamic_cast instead
+        if      ( const ISphere*   sphere   = dynamic_cast<const ISphere*  >(source) )
+            return normal * sphere->getCenter() + sphere->getRadius() < offset + EPSILON;
+        else if ( const IPlane*    plane    = dynamic_cast<const IPlane*   >(source) )
+        {
+            if      ( normal ==  plane->getNormal() )
+                return  plane->getOffset() < offset + EPSILON;
+            else if ( normal == -plane->getNormal() )
+                return -plane->getOffset() < offset + EPSILON;
+            else
+                return false;
+        }
+        else if ( const ITriangle* triangle = dynamic_cast<const ITriangle*>(source) )
+        {
+            const std::vector< Vector > points = triangle->getPoints( Vector::Zero );
+            for ( int i = 0; i < 3; ++i )
+                if ( offset + EPSILON < normal * points[i] )
+                    return false;
+            return true;
+        }
+        else
+            assert( false );
     }
 
     const BoundingBox ITriangle::getBoundingBox( const Camera* camera ) const

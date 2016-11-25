@@ -80,11 +80,12 @@ namespace Silence {
         ~Beam()
         { }
 
-        const   Scene*              getScene()        const { return scene; }
-        const   Vector&             getApex()         const { return apex;  }
-        const   Ray&                getPivot()        const { return pivot; }
-        const   std::vector< Ray >& getEdges()        const { return edges; }
-        const   Triplet&            getColor()        const { return color; }
+        const   Scene*              getScene()        const { return scene;  }
+        const   Vector&             getApex()         const { return apex;   }
+        const   Surface*            getSource()       const { return source; }
+        const   Ray&                getPivot()        const { return pivot;  }
+        const   std::vector< Ray >& getEdges()        const { return edges;  }
+        const   Triplet&            getColor()        const { return color;  }
                 Distribution        getDistribution() const { return distribution; }
 
         bool    contains    ( const Vector& point ) const;
