@@ -222,8 +222,8 @@ void parseArgs( int argc, char* argv[], struct arguments* args )
 #endif
     if( args->depth - 1 < args->level )
     {
-        std::cerr << "You requested to see --level " << args->level << " of the render but --depth is set to " << args->depth << "." << std::endl;
-        std::cerr << "(Note that levels start at 0.)" << std::endl;
+        std::cerr << "main: you requested to see --level " << args->level << " of the render but --depth is set to " << args->depth << "." << std::endl;
+        std::cerr << "main: (Note that levels start at 0.)" << std::endl;
         usage( args->progname );
     }
 }
