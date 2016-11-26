@@ -84,7 +84,7 @@ namespace Silence {
         Vector nextDirection;
         switch ( kind )
         {
-            case Material::DIFFUSE:  nextDirection = parentBeam.getApex() - sourcePoint; break;
+            case Material::DIFFUSE:  nextDirection = parentBeam.getPivot().getOrigin() - sourcePoint; break;
             case Material::METALLIC: nextDirection = eyeray.bounceMetallic( part, sourcePoint ).getDirection(); break;
             case Material::REFLECT:  nextDirection = eyeray.bounceReflect ( part, sourcePoint ).getDirection(); break;
             case Material::REFRACT:  nextDirection = eyeray.bounceRefract ( part, sourcePoint ).getDirection(); break;
