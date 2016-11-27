@@ -58,8 +58,12 @@ namespace Silence {
                    // WARNING: Experimental stuff.
                    // Spawn a separate Zone for each type of Material the Thing has
                    for ( int i = 0; i <= Material::REFRACT; i++ )
+                   {
+                       if ( (Material::METALLIC == light.getKind() || Material::REFLECT == light.getKind()) && Material::DIFFUSE == i )
+                           continue; // A "reasonable hack". Mirrors contribute extremely little to the illumination of diffuse surfaces
                        if ( !equal(0, thing->interact(Material::Interaction(i)) ) )
                            newBeams.push_back( (*part)->bounce(light, Material::Interaction(i)) );
+                   }
                }
            }
         for ( std::vector< Beam >::const_iterator beam = newBeams.begin(); beam != newBeams.end(); beam++ )
