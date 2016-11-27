@@ -44,8 +44,13 @@ namespace Silence {
        for ( ThingIt thing = light.getScene()->thingsBegin(); thing != light.getScene()->thingsEnd(); thing++ )
            for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
            {
-               if ( Material::REFRACT != light.getKind() && (*part)->getParent() == light.getSource()->getParent() )
-                   continue; // Can't hit the same Thing twice in a row
+               if ( Material::REFRACT == light.getKind() )
+               {
+                   if ( (*part)->getParent() != light.getSource()->getParent() )
+                       continue; // Need to hit the same Thing again
+               }
+               else if ( (*part) == light.getSource() )
+                   continue; // Can't hit the same ThingPart twice in a row
 
                if ( hit(*part) && !eclipsed(*part) )
                {
