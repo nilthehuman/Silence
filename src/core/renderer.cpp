@@ -73,7 +73,7 @@ namespace Silence {
                 for ( std::vector< Tree<Zone>* >::iterator leaf = leaves.begin(); leaf != leaves.end(); leaf++ )
                 {
                     const Triplet& color = (*leaf)->getValue()->getLight().getColor();
-                    if ( color.x + color.y + color.z < cutoff )
+                    if ( color.x + color.y + color.z <= max(0, cutoff) )
                         continue;
                     std::vector< Zone* > children = (*leaf)->getValue()->bounce();
                     for ( std::vector< Zone* >::iterator child = children.begin(); child != children.end(); child++ )
