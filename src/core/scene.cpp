@@ -236,7 +236,7 @@ namespace Silence {
         return points;
     }
 
-    double Sphere::getTilt( const Vector& ) const
+    double Sphere::getTilt( const Vector&, const Beam& ) const
     {
         return 1;
     }
@@ -355,9 +355,12 @@ namespace Silence {
         return points;
     }
 
-    double Plane::getTilt( const Vector& direction ) const
+    double Plane::getTilt( const Vector& point, const Beam& parentBeam ) const
     {
-        return abs( normal * direction.normalized() );
+        if ( const IPlane* plane = dynamic_cast<const IPlane*>(parentBeam.getSource()) )
+            return 0.5 + 0.5 * (normal * plane->getNormal());
+        else
+            return abs( normal * (point - parentBeam.getApex()).normalized() );
     }
 
     Vector Plane::mirror( const Vector& point ) const
@@ -478,10 +481,16 @@ namespace Silence {
         return pointsVector;
     }
 
-    double Triangle::getTilt( const Vector& direction ) const
+    double Triangle::getTilt( const Vector& point, const Beam& parentBeam ) const
     {
         const Vector normal = ( points[1] - points[0] ).cross( points[2] - points[0] ).normalize();
-        return abs( normal * direction.normalized() );
+        if ( const IPlane* plane = dynamic_cast<const IPlane*>(parentBeam.getSource()) )
+        {
+            std::cout << "tilt = " << 0.5 + 0.5 * (normal * plane->getNormal()) << std::endl;
+            return 0.5 + 0.5 * (normal * plane->getNormal());
+        }
+        else
+            return abs( normal * (point - parentBeam.getApex()).normalized() );
     }
 
     Vector Triangle::mirror( const Vector& point ) const
@@ -539,6 +548,7 @@ namespace Silence {
                       newColor, newDistribution, interaction );
         return newBeam;
     }
+
     void LightTriangle::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
