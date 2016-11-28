@@ -465,10 +465,10 @@ namespace Silence {
         const ScreenPoint screenpoint0 = camera->project( points[0] );
         const ScreenPoint screenpoint1 = camera->project( points[1] );
         const ScreenPoint screenpoint2 = camera->project( points[2] );
-        const int minCol = min( min(screenpoint0.col, screenpoint1.col), screenpoint2.col ) - 1;
-        const int minRow = min( min(screenpoint0.row, screenpoint1.row), screenpoint2.row ) - 1;
-        const int maxCol = max( max(screenpoint0.col, screenpoint1.col), screenpoint2.col ) + 1;
-        const int maxRow = max( max(screenpoint0.row, screenpoint1.row), screenpoint2.row ) + 1;
+        const int minCol = min( min(screenpoint0.col, screenpoint1.col), screenpoint2.col ) - 2;
+        const int minRow = min( min(screenpoint0.row, screenpoint1.row), screenpoint2.row ) - 2;
+        const int maxCol = max( max(screenpoint0.col, screenpoint1.col), screenpoint2.col ) + 2;
+        const int maxRow = max( max(screenpoint0.row, screenpoint1.row), screenpoint2.row ) + 2;
         return BoundingBox( ScreenPoint(minCol, minRow), ScreenPoint(maxCol, maxRow) );
     }
 
