@@ -124,7 +124,6 @@ namespace Silence {
 
     bool Zone::hit( const ThingPart* part ) const
     {
-        // Temporary solution.
         // TODO: accurate algorithm for narrow Beams.
         const std::vector< Vector > points = part->getPoints( light.getApex() );
         for ( std::vector< Vector >::const_iterator point = points.begin(); point != points.end(); point++ )
