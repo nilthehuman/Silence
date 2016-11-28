@@ -368,7 +368,8 @@ namespace Silence {
 
     Beam Plane::bounce( const Beam& beam, const Material::Interaction& interaction ) const
     {
-        const Ray adjustedPivot( beam.getScene(), adjustedPivot.getDirection(), -normal );
+        const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(),
+                                -normal + beam.getPivot().getDirection()*TANPIOVER6 );
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
 
@@ -381,7 +382,7 @@ namespace Silence {
         {
             case Material::DIFFUSE:
                 newApex  = mirror( beam.getApex() );
-                newPivot = new Ray( beam.getScene(), hitPoint, getNormal(hitPoint) );
+                newPivot = new Ray( beam.getScene(), hitPoint, normal );
                 newDistribution = Beam::Uniform;
                 break;
             case Material::METALLIC:

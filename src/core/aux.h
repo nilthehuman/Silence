@@ -29,12 +29,13 @@ namespace Silence {
         bool verbose;
     } modeFlags;
 
-    const double EPSILON  = 10e-10; // Ballpark values, tune later
-    const double INF      = 10e+10;
+    const double EPSILON    = 10e-10; // Ballpark values, tune later
+    const double INF        = 10e+10;
 
-    const double UNITDIST = 10; // Points at this distance from a Light receive 1.0 times its intensity
+    const double UNITDIST   = 10; // Points at this distance from a Light receive 1.0 times its intensity
 
-    const double PI       = 3.141592654;
+    const double PI         = 3.141592654;
+    const double TANPIOVER6 = 0.57735;
 
     inline double  abs( double x )           { return x < 0 ? -x : x; }
     inline double sign( double x )           { return x < 0 ? -1 : x == 0 ? 0 : 1; }
