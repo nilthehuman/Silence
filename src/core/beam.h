@@ -62,12 +62,13 @@ namespace Silence {
         }
 
         Beam( const Scene* scene,
-              const Vector& apex, const Surface* source, const Ray& pivot, const std::vector< Ray >& edges,
+              const Vector& apex, const Surface* source, const Thing* medium, const Ray& pivot, const std::vector< Ray >& edges,
               const Triplet& color, Distribution distribution, Material::Interaction kind = Material::DIFFUSE )
             : scene( scene )
             , zone( NULL ) // To be set later
             , apex( apex )
             , source( source )
+            , medium( medium )
             , pivot( pivot )
             , edges( edges )
             , color( color )
@@ -83,6 +84,7 @@ namespace Silence {
         const   Scene*                getScene()        const { return scene;  }
         const   Vector&               getApex()         const { return apex;   }
         const   Surface*              getSource()       const { return source; }
+        const   Thing*                getMedium()       const { return medium; }
         const   Ray&                  getPivot()        const { return pivot;  }
         const   std::vector< Ray >&   getEdges()        const { return edges;  }
         const   Triplet&              getColor()        const { return color;  }
@@ -112,6 +114,7 @@ namespace Silence {
 
         Vector                apex;   // The point where all Rays meet
         const Surface*        source; // The Surface the Beam emanates from
+        const Thing*          medium; // The Thing the Beam travels inside (if any)
         Ray                   pivot;  // A representative Ray
         std::vector< Ray >    edges;  // Rays to mark Beam boundaries
         Triplet               color;  // Current color of pivot Ray (may change with each bounce)

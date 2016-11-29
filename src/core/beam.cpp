@@ -173,7 +173,6 @@ namespace Silence {
 
     double Beam::fresnelIntensity( const Ray& eyeray, const Vector& point ) const
     {
-        const Thing* medium = zone->getMedium();
         double n1, n2;
         if ( medium )
         {

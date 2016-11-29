@@ -181,7 +181,7 @@ namespace Silence {
     void LightPoint::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
-        Zone* zone = new Zone( Beam(scene, point, (Surface*)this, Ray(scene, point, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
+        Zone* zone = new Zone( Beam(scene, point, (Surface*)this, NULL, Ray(scene, point, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
         out.push_back( new Tree<Zone>(zone) );
     }
 
@@ -253,10 +253,11 @@ namespace Silence {
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
 
-        Vector             newApex  = Vector::Invalid;
-        const Ray*         newPivot = NULL;
+        Vector             newApex   = Vector::Invalid;
+        const Thing*       newMedium = beam.getMedium();
+        const Ray*         newPivot  = NULL;
         std::vector< Ray > newEdges;
-        const Triplet      newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
+        const Triplet      newColor  = beam.getColor() * thing->getColor() * thing->interact( interaction );
         Beam::Distribution newDistribution;
         switch ( interaction )
         {
@@ -284,6 +285,10 @@ namespace Silence {
             case Material::REFRACT:
                 newApex  = beam.getApex();
                 newPivot = new Ray( adjustedPivot.bounceRefract(this, hitPoint) );
+                if      ( !newMedium && getNormal(hitPoint) * newPivot->getDirection() < 0 )
+                    newMedium = static_cast<const Thing*>( parent ); // Beam entering refractive Thing
+                else if (  newMedium && getNormal(hitPoint) * newPivot->getDirection() > 0 )
+                    newMedium = NULL; // Beam leaving refractive Thing
                 for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
                     newEdges.push_back( e->bounceRefract(this) );
                 newDistribution = beam.getDistribution();
@@ -292,7 +297,7 @@ namespace Silence {
                 assert( false );
         }
         Beam newBeam( beam.getScene(),
-                      newApex, this, *newPivot, newEdges,
+                      newApex, this, newMedium, *newPivot, newEdges,
                       newColor, newDistribution, interaction );
         return newBeam;
     }
@@ -300,7 +305,7 @@ namespace Silence {
     void LightSphere::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
-        Zone* zone = new Zone( Beam(scene, center, (Surface*)this, Ray(scene, center, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
+        Zone* zone = new Zone( Beam(scene, center, (Surface*)this, NULL, Ray(scene, center, Vector::Zero), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Spherical) );
         out.push_back( new Tree<Zone>(zone) );
     }
 
@@ -376,10 +381,11 @@ namespace Silence {
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
 
-        Vector             newApex  = Vector::Invalid;
-        const Ray*         newPivot = NULL;
+        Vector             newApex   = Vector::Invalid;
+        const Thing*       newMedium = beam.getMedium();
+        const Ray*         newPivot  = NULL;
         std::vector< Ray > newEdges;
-        const Triplet      newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
+        const Triplet      newColor  = beam.getColor() * thing->getColor() * thing->interact( interaction );
         Beam::Distribution newDistribution;
         switch ( interaction )
         {
@@ -405,6 +411,10 @@ namespace Silence {
             case Material::REFRACT:
                 newApex  = beam.getApex();
                 newPivot = new Ray( adjustedPivot.bounceRefract(this, hitPoint) );
+                if      ( !newMedium && getNormal(hitPoint) * newPivot->getDirection() < 0 )
+                    newMedium = static_cast<const Thing*>( parent ); // Beam entering refractive Thing
+                else if (  newMedium && getNormal(hitPoint) * newPivot->getDirection() > 0 )
+                    newMedium = NULL; // Beam leaving refractive Thing
                 for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
                     newEdges.push_back( e->bounceRefract(this) );
                 newDistribution = beam.getDistribution();
@@ -413,7 +423,7 @@ namespace Silence {
                 assert( false );
         }
         Beam newBeam( beam.getScene(),
-                      newApex, this, *newPivot, newEdges,
+                      newApex, this, NULL, *newPivot, newEdges,
                       newColor, newDistribution, interaction );
         return newBeam;
     }
@@ -421,11 +431,11 @@ namespace Silence {
     void LightPlane::emitZones( std::vector< Tree<Zone>* >& out ) const
     {
         const Scene* scene = parent->getScene();
-        Zone* up = new Zone( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
+        Zone* up = new Zone( Beam( scene, normal*offset, (Surface*)this, NULL, Ray(scene, normal*offset, normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
         out.push_back( new Tree<Zone>(up) );
         if ( !parent->isBackCulled() )
         {
-            Zone* down = new Zone( Beam( scene, normal*offset, (Surface*)this, Ray(scene, normal*offset, -normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
+            Zone* down = new Zone( Beam( scene, normal*offset, (Surface*)this, NULL, Ray(scene, normal*offset, -normal), std::vector<Ray>(), ((Light*)parent)->getEmission(), &Beam::Uniform ) );
             out.push_back( new Tree<Zone>(down) );
         }
     }
@@ -508,6 +518,7 @@ namespace Silence {
         const Thing* thing = static_cast<const Thing*>( parent );
 
         Vector             newApex  = Vector::Invalid;
+        const Thing*       newMedium = beam.getMedium();
         const Ray*         newPivot = NULL;
         std::vector< Ray > newEdges;
         const Triplet      newColor = beam.getColor() * thing->getColor() * thing->interact( interaction );
@@ -536,6 +547,10 @@ namespace Silence {
             case Material::REFRACT:
                 newApex  = beam.getApex();
                 newPivot = new Ray( adjustedPivot.bounceRefract(this, hitPoint) );
+                if      ( !newMedium && getNormal(hitPoint) * newPivot->getDirection() < 0 )
+                    newMedium = static_cast<const Thing*>( parent ); // Beam entering refractive Thing
+                else if (  newMedium && getNormal(hitPoint) * newPivot->getDirection() > 0 )
+                    newMedium = NULL; // Beam leaving refractive Thing
                 for ( std::vector< Ray >::const_iterator e = beam.getEdges().begin(); e != beam.getEdges().end(); e++ )
                     newEdges.push_back( e->bounceRefract(this) );
                 newDistribution = beam.getDistribution();
@@ -544,7 +559,7 @@ namespace Silence {
                 assert( false );
         }
         Beam newBeam( beam.getScene(),
-                      newApex, this, *newPivot, newEdges,
+                      newApex, this, newMedium, *newPivot, newEdges,
                       newColor, newDistribution, interaction );
         return newBeam;
     }
@@ -560,7 +575,7 @@ namespace Silence {
         edges.push_back( Ray(scene, points[0], points[0]-apex) );
         edges.push_back( Ray(scene, points[1], points[1]-apex) );
         edges.push_back( Ray(scene, points[2], points[2]-apex) );
-        Zone* up = new Zone( Beam(scene, apex, (Surface*)this, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Planar) );
+        Zone* up = new Zone( Beam(scene, apex, (Surface*)this, NULL, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Planar) );
         out.push_back( new Tree<Zone>(up) );
         if ( !parent->isBackCulled() )
         {
@@ -568,7 +583,7 @@ namespace Silence {
             edges.push_back( Ray(scene, points[0], points[0]-apex) );
             edges.push_back( Ray(scene, points[1], points[1]-apex) );
             edges.push_back( Ray(scene, points[2], points[2]-apex) );
-            Zone* down = new Zone( Beam(scene, apex, (Surface*)this, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Planar) );
+            Zone* down = new Zone( Beam(scene, apex, (Surface*)this, NULL, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Planar) );
             out.push_back( new Tree<Zone>(down) );
         }
     }

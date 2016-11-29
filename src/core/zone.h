@@ -39,15 +39,13 @@ namespace Silence {
             : node( NULL ) // To be set later
             , light( light )
             , shadows()
-            , medium( NULL )
         {
             this->light.setZone( this );
         }
-        Zone( const Beam& light, const std::vector< Shadow >& shadows, const Thing* medium = NULL )
+        Zone( const Beam& light, const std::vector< Shadow >& shadows )
             : node( NULL ) // To be set later
             , light( light )
             , shadows( shadows )
-            , medium( medium )
         {
             this->light.setZone( this );
         }
@@ -57,7 +55,6 @@ namespace Silence {
 
         const Tree<Zone>*    getNode()   const { return node; }
         const Beam&          getLight()  const { return light; }
-        const Thing*         getMedium() const { return medium; }
 
         void                 occlude(); // Generate Shadow beams
         std::vector< Zone* > bounce();  // Generate child Zones
@@ -79,8 +76,6 @@ namespace Silence {
 
         Beam light; // Only a single light Beam per Zone is allowed
         std::vector< Shadow > shadows;
-
-        const Thing* medium; // The Thing the Zone travels inside (if any)
     };
 
 }
