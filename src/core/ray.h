@@ -38,7 +38,7 @@ namespace Silence {
         Ray( const Scene* scene, const Vector& origin, const Vector& direction, const Thing* medium = NULL )
             : scene( scene )
             , origin( origin )
-            , direction( direction.normalized() )
+            , direction( Vector::Zero == direction ? direction : direction.normalized() )
             , medium( medium )
         {
             assert( scene || (Vector::Invalid == origin && Vector::Invalid == direction) );
