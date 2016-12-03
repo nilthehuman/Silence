@@ -81,16 +81,18 @@ namespace Silence {
         const Beam&  parentBeam  = (**parent).getLight();
         const ThingPart* part = dynamic_cast<const ThingPart*>( source );
         assert( part );
-        Vector nextDirection;
+        Vector       nextDirection;
+        const Thing* nextMedium = NULL;
         switch ( kind )
         {
             case Material::DIFFUSE:  nextDirection = parentBeam.getPivot().getOrigin() - sourcePoint; break;
             case Material::METALLIC: nextDirection = eyeray.bounceMetallic( part, sourcePoint ).getDirection(); break;
             case Material::REFLECT:  nextDirection = eyeray.bounceReflect ( part, sourcePoint ).getDirection(); break;
-            case Material::REFRACT:  nextDirection = eyeray.bounceRefract ( part, sourcePoint ).getDirection(); break;
+            case Material::REFRACT:  nextDirection = eyeray.bounceRefract ( part, sourcePoint ).getDirection();
+                                     if ( !medium ) nextMedium = parentBeam.getMedium(); break;
             default: assert( false );
         }
-        Ray nextEyeray( scene, sourcePoint, nextDirection );
+        Ray nextEyeray( scene, sourcePoint, nextDirection, nextMedium );
         const double diffuseTerm = Material::DIFFUSE  == kind ? (*parentBeam.distribution)( parentBeam.pivot, nextEyeray.getOrigin() ) : 1;
         const double    tiltTerm = Material::DIFFUSE  == kind ? part->getTilt( sourcePoint, parentBeam ) : 1; // cos(angle of receiving surface)
         const double fresnelTerm = Material::METALLIC == kind ? fresnelIntensity( eyeray ) : 1;
