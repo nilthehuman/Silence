@@ -31,6 +31,12 @@ namespace Silence {
 
     const Ray Ray::Invalid = Ray( NULL, Vector::Invalid, Vector::Invalid );
 
+    std::ostream& operator<<( std::ostream& os, const Ray& ray )
+    {
+        os << ray.origin << " -> " << ray.direction;
+        return os;
+    }
+
     Ray Ray::bounceDiffuse( const ThingPart* part, const Vector& point ) const
     {
         assert( part );
@@ -92,6 +98,7 @@ namespace Silence {
             hitPoint = point;
         else
         {
+            // Take it upon ourselves to find the contact point
             const double t = part->intersect( *this );
             if ( equal(0, t) )
                 return Ray::Invalid;

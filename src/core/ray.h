@@ -46,6 +46,8 @@ namespace Silence {
 
         static const Ray Invalid;
 
+        friend std::ostream& operator<<( std::ostream& os, const Ray& ray );
+
         const Vector& getOrigin()     const { return origin; }
         const Vector& getDirection()  const { return direction; }
 
