@@ -43,20 +43,29 @@ namespace Silence {
     public:
         typedef double (*Distribution)( const Ray& pivot, const Vector& point );
 
+        // A default distribution for Shadows
+        static double Zero( const Ray&, const Vector& )
+        {
+            return 0;
+        }
+        // This is what an infinite glowing Plane will look like
         static double Uniform( const Ray& pivot, const Vector& point )
         {
             const double distance = pivot.getDirection() * point - pivot.getDirection() * pivot.getOrigin();
             return UNITDIST * UNITDIST / ( distance * distance );
         }
+        // This is what a glowing Sphere will look like
         static double Spherical( const Ray& pivot, const Vector& point )
         {
             const double distance = (point - pivot.getOrigin()).length();
             return UNITDIST * UNITDIST / ( distance * distance );
         }
+        // This is what a glowing Triangle will look like
         static double Planar( const Ray& pivot, const Vector& point )
         {
             const Vector toPoint  = point - pivot.getOrigin();
             const double distance = toPoint.length();
+            // The more edge-on you look at the source the less intensity you get
             const double cosine   = pivot.getDirection() * toPoint.normalized();
             return cosine * UNITDIST * UNITDIST / ( distance * distance );
         }
@@ -91,12 +100,10 @@ namespace Silence {
                 Distribution          getDistribution() const { return distribution; }
                 Material::Interaction getKind()         const { return kind;   }
 
+        // Phase Two
         bool    contains    ( const Vector& point ) const;
         Triplet getColor    ( const Ray&   eyeray ) const;
-        double  getIntensity( const Ray&   eyeray ) const;
         void    rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* buffer, double* skyBlocked ) const;
-
-        void    occlude(); // Figure out what ThingParts obstruct the Beam
 
     private:
         void    setZone( const Zone* z ) { zone = z; }

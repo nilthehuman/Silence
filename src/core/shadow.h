@@ -32,7 +32,11 @@ namespace Silence {
         Shadow( const Beam& umbra, const Beam& penumbra )
             : umbra( umbra )
             , penumbra( penumbra )
-        { }
+        {
+            assert( umbra.getSource() == penumbra.getSource() );
+        }
+
+        const Surface* getSource() const { return umbra.getSource(); }
 
         double occluded( const Vector& point ) const;
 

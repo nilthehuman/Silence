@@ -62,43 +62,7 @@ namespace Silence {
     {
         if ( !contains(eyeray.getOrigin()) )
             return RGB::Black;
-        return color * getIntensity( eyeray );
-    }
-
-    // Walk back up the Zone tree to see how much light is radiated in the viewing direction
-    double Beam::getIntensity( const Ray& eyeray ) const
-    {
-        // LightPoints are a special case, they normally can't be hit
-        const LightPoint* lightpoint = dynamic_cast<const LightPoint*>( source );
-        // Need to test if we hit the emitter at all first
-        const double sourceT = lightpoint ? (lightpoint->getPoint() - eyeray.getOrigin()).length() : source->intersect( eyeray );
-        if ( sourceT < EPSILON )
-            return 0; // No hit
-        const Tree<Zone>* parent = zone->getNode()->getParent();
-        if ( NULL == parent )
-            return 1; // We are in a root Zone
-        const Vector sourcePoint = eyeray[ sourceT ];
-        const Beam&  parentBeam  = (**parent).getLight();
-        const ThingPart* part = dynamic_cast<const ThingPart*>( source );
-        assert( part );
-        Vector       nextDirection;
-        const Thing* nextMedium = NULL;
-        switch ( kind )
-        {
-            case Material::DIFFUSE:  nextDirection = parentBeam.getPivot().getOrigin() - sourcePoint; break;
-            case Material::METALLIC: nextDirection = eyeray.bounceMetallic( part, sourcePoint ).getDirection(); break;
-            case Material::REFLECT:  nextDirection = eyeray.bounceReflect ( part, sourcePoint ).getDirection(); break;
-            case Material::REFRACT:  nextDirection = eyeray.bounceRefract ( part, sourcePoint ).getDirection();
-                                     if ( !medium ) nextMedium = parentBeam.getMedium(); break;
-            default: assert( false );
-        }
-        Ray nextEyeray( scene, sourcePoint, nextDirection, nextMedium );
-        const double diffuseTerm = Material::DIFFUSE  == kind ? (*parentBeam.distribution)( parentBeam.pivot, nextEyeray.getOrigin() ) : 1;
-        const double    tiltTerm = Material::DIFFUSE  == kind ? part->getTilt( sourcePoint, parentBeam ) : 1; // cos(angle of receiving surface)
-        const double fresnelTerm = Material::METALLIC == kind ? fresnelIntensity( eyeray ) : 1;
-        // Recursion
-        const double aggregateIntensity = parentBeam.getIntensity( nextEyeray ) * diffuseTerm * tiltTerm * fresnelTerm;
-        return aggregateIntensity;
+        return color * zone->getIntensity( NULL, eyeray );
     }
 
     void Beam::rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* pixelBuffer, double* skyBlocked ) const
@@ -166,11 +130,6 @@ namespace Silence {
                 skyBlocked [col] = 1 - transparency;
             }
         }
-    }
-
-    void Beam::occlude()
-    {
-        // TODO
     }
 
     double Beam::fresnelIntensity( const Ray& eyeray, const Vector& point ) const

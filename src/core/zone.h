@@ -56,18 +56,22 @@ namespace Silence {
         const Tree<Zone>*    getNode()   const { return node; }
         const Beam&          getLight()  const { return light; }
 
-        void                 occlude(); // Generate Shadow beams
-        std::vector< Zone* > bounce();  // Generate child Zones
+        // Phase One
+        void                 occlude( const Surface* surface ); // Generate Shadow beams
+        std::vector< Zone* > bounce();                          // Generate child Zones
 
-        void rasterize( Camera* camera ) const;
+        // Phase Two
+        int    rasterize   ( Camera*    camera ) const; // Returs the number of paths used
+        double getIntensity( const Surface* surface, const Ray& eyeray ) const;
+        double occluded    ( const Surface* surface, const Vector& point, bool background = true ) const;
 
     private:
         void setNode( const Tree<Zone>* n ) { node = n; }
 
         friend class Renderer;
 
-        bool hit     ( const ThingPart* part ) const; // Is a surface element reached by the light?
-        bool eclipsed( const ThingPart* part ) const; // Is a surface element completely obscured?
+        bool hit     ( const Surface* Surface ) const; // Is a surface element reached by the light?
+        bool eclipsed( const Surface* surface ) const; // Is a surface element completely obscured?
 
         void rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* pixelBuffer, double* skyBlocked ) const;
 
