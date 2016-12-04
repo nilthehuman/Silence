@@ -58,6 +58,8 @@ namespace Silence {
         Ray    bounceReflect ( const ThingPart* part, const Vector& point = Vector::Invalid ) const;
         Ray    bounceRefract ( const ThingPart* part, const Vector& point = Vector::Invalid ) const;
 
+        double findNearestIntersection();
+
     private:
         const Scene* const scene;
 

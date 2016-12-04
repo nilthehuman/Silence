@@ -133,5 +133,30 @@ namespace Silence {
         return Ray( scene, hitPoint, newDirection );
     }
 
+    double Ray::findNearestIntersection()
+    {
+        double nearestT = INF;
+        double t        = INF;
+
+        // Check foreground Surfaces
+        for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
+            if ( (*thing)->isBackground() == false )
+                for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                    if ( (t = (*part)->intersect(*this)) && t < nearestT )
+                        nearestT = t;
+
+        if ( !equal(nearestT, INF) )
+            return nearestT;
+
+        // Check background Surfaces
+        for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
+            if ( (*thing)->isBackground() == true )
+                for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
+                    if ( (t = (*part)->intersect(*this)) && t < nearestT )
+                        nearestT = t;
+
+        return nearestT;
+    }
+
 }
 
