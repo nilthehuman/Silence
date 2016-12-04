@@ -98,10 +98,11 @@ namespace Silence {
                     // Spawn a separate Zone for each type of Material the Thing has
                     for ( int i = 0; i <= Material::REFRACT; i++ )
                     {
-                        if ( (Material::METALLIC == light.getKind() || Material::REFLECT == light.getKind()) && Material::DIFFUSE == i )
+                        const Material::Interaction interaction = Material::Interaction( i );
+                        if ( (Material::METALLIC == light.getKind() || Material::REFLECT == light.getKind()) && Material::DIFFUSE == interaction )
                             continue; // A "reasonable hack". Mirrors contribute extremely little to the illumination of diffuse surfaces
-                        if ( !equal(0, thing->interact(Material::Interaction(i)) ) )
-                            newBeams.push_back( (*part)->bounce(light, Material::Interaction(i)) );
+                        if ( !equal(0, thing->interact(interaction) ) )
+                            newBeams.push_back( (*part)->bounce(light, interaction) );
                     }
                 }
             }
@@ -179,11 +180,15 @@ namespace Silence {
     bool Zone::hit( const Surface* surface ) const
     {
         // TODO: accurate algorithm for narrow Beams.
+        if ( surface->getParent()->isBackCulled() && surface->behind(light.getSource()) )
+            return false;
         const std::vector< Vector > points = surface->getPoints( light.getApex() );
         for ( std::vector< Vector >::const_iterator point = points.begin(); point != points.end(); point++ )
             if ( light.contains(*point) )
-                if ( !surface->getParent()->isBackCulled() || !surface->behind(light.getSource()) )
-                    return true;
+            {
+                std::cout << "point " << *point << " hit." << std::endl;
+                return true;
+            }
         return false;
     }
 
