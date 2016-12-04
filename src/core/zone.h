@@ -36,14 +36,16 @@ namespace Silence {
     class Zone {
     public:
         Zone( const Beam& light )
-            : node( NULL ) // To be set later
+            : scene( light.getScene() )
+            , node( NULL ) // To be set later
             , light( light )
             , shadows()
         {
             this->light.setZone( this );
         }
         Zone( const Beam& light, const std::vector< Shadow >& shadows )
-            : node( NULL ) // To be set later
+            : scene( light.getScene() )
+            , node( NULL ) // To be set later
             , light( light )
             , shadows( shadows )
         {
@@ -77,7 +79,8 @@ namespace Silence {
         void rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* pixelBuffer, double* skyBlocked ) const;
 
     private:
-        const Tree<Zone>* node; // An unfortunate necessity
+        const Scene* const scene;
+        const Tree<Zone>*  node; // An unfortunate necessity
 
         Beam light; // Only a single light Beam per Zone is allowed
         std::vector< Shadow > shadows;

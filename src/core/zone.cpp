@@ -80,7 +80,7 @@ namespace Silence {
     {
         std::vector< Beam > newBeams;
         std::vector< Zone* > newZones;
-        for ( ThingIt thing = light.getScene()->thingsBegin(); thing != light.getScene()->thingsEnd(); thing++ )
+        for ( ThingIt thing = scene->thingsBegin(); thing != scene->thingsEnd(); thing++ )
             for ( ThingPartIt part = (*thing)->partsBegin(); part != (*thing)->partsEnd(); part++ )
             {
                 if ( Material::REFRACT == light.getKind() )
@@ -251,7 +251,7 @@ namespace Silence {
                                      if ( !light.getMedium() ) nextMedium = parentBeam.getMedium(); break;
             default: assert( false );
         }
-        Ray nextEyeray( light.getScene(), sourcePoint, nextDirection, nextMedium );
+        Ray nextEyeray( scene, sourcePoint, nextDirection, nextMedium );
         const double diffuseTerm = Material::DIFFUSE  == kind ? (*parentBeam.distribution)( parentBeam.pivot, nextEyeray.getOrigin() ) : 1;
         const double    tiltTerm = Material::DIFFUSE  == kind ? part->getTilt( sourcePoint, parentBeam ) : 1; // cos(angle of receiving surface)
         const double fresnelTerm = Material::METALLIC == kind ? light.fresnelIntensity( eyeray ) : 1;
