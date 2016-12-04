@@ -133,7 +133,7 @@ namespace Silence {
                     for ( Tree<Zone>::TreeIt child = children.begin(); child != children.end(); child++ )
                     {
                         if ( -1 == level || thisLevel == level )
-                            (*child)->getValue()->rasterize( *camera );
+                            pathsTotal += (*child)->getValue()->rasterize( *camera );
                         for ( Tree<Zone>::TreeIt grandchild = (*child)->childrenBegin(); grandchild != (*child)->childrenEnd(); grandchild++ )
                             grandchildren.push_back( *grandchild );
                     }
@@ -144,7 +144,10 @@ namespace Silence {
             (*camera)->gammaCorrect( gamma );
         }
         if ( modeFlags.verbose )
+        {
             std::cerr << "done." << std::endl;
+            std::cerr << "Renderer: total paths used: " << pathsTotal << std::endl;
+        }
     }
 
 }

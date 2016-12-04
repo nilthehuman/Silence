@@ -23,6 +23,7 @@
 #ifndef SILENCE_RENDERER
 #define SILENCE_RENDERER
 
+#include <atomic>
 #include <vector>
 
 #include "tree.h"
@@ -45,6 +46,7 @@ namespace Silence {
             , zoneForest()
             , zoneForestReady( false )
             , rendering( false )
+            , pathsTotal( 0 )
         { }
 
         void addCamera( Camera* camera );
@@ -53,9 +55,11 @@ namespace Silence {
         void render( int time, int depth, int level = -1, double cutoff = 0, double gamma = 1 );
 
     private:
+        // Phase One
         void buildZoneForest( int time, int depth, int level = -1, double cutoff = 0 );
         void clearZoneForest();
 
+        // Phase Two
         void rasterizeByPixel( int time, int level, double gamma );
         void rasterizeByZone ( int time, int level, double gamma );
 
@@ -68,6 +72,7 @@ namespace Silence {
         // State and housekeeping
         bool zoneForestReady;
         bool rendering;
+        std::atomic< int > pathsTotal;
     };
 
 }

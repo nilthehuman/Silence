@@ -146,7 +146,11 @@ namespace Silence {
                 skyBlocked[row] = new double[width];
 
             const BoundingBox bb = light.source->getBoundingBox( camera );
-            for ( int row = max(0, bb.topLeft.row); row < min(height, bb.bottomRight.row); ++row )
+            const int rowMin = max( 0, bb.topLeft.row );
+            const int rowMax = min( height, bb.bottomRight.row );
+            const int colMin = max( 0, bb.topLeft.col );
+            const int colMax = min( width, bb.bottomRight.col );
+            for ( int row = rowMin; row < rowMax; ++row )
                 rasterizeRow( camera, bb, row, pixelBuffer[row], skyBlocked[row] );
             // Write results directly in Camera's pixels array:
             // contributions from all Zones will be superimposed on each other

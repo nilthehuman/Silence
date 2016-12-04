@@ -140,7 +140,7 @@ namespace Silence {
         bool          behind ( const Vector& point ) const;
 
     private:
-        friend void Zone::rasterize( Camera* ) const;
+        friend int Zone::rasterize( Camera* ) const;
 
         friend std::istream& operator>>( std::istream& is, Camera& camera );
 
