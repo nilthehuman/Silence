@@ -22,6 +22,7 @@
 
 #include "zone.h"
 
+#include <algorithm>
 #include <cstdlib>
 
 #include "scene.h"
@@ -32,22 +33,44 @@ namespace Silence {
     void Zone::occlude( const Surface* surface )
     {
         const Vector& apex = light.getApex();
-        const Scene* scene = light.getScene();
         // The "outline" of the occluder
         const std::vector< Vector > points = surface->getPoints( apex );
         Vector center;
-        std::vector< Ray > edges;
-        for ( std::vector< Vector >::const_reverse_iterator p = points.rbegin(); p != points.rend(); p++ )
+        std::vector< Ray > penumbraEdges;
+        for ( std::vector< Vector >::const_iterator p = points.begin(); p != points.end(); p++ )
         {
             center += *p;
-            edges.push_back( *(new Ray(scene, *p, *p-apex)) );
+            penumbraEdges.push_back( Ray(scene, *p, *p-apex) );
         }
         center /= points.size();
         // The "outline" of the source of the light Beam
-        const std::vector< Vector > lightPoints = light.getSource()->getPoints( center );
-        Beam penumbra( scene, light.getApex(), surface, NULL, Ray(scene, center, center-apex), edges, RGB::Black, Beam::Zero );
-        // TODO: umbra
-        Beam umbra = penumbra;
+        std::vector< Vector > lightPoints = light.getSource()->getPoints( center );
+        std::vector< Vector > pointPairs;
+        // Find the corresponding lightPoint for each occluder point
+        for ( std::vector< Vector >::const_iterator p = points.begin(); p != points.end(); p++ )
+        {
+            if ( 0 == lightPoints.size() )
+                break;
+            double maxProduct = -1;
+            Vector pair = Vector::Invalid;
+            for ( std::vector< Vector >::const_iterator lp = lightPoints.begin(); lp != lightPoints.end(); lp++ )
+            {
+                const double product = (*lp-apex).normalized() * (*p-center).normalized();
+                if ( maxProduct < product )
+                {
+                    maxProduct = product;
+                    pair       = *lp;
+                }
+            }
+            assert( Vector::Invalid != pair );
+            pointPairs.push_back( pair );
+            lightPoints.erase( std::remove(lightPoints.begin(), lightPoints.end(), pair), lightPoints.end() );
+        }
+        std::vector< Ray > umbraEdges;
+        for ( unsigned int i = 0; i < points.size(); ++i )
+            umbraEdges.push_back( Ray(scene, points[i], points[i]-pointPairs[i]) );
+        Beam umbra   ( scene, apex, surface, NULL, Ray(scene, center, center-apex),    umbraEdges, RGB::Black, Beam::Zero );
+        Beam penumbra( scene, apex, surface, NULL, Ray(scene, center, center-apex), penumbraEdges, RGB::Black, Beam::Zero );
         Shadow newShadow( umbra, penumbra );
         shadows.push_back( newShadow );
     }
@@ -184,6 +207,13 @@ namespace Silence {
         return false;
     }
 
+    Triplet Zone::getColor( const Ray& eyeray ) const
+    {
+        if ( !light.contains(eyeray.getOrigin()) )
+            return RGB::Black;
+        return light.getColor() * getIntensity( NULL, eyeray );
+    }
+
     // Walk back up the Zone tree to see how much light is radiated in the viewing direction
     double Zone::getIntensity( const Surface* surface, const Ray& eyeray ) const
     {
@@ -237,14 +267,30 @@ namespace Silence {
             if ( !background && shadow->getSource()->getParent()->isBackground() )
                 continue; // Backgrounds cannot occlude non-backgrounds
             occlusion += (*shadow).occluded( point );
+            if ( 1 <= occlusion )
+                break;
         }
         return min( 1, occlusion );
     }
 
     void Zone::rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* pixelBuffer, double* skyBlocked ) const
     {
-        // TODO: Inline the whole function here
-        light.rasterizeRow( camera, bb, row, pixelBuffer, skyBlocked );
+        const int    gridwidth    = camera->getGridwidth();
+        const Vector viewpoint    = camera->getViewpoint();
+        const Vector leftEdge     = camera->getLeftEdge ( row );
+        const Vector rowDirection = camera->getRightEdge( row ) - leftEdge;
+        const double transparency = light.getSource()->getParent()->getTransparency();
+        for ( int col = max(0, bb.topLeft.col); col < min(gridwidth, bb.bottomRight.col); ++col )
+        {
+            const Vector screenPoint = leftEdge + rowDirection * ( (double)col/gridwidth );
+            const Ray eyeray( scene, screenPoint, screenPoint - viewpoint );
+            const double sourceT = light.getSource()->intersect( eyeray );
+            if ( 0 != sourceT  )
+            {
+                pixelBuffer[col] = getColor( eyeray ).normalize(); // Squash values into (0, 0, 0)..(1, 1, 1)
+                skyBlocked [col] = 1 - transparency;
+            }
+        }
     }
 
 }

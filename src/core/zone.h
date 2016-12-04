@@ -61,9 +61,10 @@ namespace Silence {
         std::vector< Zone* > bounce();                          // Generate child Zones
 
         // Phase Two
-        int    rasterize   ( Camera*    camera ) const; // Returs the number of paths used
-        double getIntensity( const Surface* surface, const Ray& eyeray ) const;
-        double occluded    ( const Surface* surface, const Vector& point, bool background = true ) const;
+        int     rasterize   ( Camera*        camera ) const; // Returs the number of paths used
+        Triplet getColor    ( const Ray&     eyeray ) const;
+        double  getIntensity( const Surface* surface, const Ray& eyeray ) const;
+        double  occluded    ( const Surface* surface, const Vector& point, bool background = true ) const;
 
     private:
         void setNode( const Tree<Zone>* n ) { node = n; }

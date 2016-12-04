@@ -102,7 +102,6 @@ namespace Silence {
 
         // Phase Two
         bool    contains    ( const Vector& point ) const;
-        Triplet getColor    ( const Ray&   eyeray ) const;
         void    rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* buffer, double* skyBlocked ) const;
 
     private:
