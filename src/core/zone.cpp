@@ -185,10 +185,7 @@ namespace Silence {
         const std::vector< Vector > points = surface->getPoints( light.getApex() );
         for ( std::vector< Vector >::const_iterator point = points.begin(); point != points.end(); point++ )
             if ( light.contains(*point) )
-            {
-                std::cout << "point " << *point << " hit." << std::endl;
                 return true;
-            }
         return false;
     }
 

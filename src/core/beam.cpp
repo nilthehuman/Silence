@@ -31,6 +31,8 @@ namespace Silence {
     bool Beam::contains( const Vector& point ) const
     {
         const Vector direction = point - apex;
+        if ( pivot.getDirection() * direction < 0 )
+            return false;
         const Ray ray( scene, apex, direction );
         const Vector testPoint = ray[ source->intersect(ray) ];
         if ( direction.length() + EPSILON < (testPoint - apex).length() )

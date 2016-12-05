@@ -344,17 +344,16 @@ namespace Silence {
         return BoundingBox( topLeft, bottomRight );
     }
 
-    std::vector< Vector > IPlane::getPoints( const Vector& viewpoint ) const
+    std::vector< Vector > IPlane::getPoints( const Vector& ) const
     {
-        const Vector viewnormal = (normal * offset - viewpoint).normalize();
         std::vector< Vector > points;
-        if ( Vector::UnitX == viewnormal || -Vector::UnitX == viewnormal )
-            points.push_back( normal * offset + viewnormal.cross(Vector::UnitY).normalize() );
+        if ( Vector::UnitX == normal || -Vector::UnitX == normal )
+            points.push_back( normal * offset + normal.cross(Vector::UnitY).normalize() );
         else
-            points.push_back( normal * offset + viewnormal.cross(Vector::UnitX).normalize() );
-        points.push_back( normal * offset + viewnormal.cross(points[0] - normal * offset) );
-        points.push_back( normal * offset + viewnormal.cross(points[1] - normal * offset) );
-        points.push_back( normal * offset + viewnormal.cross(points[2] - normal * offset) );
+            points.push_back( normal * offset + normal.cross(Vector::UnitX).normalize() );
+        points.push_back( normal * offset + normal.cross(points[0] - normal * offset) );
+        points.push_back( normal * offset + normal.cross(points[1] - normal * offset) );
+        points.push_back( normal * offset + normal.cross(points[2] - normal * offset) );
         for ( int i = 0; i < 4; ++i )
             points[i] *= INF;
         return points;
@@ -526,8 +525,11 @@ namespace Silence {
         switch ( interaction )
         {
             case Material::DIFFUSE:
-                newApex  = mirror( beam.getApex() );
+                newApex  = (points[0] + points[1] + points[2]) * 0.333;
                 newPivot = new Ray( beam.getScene(), hitPoint, getNormal(hitPoint) );
+                newEdges.push_back( Ray(beam.getScene(), points[0], points[0]-newApex) );
+                newEdges.push_back( Ray(beam.getScene(), points[1], points[1]-newApex) );
+                newEdges.push_back( Ray(beam.getScene(), points[2], points[2]-newApex) );
                 newDistribution = Beam::Planar;
                 break;
             case Material::METALLIC:
