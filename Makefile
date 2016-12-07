@@ -41,7 +41,7 @@ src/core/renderer.o: src/core/renderer.h src/core/camera.h src/core/scene.h src/
 
 src/core/scene.o: src/core/scene.h src/core/aux.h src/core/beam.h src/core/material.h src/core/ray.h src/core/tree.h src/core/triplet.h src/core/zone.h
 
-src/core/shadow.o: src/core/shadow.h src/core/beam.h
+src/core/shadow.o: src/core/shadow.h src/core/aux.h src/core/beam.h
 
 src/core/zone.o: src/core/zone.h src/core/beam.h src/core/camera.h src/core/shadow.h
 

@@ -60,6 +60,44 @@ namespace Silence {
         return inside;
     }
 
+    bool Beam::containsNew( const Vector& point ) const
+    {
+        const Vector direction = point - apex;
+        if ( pivot.getDirection() * direction < 0 )
+            return false;
+        if ( edges.size() < 3 )
+            return true;
+        // en.wikipedia.org/wiki/Point_in_polygon#Ray_casting_algorithm
+        const Vector normal = -direction.normalized();
+        const double offset = normal * point;
+        Plane plane( normal, offset );
+        std::vector< Vector > images;
+        for ( std::vector< Ray >::const_iterator edge = edges.begin(); edge != edges.end(); edge++ )
+        {
+            const double t = plane.intersect( *edge );
+            if ( equal(0, t) )
+                return false;
+            images.push_back( (*edge)[t] );
+        }
+        const Vector rayCast = (images[1] + images[0]) * 0.5 - point;
+        bool inside = false;
+        std::vector< Vector >::const_iterator imageA, imageB;
+        for ( imageA = images.begin(), imageB = images.begin() + 1;
+              imageA != images.end();
+              ++imageA, ++imageB == images.end() ? imageB = images.begin() : imageB )
+        {
+            const Vector a = *imageA - point;
+            const Vector b = *imageB - point;
+            const double dotA = rayCast * a.normalized();
+            const double dotB = rayCast * b.normalized();
+            if ( dotA + dotB < 0 )
+                continue; // the surface edge runs behind the test point
+            if ( rayCast.cross(a) * rayCast.cross(b) < 0 )
+                inside = !inside;
+        }
+        return inside;
+    }
+
     double Beam::fresnelIntensity( const Ray& eyeray, const Vector& point ) const
     {
         double n1, n2;

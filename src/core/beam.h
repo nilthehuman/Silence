@@ -102,6 +102,7 @@ namespace Silence {
 
         // Phase Two
         bool    contains    ( const Vector& point ) const;
+        bool    containsNew ( const Vector& point ) const;
         void    rasterizeRow( const Camera* camera, const BoundingBox& bb, int row, RGB* buffer, double* skyBlocked ) const;
 
     private:

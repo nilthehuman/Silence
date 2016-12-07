@@ -34,41 +34,87 @@ namespace Silence {
     {
         const Vector& apex = light.getApex();
         // The "outline" of the occluder
-        const std::vector< Vector > points = surface->getPoints( apex );
+        std::vector< Vector > points = surface->getPoints( apex );
         Vector center;
-        std::vector< Ray > penumbraEdges;
         for ( std::vector< Vector >::const_iterator p = points.begin(); p != points.end(); p++ )
-        {
             center += *p;
-            penumbraEdges.push_back( Ray(scene, *p, *p-apex) );
-        }
         center /= points.size();
         // The "outline" of the source of the light Beam
-        std::vector< Vector > lightPoints = light.getSource()->getPoints( center );
-        std::vector< Vector > pointPairs;
-        // Find the corresponding lightPoint for each occluder point
-        for ( std::vector< Vector >::const_iterator p = points.begin(); p != points.end(); p++ )
-        {
-            if ( 0 == lightPoints.size() )
-                break;
-            double maxProduct = -1;
-            Vector pair = Vector::Invalid;
-            for ( std::vector< Vector >::const_iterator lp = lightPoints.begin(); lp != lightPoints.end(); lp++ )
+        std::vector< Vector > umbraLightPoints = light.getSource()->getPoints( center );
+        std::vector< Vector > penumbraLightPoints( umbraLightPoints );
+        std::vector< Vector > umbraPoints, penumbraPoints;
+        std::vector< Vector > umbraPairs,  penumbraPairs;
+        // Find the corresponding and the opposing lightPoint for each occluder point
+        if ( 1 == umbraLightPoints.size() )
+            for ( std::vector< Vector >::const_iterator p = points.begin(); p != points.end(); p++ )
             {
-                const double product = (*lp-apex).normalized() * (*p-center).normalized();
-                if ( maxProduct < product )
-                {
-                    maxProduct = product;
-                    pair       = *lp;
-                }
+                umbraPoints.push_back( *p );
+                umbraPairs .push_back( apex );
+                penumbraPoints.push_back( *p );
+                penumbraPairs .push_back( apex );
             }
-            assert( Vector::Invalid != pair );
-            pointPairs.push_back( pair );
-            lightPoints.erase( std::remove(lightPoints.begin(), lightPoints.end(), pair), lightPoints.end() );
+        else
+        {
+            // Perhaps these loops could be refactored in a more functional style?
+            // Find the corresponding lightPoint for each occluder point
+            while ( umbraLightPoints.size() && points.size() )
+            {
+                double maxProduct = -1;
+                Vector umbraPoint = Vector::Invalid;
+                Vector umbraPair  = Vector::Invalid;
+                for ( std::vector< Vector >::const_iterator p = points.begin(); p != points.end(); p++ )
+                    for ( std::vector< Vector >::const_iterator ulp = umbraLightPoints.begin(); ulp != umbraLightPoints.end(); ulp++ )
+                    {
+                        const double product = (*ulp-apex).normalized() * (*p-center).normalized();
+                        if ( maxProduct < product )
+                        {
+                            maxProduct = product;
+                            umbraPoint = *p;
+                            umbraPair  = *ulp;
+                        }
+                    }
+                assert( 0 == umbraLightPoints.size() || Vector::Invalid != umbraPair );
+                if ( Vector::Invalid != umbraPair )
+                {
+                    umbraPoints.push_back( umbraPoint );
+                    umbraPairs .push_back( umbraPair );
+                }
+                points.erase( std::remove(points.begin(), points.end(), umbraPoint), points.end() );
+                umbraLightPoints.erase( std::remove(umbraLightPoints.begin(), umbraLightPoints.end(), umbraPair), umbraLightPoints.end() );
+            }
+            points = surface->getPoints( apex );
+            // Find the opposing lightPoint for each occluder point
+            while ( penumbraLightPoints.size() && points.size() )
+            {
+                double minProduct    = 2;
+                Vector penumbraPoint = Vector::Invalid;
+                Vector penumbraPair  = Vector::Invalid;
+                for ( std::vector< Vector >::const_iterator p = points.begin(); p != points.end(); p++ )
+                    for ( std::vector< Vector >::const_iterator plp = penumbraLightPoints.begin(); plp != penumbraLightPoints.end(); plp++ )
+                    {
+                        const double product = (*plp-apex).normalized() * (*p-center).normalized();
+                        if ( product < minProduct )
+                        {
+                            minProduct    = product;
+                            penumbraPoint = *p;
+                            penumbraPair  = *plp;
+                        }
+                    }
+                assert( 0 == penumbraLightPoints.size() || Vector::Invalid != penumbraPair );
+                if ( Vector::Invalid != penumbraPair )
+                {
+                    penumbraPoints.push_back( penumbraPoint );
+                    penumbraPairs .push_back( penumbraPair );
+                }
+                points.erase( std::remove(points.begin(), points.end(), penumbraPoint), points.end() );
+                penumbraLightPoints.erase( std::remove(penumbraLightPoints.begin(), penumbraLightPoints.end(), penumbraPair), penumbraLightPoints.end() );
+            }
         }
-        std::vector< Ray > umbraEdges;
-        for ( unsigned int i = 0; i < points.size(); ++i )
-            umbraEdges.push_back( Ray(scene, points[i], points[i]-pointPairs[i]) );
+        std::vector< Ray > umbraEdges, penumbraEdges;
+        for ( unsigned int i = 0; i < umbraPoints.size(); ++i )
+            umbraEdges.push_back( Ray(scene, umbraPoints[i], umbraPoints[i]-umbraPairs[i]) );
+        for ( unsigned int i = 0; i < penumbraPoints.size(); ++i )
+            penumbraEdges.push_back( Ray(scene, penumbraPoints[i], penumbraPoints[i]-penumbraPairs[i]) );
         Beam umbra   ( scene, apex, surface, NULL, Ray(scene, center, center-apex),    umbraEdges, RGB::Black, Beam::Zero );
         Beam penumbra( scene, apex, surface, NULL, Ray(scene, center, center-apex), penumbraEdges, RGB::Black, Beam::Zero );
         Shadow newShadow( umbra, penumbra );

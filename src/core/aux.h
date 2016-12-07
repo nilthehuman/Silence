@@ -37,6 +37,8 @@ namespace Silence {
     const double PI         = 3.141592654;
     const double TANPIOVER6 = 0.57735;
 
+    const int    PENUMBRAIP = 4; // How many iterations of faux interpolation to perform in the penumbra
+
     inline double  abs( double x )           { return x < 0 ? -x : x; }
     inline double sign( double x )           { return x < 0 ? -1 : x == 0 ? 0 : 1; }
     inline double  min( double a, double b ) { return a < b ?  a : b; }
