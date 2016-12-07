@@ -205,6 +205,8 @@ features small. (See the introductory section "What it is".)
 __Silence__ aims to be correct and unbiased, but it is not perfect and has some
 bugs. Please do NOT rely on __Silence__ to produce ground truth renders.
 
+  * No soft shadows yet
+  * Indirect illumination is unreliable
   * __Silence__ assumes that all light zones are spawned in vacuum so if your
 light source is inside a glass object it will look like the object is vacuum
 and it's _the world_ that's made of glass
