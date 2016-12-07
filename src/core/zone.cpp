@@ -318,6 +318,7 @@ namespace Silence {
                 continue; // Nothing can occlude itself
             if ( !background && shadow->getSource()->getParent()->isBackground() )
                 continue; // Backgrounds cannot occlude non-backgrounds
+            // This ignores the complications arising from overlapping occluders
             occlusion += (*shadow).occluded( point );
             if ( 1 <= occlusion )
                 break;
