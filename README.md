@@ -267,7 +267,7 @@ Email: nil.the.human at gmail dot com
 
 GitHub: https://github.com/nilthehuman
 
-#### __Q.__: __Silence__ doesn't parse my scene file right.
+#### __Q.__: __Silence__ won't parse my scene file right.
 __A.:__ You're probably missing a comma (`,`) between entries or a closing brace
 (`}`) somewhere. Also please note that JSON uses brackets (`[`...`]`) instead of
 parentheses (`(`...`)`) for tuples and lists. Try opening the file in a
