@@ -512,7 +512,8 @@ namespace Silence {
 
     Beam Triangle::bounce( const Beam& beam, const Material::Interaction& interaction ) const
     {
-        const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(), (points[0] + points[1] + points[2]) * 0.333 - beam.getPivot().getOrigin() );
+        const Ray adjustedPivot( beam.getScene(), beam.getPivot().getOrigin(),
+                                -getNormal(Vector::Invalid) + beam.getPivot().getDirection()*TANPIOVER6 );
         const Vector hitPoint = adjustedPivot[ intersect(adjustedPivot) ];
         const Thing* thing = static_cast<const Thing*>( parent );
 
@@ -530,7 +531,7 @@ namespace Silence {
                 newEdges.push_back( Ray(beam.getScene(), points[0], points[0]-newApex) );
                 newEdges.push_back( Ray(beam.getScene(), points[1], points[1]-newApex) );
                 newEdges.push_back( Ray(beam.getScene(), points[2], points[2]-newApex) );
-                newDistribution = Beam::Planar;
+                newDistribution = Beam::Triangular2;
                 break;
             case Material::METALLIC:
                 newApex  = mirror( beam.getApex() );
@@ -577,7 +578,7 @@ namespace Silence {
         edges.push_back( Ray(scene, points[0], points[0]-apex) );
         edges.push_back( Ray(scene, points[1], points[1]-apex) );
         edges.push_back( Ray(scene, points[2], points[2]-apex) );
-        Zone* up = new Zone( Beam(scene, apex, (Surface*)this, NULL, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Planar) );
+        Zone* up = new Zone( Beam(scene, apex, (Surface*)this, NULL, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Triangular) );
         out.push_back( new Tree<Zone>(up) );
         if ( !parent->isBackCulled() )
         {
@@ -585,7 +586,7 @@ namespace Silence {
             edges.push_back( Ray(scene, points[0], points[0]-apex) );
             edges.push_back( Ray(scene, points[1], points[1]-apex) );
             edges.push_back( Ray(scene, points[2], points[2]-apex) );
-            Zone* down = new Zone( Beam(scene, apex, (Surface*)this, NULL, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Planar) );
+            Zone* down = new Zone( Beam(scene, apex, (Surface*)this, NULL, Ray(scene, apex, normal), edges, ((Light*)parent)->getEmission(), &Beam::Triangular) );
             out.push_back( new Tree<Zone>(down) );
         }
     }

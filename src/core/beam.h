@@ -52,7 +52,13 @@ namespace Silence {
         static double Uniform( const Ray& pivot, const Vector& point )
         {
             const double distance = pivot.getDirection() * point - pivot.getDirection() * pivot.getOrigin();
-            return UNITDIST * UNITDIST / ( distance * distance );
+            return min( 1, UNITDIST * UNITDIST / (distance * distance) );
+        }
+        // This is what a Plane lit directly will look like
+        static double Planar( const Ray& pivot, const Vector& point )
+        {
+            // TODO
+            return Uniform( pivot, point );
         }
         // This is what a glowing Sphere will look like
         static double Spherical( const Ray& pivot, const Vector& point )
@@ -60,13 +66,22 @@ namespace Silence {
             const double distance = (point - pivot.getOrigin()).length();
             return UNITDIST * UNITDIST / ( distance * distance );
         }
-        // This is what a glowing Triangle will look like
-        static double Planar( const Ray& pivot, const Vector& point )
+        // Experimental distribution
+        static double Triangular2( const Ray& pivot, const Vector& point )
         {
             const Vector toPoint  = point - pivot.getOrigin();
             const double distance = toPoint.length();
             // The more edge-on you look at the source the less intensity you get
-            const double cosine   = pivot.getDirection() * toPoint.normalized();
+            const double cosine   = abs( pivot.getDirection() * toPoint.normalized() );
+            return (pivot.getDirection() == Vector::UnitY && pivot.getOrigin().y < 100 ? 0.5 : 20) * cosine * UNITDIST * UNITDIST / ( distance * distance );
+        }
+        // This is what a glowing Triangle will look like
+        static double Triangular( const Ray& pivot, const Vector& point )
+        {
+            const Vector toPoint  = point - pivot.getOrigin();
+            const double distance = toPoint.length();
+            // The more edge-on you look at the source the less intensity you get
+            const double cosine   = abs( pivot.getDirection() * toPoint.normalized() );
             return cosine * UNITDIST * UNITDIST / ( distance * distance );
         }
 
