@@ -1,12 +1,12 @@
 # __Silence__, an experimental 3D renderer
 
-Status: pre-alpha (as in "doesn't work yet")
+Status: alpha (as in "barely works yet")
 
 ### What it is
 
 __Silence__ is a proof-of-concept rendering program written in C++11 that uses
-something called zones instead of rays to calculate light transport efficiently.
-It also serves as the bulk of my bachelor's thesis.
+something called zones in combination with rays to calculate light transport
+more efficiently. It also serves as the main focus of [my bachelor's thesis][1].
 
 __Silence__ is the sister project of another small rendering program called
 __Retra__. __Retra__'s main purpose is to serve as a reference and benchmark
@@ -34,7 +34,7 @@ full source code is available under the same license terms as __Silence__.
 
 The best way to install __Silence__ is to build it from source on your machine.
 The following instructions are for Unix-like operating systems but __Silence__
-should be easy to build on Windows machines too with [MinGW][1]. You may have
+should be easy to build on Windows machines too with [MinGW][2]. You may have
 to change the line endings from LF to CRLF on Windows.
 The source is available on GitHub or as a tarball from [__TBA__]. Choose
 whatever is convenient for you.
@@ -50,7 +50,7 @@ git clone git://github.com/nilthehuman/Silence
 
 Go to the directory you want to download to, get the tarball and extract it:
 ```bash
-wget [...]
+wget [__TBA__]
 gunzip [file]
 tar -xvf [file]
 ```
@@ -59,7 +59,7 @@ tar -xvf [file]
 
 A Makefile is provided with the source so you don't have to build the program
 by hand. (GNU `make` is of course available in the official package repositories
-of all common GNU/Linux distributions or in the [MinGW suite][1] for Windows.)
+of all common GNU/Linux distributions or in the [MinGW suite][2] for Windows.)
 
 To compile __Silence__ with no graphical interface issue the following command in
 the folder you downloaded it to:
@@ -86,23 +86,24 @@ The following compilers have been tested and should work fine:
 ### Pre-built packages
 
 There are no pre-built binary packages available at this time.
+I expect to publish some binaries by the end of 2016.
 
 ## Dependencies
 
 __Silence__ relies on...
 
-  * [the C standard libraries][2] for math, string functions and assert
-  * [the C++ Standard Library][3] for stream I/O, timing, containers and
+  * [the C standard libraries][3] for math, string functions and assert
+  * [the C++ Standard Library][4] for stream I/O, timing, containers and
   iterators
-  * [OpenMP][4] for parallel processing
+  * [OpenMP][5] for parallel processing
 
 That's it, that's all you need to render to file. Since GCC comes with all of
 these built-in you've probably already got them.
 
 The graphical interface has the following additional dependencies:
 
-  * OpenGL or an equivalent replacement (like [Mesa][5])
-  * The OpenGL Utility Toolkit or an equivalent replacement (like [freeglut][6])
+  * OpenGL or an equivalent replacement (like [Mesa][6])
+  * The OpenGL Utility Toolkit or an equivalent replacement (like [freeglut][7])
 
 Both should be available in your favourite distro's official repositories.
 
@@ -126,14 +127,16 @@ you an estimate of the remaining time:
 ### Options
 
 __Silence__ is only a proof of concept and doesn't have too many knobs on it.
-Basically you can set the upper limit on __recursion depth__ and the __gamma
-correction__ exponent.
+Basically you can set the upper limit on __zone tree depth__, a __minimum
+intensity__ below which zones are traced no further and the __gamma correction__
+exponent.
 Type `./silence -h` for a full list of command line options.
 
-Example to render with a zone tree no deeper than 5 and no gamma correction:
+Example to render with a zone tree no deeper than 3, cutoff itensity of 0.5 and
+no gamma correction:
 
 ```bash
-./silence scene.json -v -d 5 -g 1
+./silence scene.json -v -d 3 -c 0.5 -g 1
 ```
 
 ## Features
@@ -203,7 +206,8 @@ features small. (See the introductory section "What it is".)
 ## Known bugs and shortcomings
 
 __Silence__ aims to be correct and unbiased, but it is not perfect and has some
-bugs. Please do NOT rely on __Silence__ to produce ground truth renders.
+bugs. Needless to say __Silence__ is NOT correct enough to produce ground truth
+renders.
 
   * No soft shadows yet
   * Indirect illumination is unreliable
@@ -238,7 +242,7 @@ Useful rules of thumb for keeping the interdependencies straight:
 
 ## Forking and Contributing
 
-Fork away to your heart's content. [The License][7] not only allows but
+Fork away to your heart's content. [The License][8] not only allows but
 encourages it. Do something amazing!
 
 Pull requests are welcome too as long as they don't inflate the codebase, but I
@@ -249,7 +253,7 @@ instead.
 ## License
 
 __Silence__ is free software released under the [GNU General Public License
-version 3][7].
+version 3][8].
 Please refer to the file named COPYING for more information.
 
 Copyright 2016 Dániel Arató
@@ -274,7 +278,7 @@ still get an error please drop me a mail or a message.
 #### __Q.__: Performance _sucks_.
 __A.:__ __Silence__ is not an industry grade renderer and features no
 optimizations to the basic zone tracing algorithm. The engine source is some
-??? actual lines of code.
+2000 actual lines of code.
 This is in keeping with the project's aim to be a compact demonstration of the
 method I call zone tracing. If you're trying to use a small pure-CPU toy to
 render blockbuster animations that's your problem anyway.
@@ -283,22 +287,23 @@ render blockbuster animations that's your problem anyway.
 __A.:__ Good question! I understand you're tired of legal overhead and all the
 free/non-free drama, but if you make programs or other digital content you
 _should_ license them. In most jurisdictions any written work (programs
-included) is [automatically copyrighted][8] once it is produced unless the
+included) is [automatically copyrighted][9] once it is produced unless the
 author expressly tells you how you can use it. Basically if you fail to license
 your program and someone else downloads it and starts playing with the source
 code they are already _commiting a crime_!
 _Any_ free license is better than not having a license at all. If you can't be
-bothered to care either way, just [slap a license on your work][9]. Pick GPL.
+bothered to care either way, just [slap a license on your work][10]. Pick GPL.
 Or pick one at random. You'll be doing everyone a solid.
-([Further reading.][10])
+([Further reading.][11])
 
-[1]:  http://www.mingw.org/wiki/HOWTO_Install_the_MinGW_GCC_Compiler_Suite
-[2]:  http://www.gnu.org/software/libc/
-[3]:  https://gcc.gnu.org/libstdc++/
-[4]:  https://gcc.gnu.org/onlinedocs/libgomp/Enabling-OpenMP.html
-[5]:  http://www.mesa3d.org/
-[6]:  http://sourceforge.net/projects/freeglut/
-[7]:  https://www.gnu.org/copyleft/gpl.html
-[8]:  https://help.github.com/articles/open-source-licensing/#what-happens-if-i-dont-choose-a-license
-[9]:  http://choosealicense.com/
-[10]: http://www.softwareliberty.com/
+[1]:  https://github.com/nilthehuman/thesis
+[2]:  http://www.mingw.org/wiki/HOWTO_Install_the_MinGW_GCC_Compiler_Suite
+[3]:  http://www.gnu.org/software/libc/
+[4]:  https://gcc.gnu.org/libstdc++/
+[5]:  https://gcc.gnu.org/onlinedocs/libgomp/Enabling-OpenMP.html
+[6]:  http://www.mesa3d.org/
+[7]:  http://sourceforge.net/projects/freeglut/
+[8]:  https://www.gnu.org/copyleft/gpl.html
+[9]:  https://help.github.com/articles/open-source-licensing/#what-happens-if-i-dont-choose-a-license
+[10]: http://choosealicense.com/
+[11]: http://www.softwareliberty.com/
