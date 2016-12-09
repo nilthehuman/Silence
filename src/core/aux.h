@@ -34,6 +34,7 @@ namespace Silence {
 
     const double UNITDIST   = 10; // Points at this distance from a Light receive 1.0 times its intensity
 
+    const double E          = 2.71828;
     const double PI         = 3.141592654;
     const double TANPIOVER6 = 0.57735;
 
