@@ -65,7 +65,7 @@ namespace Silence {
             (*light)->emitZones( zoneForest );
         for ( ForestIt tree = zoneForest.begin(); tree != zoneForest.end(); tree++ )
         {
-            (*tree)->getValue()->setNode( *tree );
+            (*tree)->getValue()->setNode( *tree ); // Wrap up the Zone's initialization
             for ( int d = 1; d < depth && (-1 == level || d - 1 < level); ++d )
             {
                 std::vector< Tree<Zone>* > leaves = (*tree)->getLeaves();

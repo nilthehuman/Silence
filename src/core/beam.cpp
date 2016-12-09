@@ -24,7 +24,6 @@
 
 #include "camera.h"
 #include "scene.h"
-#include "tree.h"
 
 namespace Silence {
 
